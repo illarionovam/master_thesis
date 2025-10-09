@@ -1,15 +1,15 @@
 import { Sequelize } from 'sequelize';
 import { AppUser } from '../models/appUser.js';
+import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 
-async function createAppUser({ username, email, hash_password, name, avatar_url }, { transaction } = {}) {
+async function createAppUser({ username, email, hash_password, name }, { transaction } = {}) {
     try {
         const appUser = await AppUser.create(
             {
                 username,
                 email,
                 hash_password,
-                name: name ?? null,
-                avatar_url: avatar_url ?? null,
+                name: normalizeOptionalText(name),
             },
             { transaction }
         );
