@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db/db.js';
+import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 
 export const AppUser = sequelize.define(
     'app_user',
@@ -20,7 +21,7 @@ export const AppUser = sequelize.define(
                 },
             },
             set(v) {
-                this.setDataValue('name', v?.trim() || null);
+                this.setDataValue('name', normalizeOptionalText(v));
             },
         },
         username: {
@@ -62,12 +63,7 @@ export const AppUser = sequelize.define(
             type: DataTypes.TEXT,
             allowNull: true,
             set(v) {
-                if (v == null) {
-                    this.setDataValue('avatar_url', null);
-                } else {
-                    const val = v.trim();
-                    this.setDataValue('avatar_url', val === '' ? null : val);
-                }
+                this.setDataValue('avatar_url', normalizeOptionalText(v));
             },
         },
     },
