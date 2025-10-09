@@ -1,7 +1,9 @@
-export default controllerWrapper => async (req, res, next) => {
-    try {
-        await controller(req, res, next);
-    } catch (error) {
-        next(error);
-    }
-};
+export default function controllerWrapper(controllerFn) {
+    return async (req, res, next) => {
+        try {
+            await Promise.resolve(controllerFn(req, res, next));
+        } catch (err) {
+            next(err);
+        }
+    };
+}

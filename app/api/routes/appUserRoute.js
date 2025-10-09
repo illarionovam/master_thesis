@@ -1,9 +1,10 @@
 import express from 'express';
 
 import appUserController from '../controllers/appUserController.js';
+import controllerWrapper from '../decorators/controllerWrapper.js';
 
 const appUserRoute = express.Router();
 
-appUserRoute.post('/signup', appUserController.createAppUser);
+appUserRoute.post('/signup', controllerWrapper(appUserController.createAppUser));
 
 export default appUserRoute;
