@@ -16,7 +16,7 @@ const stripAppUserResponse = appUser => {
     };
 };
 
-const createAppUser = async (req, res) => {
+const signUpAppUser = async (req, res) => {
     const { username, email, password, name } = req.body;
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -72,7 +72,18 @@ const signInAppUser = async (req, res) => {
     });
 };
 
+const signOutAppUser = async (req, res) => {
+    const { terminateAllSessions } = req.body;
+    if (terminateAllSessions === true) {
+        await tokenService.destroyTokenByOwnerId(req.appUser.id);
+    } else {
+        await tokenService.destroyTokenByTokenValue(req.token);
+    }
+    res.sendStatus(204);
+};
+
 export default {
-    createAppUser,
+    signUpAppUser,
     signInAppUser,
+    signOutAppUser,
 };
