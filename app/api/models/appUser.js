@@ -17,7 +17,7 @@ export const AppUser = sequelize.define(
             validate: {
                 len: {
                     args: [1, 255],
-                    msg: 'Name must contain between from 1 to 255 characters.',
+                    msg: 'Name must contain from 1 to 255 characters',
                 },
             },
             set(v) {
@@ -31,7 +31,7 @@ export const AppUser = sequelize.define(
             validate: {
                 len: {
                     args: [3, 60],
-                    msg: 'Username must contain from 3 to 60 characters.',
+                    msg: 'Username must contain from 3 to 60 characters',
                 },
             },
             set(v) {
@@ -44,11 +44,11 @@ export const AppUser = sequelize.define(
             unique: 'idx_app_user_email_unique',
             validate: {
                 isEmail: {
-                    msg: 'Email must be a valid email address.',
+                    msg: 'Email must be a valid email address',
                 },
                 len: {
                     args: [1, 255],
-                    msg: 'Email must contain no more than 255 characters.',
+                    msg: 'Email must contain no more than 255 characters',
                 },
             },
             set(v) {
@@ -60,11 +60,11 @@ export const AppUser = sequelize.define(
             allowNull: true,
             validate: {
                 isEmail: {
-                    msg: 'Email must be a valid email address.',
+                    msg: 'Email must be a valid email address',
                 },
                 len: {
                     args: [1, 255],
-                    msg: 'Email must contain no more than 255 characters.',
+                    msg: 'Email must contain no more than 255 characters',
                 },
             },
             set(v) {

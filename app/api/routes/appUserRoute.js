@@ -5,6 +5,6 @@ import controllerWrapper from '../decorators/controllerWrapper.js';
 
 const appUserRoute = express.Router();
 
-appUserRoute.post('/signup', controllerWrapper(appUserController.createAppUser));
+appUserRoute.post('/sign-up', controllerWrapper(appUserController.createAppUser));
 
 export default appUserRoute;

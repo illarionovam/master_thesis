@@ -21,7 +21,7 @@ export const Token = sequelize.define(
             validate: {
                 len: {
                     args: [16, 4096],
-                    msg: 'Token length must be between 16 and 4096 chars',
+                    msg: 'Token must contain from 16 to 4096 characters',
                 },
             },
         },
