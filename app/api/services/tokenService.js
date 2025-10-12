@@ -17,17 +17,17 @@ async function getTokenByTokenValue(tokenValue, { transaction } = {}) {
     return token;
 }
 
-async function destroyTokenByOwnerId(ownerId, { transaction } = {}) {
-    await Token.destroy({ where: { owner_id: ownerId }, transaction });
+async function destroyToken(token, { transaction } = {}) {
+    await token.destroy({ transaction });
 }
 
-async function destroyTokenByTokenValue(tokenValue, { transaction } = {}) {
-    await Token.destroy({ where: { token: tokenValue }, transaction });
+async function destroyTokenByOwnerId(ownerId, { transaction } = {}) {
+    await Token.destroy({ where: { owner_id: ownerId, scope: '*' }, transaction });
 }
 
 export default {
     createToken,
     getTokenByTokenValue,
+    destroyToken,
     destroyTokenByOwnerId,
-    destroyTokenByTokenValue,
 };

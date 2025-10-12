@@ -33,7 +33,7 @@ const authMiddleware = async (req, res, next) => {
 
         const token = await tokenService.getTokenByTokenValue(tokenValue);
 
-        if (token == null || token.owner_id !== decoded.iss || token.scope !== decoded.scope) {
+        if (token == null || token.owner_id !== decoded.sub || token.scope !== decoded.scope) {
             res.set(
                 'WWW-Authenticate',
                 'Bearer error="invalid_token", error_description="Revoked or mismatched token"'
@@ -41,7 +41,7 @@ const authMiddleware = async (req, res, next) => {
             return next(createHttpError(401, 'Unauthorized'));
         }
 
-        const appUser = await appUserService.getAppUser(decoded.iss);
+        const appUser = await appUserService.getAppUser(decoded.sub);
 
         req.appUser = appUser;
         req.token = token;
@@ -52,4 +52,19 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
-export default authMiddleware;
+const requireScope = needed => async (req, res, next) => {
+    if (req.token.scope !== needed) {
+        res.set(
+            'WWW-Authenticate',
+            `Bearer error="insufficient_scope", error_description="Token does not have the required scope", scope="${needed}"`
+        );
+        return next(createHttpError(403, 'Forbidden'));
+    }
+
+    return next();
+};
+
+export default {
+    authMiddleware,
+    requireScope,
+};

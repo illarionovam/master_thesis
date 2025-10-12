@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import { sequelize } from '../db/db.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
@@ -64,7 +65,7 @@ const signInAppUser = async (req, res) => {
         // у такому разі не даємо юзеру токен
     }
 
-    const token = jwt.sign({ iss: appUser.id, scope: '*' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ sub: appUser.id, scope: '*' }, process.env.JWT_SECRET, { expiresIn: '1d' });
     await tokenService.createToken({ owner_id: appUser.id, token, scope: '*' });
 
     res.json({
@@ -78,76 +79,94 @@ const signOutAppUser = async (req, res) => {
     if (terminateAllSessions === true) {
         await tokenService.destroyTokenByOwnerId(req.appUser.id);
     } else {
-        await tokenService.destroyTokenByTokenValue(req.token);
+        await tokenService.destroyToken(req.token);
     }
     res.sendStatus(204);
 };
 
 const resetAppUserPassword = async (req, res) => {
-    // тут саме forgot password, тобто ендпойнт працює без токена, відправка на імейл юзера лінки з токеном із scope=password_reset
-    // там вже дозволяється замінити пароль, і тоді вже викликається updateAppUserNormalFields
+    const { email } = req.body;
+
+    const appUser = await appUserService.getAppUserByEmail(email);
+
+    if (appUser != null) {
+        // якщо null, то юзера з таким імейлом нема, тож ми ішноруємо, але показуємо на-гора 200, щоб не дозволити енумерейтити
+
+        // тут саме forgot password, тобто ендпойнт працює без токена, відправка на імейл юзера лінки з токеном із scope=password_reset
+        // там вже дозволяється замінити пароль, і тоді вже викликається updateAppUserNormalFields
+        const token = jwt.sign({ sub: appUser.id, scope: 'password_reset' }, process.env.JWT_SECRET, {
+            expiresIn: '15m',
+        });
+        await tokenService.createToken({ owner_id: appUser.id, token, scope: 'password_reset' });
+
+        res.json({ token });
+    } else {
+        res.sendStatus(200); // потім прибрати else, бо воно завжди видаватиме на-гора 200
+    }
+
+    //res.sendStatus(200); // завжди 200, щоб не було енумерації, просто пишемо, що відправили на мейл, навіть якщо такий мейл вже є в базі
+    // - потім замінити, щоб не викидати токен у респонс, поки для тестування без імейлів мені потрібен респонс
 };
 
 const confirmAppUserPassword = async (req, res) => {
-    const { newPassword } = req.body ?? {};
-
-    const appUser = await appUserService.getAppUser(req.appUser.id);
-
-    if (appUser == null) {
-        throw createHttpError(404, 'User not found');
-    }
+    const { newPassword } = req.body;
 
     const hashPassword = await bcrypt.hash(newPassword, 10);
-    await appUserService.updateAppUser(appUser, { hash_password: hashPassword });
+
+    await sequelize.transaction(async t => {
+        await appUserService.updateAppUser(req.appUser, { hash_password: hashPassword }, { transaction: t });
+        await tokenService.destroyToken(req.token, { transaction: t }); // одразу зносимо токен зі скоупом пасворд ресет
+    });
 
     res.sendStatus(200);
 };
 
 const updateAppUserEmail = async (req, res) => {
-    const { newEmail } = req.body ?? {};
-
-    const appUser = await appUserService.getAppUser(req.appUser.id);
-
-    if (appUser == null) {
-        throw createHttpError(404, 'User not found');
-    }
+    const { newEmail } = req.body;
 
     if (newEmail != null) {
-        await appUserService.updateAppUser(appUser, { new_email: newEmail.trim() });
+        const token = await sequelize.transaction(async t => {
+            await appUserService.updateAppUser(req.appUser, { new_email: newEmail.trim() }, { transaction: t });
+            const token = jwt.sign({ sub: req.appUser.id, scope: 'email_verify' }, process.env.JWT_SECRET, {
+                expiresIn: '15m',
+            });
+            await tokenService.createToken(
+                { owner_id: req.appUser.id, token, scope: 'email_verify' },
+                { transaction: t }
+            );
+            return token;
+        });
+
+        res.json({ token });
         // тут відправляємо імейл на підтвердження з токеном scope=email_verify
+    } else {
+        res.sendStatus(200); // потім прибрати else, бо воно завжди видаватиме на-гора 200
     }
 
-    res.sendStatus(200); // завжди 200, щоб не було енумерації, просто пишемо, що відправили на мейл, навіть якщо такий мейл вже є в базі
+    //res.sendStatus(200); // завжди 200, щоб не було енумерації, просто пишемо, що відправили на мейл, навіть якщо такий мейл вже є в базі
+    // - потім замінити, щоб не викидати токен у респонс, поки для тестування без імейлів мені потрібен респонс
 };
 
 const confirmAppUserEmail = async (req, res) => {
-    const appUser = await appUserService.getAppUser(req.appUser.id);
-
-    if (appUser == null) {
-        throw createHttpError(404, 'User not found');
-    }
-
     const payload = {};
 
-    if (!appUser.verified) {
+    if (!req.appUser.verified) {
         payload.verified = true;
     } else {
-        payload.email = appUser.new_email;
+        payload.email = req.appUser.new_email;
         payload.new_email = null;
     }
 
-    await appUserService.updateAppUser(appUser, payload);
+    await sequelize.transaction(async t => {
+        await appUserService.updateAppUser(req.appUser, payload, { transaction: t });
+        await tokenService.destroyToken(req.token, { transaction: t }); // одразу зносимо токен зі скоупом веріфай імейл
+    });
+
     res.sendStatus(200);
 };
 
 const updateAppUserNormalFields = async (req, res) => {
     const { name, username, newPassword, avatarUrl, password } = req.body ?? {};
-
-    const appUser = await appUserService.getAppUser(req.appUser.id);
-
-    if (appUser == null) {
-        throw createHttpError(404, 'User not found');
-    }
 
     const payload = {};
 
@@ -162,7 +181,7 @@ const updateAppUserNormalFields = async (req, res) => {
             throw createHttpError(400, 'Current password is required to set a new password');
         }
 
-        const passwordIsCorrect = await bcrypt.compare(password, appUser.hash_password);
+        const passwordIsCorrect = await bcrypt.compare(password, req.appUser.hash_password);
 
         if (!passwordIsCorrect) {
             throw createHttpError(401, 'Incorrect credentials');
@@ -172,7 +191,7 @@ const updateAppUserNormalFields = async (req, res) => {
     }
 
     if (Object.keys(payload).length > 0) {
-        await appUserService.updateAppUser(appUser, payload);
+        await appUserService.updateAppUser(req.appUser, payload);
     }
 
     res.sendStatus(200);
