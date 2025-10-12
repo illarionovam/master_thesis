@@ -1,6 +1,8 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db/db.js';
 
+const ALLOWED_SCOPES = ['*', 'email_verify', 'password_reset'];
+
 export const Token = sequelize.define(
     'token',
     {
@@ -23,6 +25,23 @@ export const Token = sequelize.define(
                     args: [16, 4096],
                     msg: 'Token must contain from 16 to 4096 characters',
                 },
+            },
+        },
+        scope: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+            validate: {
+                len: {
+                    args: [1, 255],
+                    msg: 'Scope must contain from 1 to 255 characters',
+                },
+                isIn: {
+                    args: [ALLOWED_SCOPES],
+                    msg: `Scope must be one of: ${ALLOWED_SCOPES.join(', ')}`,
+                },
+            },
+            set(v) {
+                this.setDataValue('scope', v?.trim());
             },
         },
     },

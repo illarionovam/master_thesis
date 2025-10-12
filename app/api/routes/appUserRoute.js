@@ -12,5 +12,6 @@ appUserRoute.post('/sign-in', controllerWrapper(appUserController.signInAppUser)
 appUserRoute.use(authMiddleware);
 
 appUserRoute.post('/sign-out', controllerWrapper(appUserController.signOutAppUser));
+appUserRoute.post('/update', controllerWrapper(appUserController.updateAppUserNormalFields));
 
 export default appUserRoute;

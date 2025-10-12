@@ -1,12 +1,21 @@
 import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
-import { getAuthorizationHeaderValue } from '../helpers/getAuthorizationHeaderValue.js';
 import tokenService from '../services/tokenService.js';
 import appUserService from '../services/appUserService.js';
 
 const authMiddleware = async (req, res, next) => {
     try {
-        const tokenValue = getAuthorizationHeaderValue(req, res, next);
+        const authHeader = req.headers.authorization;
+
+        if (authHeader == null || !authHeader.startsWith('Bearer ')) {
+            res.set(
+                'WWW-Authenticate',
+                'Bearer error="invalid_request", error_description="Missing or malformed Authorization header"'
+            );
+            return next(createHttpError(401, 'Unauthorized'));
+        }
+
+        const tokenValue = authHeader.split(' ')[1];
 
         let decoded;
         try {
@@ -23,9 +32,8 @@ const authMiddleware = async (req, res, next) => {
         }
 
         const token = await tokenService.getTokenByTokenValue(tokenValue);
-        const appUser = await appUserService.getAppUser(decoded.id);
 
-        if (token == null || token.owner_id !== appUser.id) {
+        if (token == null || token.owner_id !== decoded.iss || token.scope !== decoded.scope) {
             res.set(
                 'WWW-Authenticate',
                 'Bearer error="invalid_token", error_description="Revoked or mismatched token"'
@@ -33,8 +41,10 @@ const authMiddleware = async (req, res, next) => {
             return next(createHttpError(401, 'Unauthorized'));
         }
 
+        const appUser = await appUserService.getAppUser(decoded.iss);
+
         req.appUser = appUser;
-        req.token = tokenValue;
+        req.token = token;
 
         return next();
     } catch (err) {

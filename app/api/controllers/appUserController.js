@@ -60,11 +60,12 @@ const signInAppUser = async (req, res) => {
         throw createHttpError(403, 'Unverified email');
         // тут показуємо плашку, шо ніфіга, треба підтвердити імейл, проглянь свою пошту
         // якщо загубив, запропонувати прислати знову
+        // так як введено правильний пароль, то це не енумерація, дозволено показати, що відправляємо мейл
         // у такому разі не даємо юзеру токен
     }
 
-    const token = jwt.sign({ id: appUser.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    await tokenService.createToken({ owner_id: appUser.id, token });
+    const token = jwt.sign({ iss: appUser.id, scope: '*' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    await tokenService.createToken({ owner_id: appUser.id, token, scope: '*' });
 
     res.json({
         token,
@@ -73,7 +74,7 @@ const signInAppUser = async (req, res) => {
 };
 
 const signOutAppUser = async (req, res) => {
-    const { terminateAllSessions } = req.body;
+    const { terminateAllSessions } = req.body ?? {};
     if (terminateAllSessions === true) {
         await tokenService.destroyTokenByOwnerId(req.appUser.id);
     } else {
@@ -82,8 +83,108 @@ const signOutAppUser = async (req, res) => {
     res.sendStatus(204);
 };
 
+const resetAppUserPassword = async (req, res) => {
+    // тут саме forgot password, тобто ендпойнт працює без токена, відправка на імейл юзера лінки з токеном із scope=password_reset
+    // там вже дозволяється замінити пароль, і тоді вже викликається updateAppUserNormalFields
+};
+
+const confirmAppUserPassword = async (req, res) => {
+    const { newPassword } = req.body ?? {};
+
+    const appUser = await appUserService.getAppUser(req.appUser.id);
+
+    if (appUser == null) {
+        throw createHttpError(404, 'User not found');
+    }
+
+    const hashPassword = await bcrypt.hash(newPassword, 10);
+    await appUserService.updateAppUser(appUser, { hash_password: hashPassword });
+
+    return res.sendStatus(200);
+};
+
+const updateAppUserEmail = async (req, res) => {
+    const { newEmail } = req.body ?? {};
+
+    const appUser = await appUserService.getAppUser(req.appUser.id);
+
+    if (appUser == null) {
+        throw createHttpError(404, 'User not found');
+    }
+
+    if (newEmail != null) {
+        await appUserService.updateAppUser(appUser, { new_email: newEmail.trim() });
+        // тут відправляємо імейл на підтвердження з токеном scope=email_verify
+    }
+
+    return res.sendStatus(200); // завжди 200, щоб не було енумерації, просто пишемо, що відправили на мейл, навіть якщо такий мейл вже є в базі
+};
+
+const confirmAppUserEmail = async (req, res) => {
+    const appUser = await appUserService.getAppUser(req.appUser.id);
+
+    if (appUser == null) {
+        throw createHttpError(404, 'User not found');
+    }
+
+    const payload = {};
+
+    if (!appUser.verified) {
+        payload.verified = true;
+    } else {
+        payload.email = appUser.new_email;
+        payload.new_email = null;
+    }
+
+    const updatedAppUser = await appUserService.updateAppUser(appUser, payload);
+    return res.json(stripAppUserResponse(updatedAppUser));
+};
+
+const updateAppUserNormalFields = async (req, res) => {
+    const { name, username, newPassword, avatarUrl, password } = req.body ?? {};
+
+    const appUser = await appUserService.getAppUser(req.appUser.id);
+
+    if (appUser == null) {
+        throw createHttpError(404, 'User not found');
+    }
+
+    const payload = {};
+
+    if (typeof name !== 'undefined') payload.name = normalizeOptionalText(name); // дозволяємо занулити
+    if (username != null) payload.username = username.trim(); // тут лише замінити, занулити НЕ дозволяємо
+    if (typeof avatarUrl !== 'undefined') payload.avatar_url = normalizeOptionalText(avatarUrl); // дозволяємо занулити
+
+    const wantsPasswordChange = typeof newPassword === 'string' && newPassword.trim() !== '';
+
+    if (wantsPasswordChange) {
+        if (typeof password !== 'string' || password.length === 0) {
+            throw createHttpError(400, 'Current password is required to set a new password');
+        }
+
+        const passwordIsCorrect = await bcrypt.compare(password, appUser.hash_password);
+
+        if (!passwordIsCorrect) {
+            throw createHttpError(401, 'Incorrect credentials');
+        }
+
+        payload.hash_password = await bcrypt.hash(newPassword, 10);
+    }
+
+    if (Object.keys(payload).length > 0) {
+        await appUserService.updateAppUser(appUser, payload);
+    }
+
+    res.sendStatus(200);
+};
+
 export default {
     signUpAppUser,
     signInAppUser,
     signOutAppUser,
+    resetAppUserPassword,
+    confirmAppUserPassword,
+    updateAppUserEmail,
+    confirmAppUserEmail,
+    updateAppUserNormalFields,
 };
