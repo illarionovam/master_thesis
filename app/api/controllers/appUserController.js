@@ -100,7 +100,7 @@ const confirmAppUserPassword = async (req, res) => {
     const hashPassword = await bcrypt.hash(newPassword, 10);
     await appUserService.updateAppUser(appUser, { hash_password: hashPassword });
 
-    return res.sendStatus(200);
+    res.sendStatus(200);
 };
 
 const updateAppUserEmail = async (req, res) => {
@@ -117,7 +117,7 @@ const updateAppUserEmail = async (req, res) => {
         // тут відправляємо імейл на підтвердження з токеном scope=email_verify
     }
 
-    return res.sendStatus(200); // завжди 200, щоб не було енумерації, просто пишемо, що відправили на мейл, навіть якщо такий мейл вже є в базі
+    res.sendStatus(200); // завжди 200, щоб не було енумерації, просто пишемо, що відправили на мейл, навіть якщо такий мейл вже є в базі
 };
 
 const confirmAppUserEmail = async (req, res) => {
@@ -136,8 +136,8 @@ const confirmAppUserEmail = async (req, res) => {
         payload.new_email = null;
     }
 
-    const updatedAppUser = await appUserService.updateAppUser(appUser, payload);
-    return res.json(stripAppUserResponse(updatedAppUser));
+    await appUserService.updateAppUser(appUser, payload);
+    res.sendStatus(200);
 };
 
 const updateAppUserNormalFields = async (req, res) => {
