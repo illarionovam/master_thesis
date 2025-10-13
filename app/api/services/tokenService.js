@@ -5,14 +5,12 @@ async function createToken(payload, { transaction } = {}) {
 }
 
 async function getTokenByTokenValue(tokenValue, { transaction } = {}) {
-    const token = await Token.findOne({
+    return Token.findOne({
         where: {
             token: tokenValue,
         },
         transaction,
     });
-
-    return token;
 }
 
 async function destroyToken(token, { transaction } = {}) {

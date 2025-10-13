@@ -5,20 +5,16 @@ async function createAppUser(payload, { transaction } = {}) {
 }
 
 async function getAppUser(id, { transaction } = {}) {
-    const appUser = await AppUser.findByPk(id, { transaction });
-
-    return appUser;
+    return AppUser.findByPk(id, { transaction });
 }
 
 async function getAppUserByEmail(email, { transaction } = {}) {
-    const appUser = await AppUser.findOne({
+    return AppUser.findOne({
         where: {
             email: email,
         },
         transaction,
     });
-
-    return appUser;
 }
 
 async function updateAppUser(appUser, payload, { transaction } = {}) {

@@ -1,32 +1,26 @@
 import { Work } from '../models/work.js';
 
 async function createWork(payload, { transaction } = {}) {
-    const work = await Work.create(payload, { transaction });
-
-    return work;
+    return Work.create(payload, { transaction });
 }
 
 async function getWork(id, ownerId, { transaction } = {}) {
-    const work = await Work.findOne({
+    return Work.findOne({
         where: {
             id,
             owner_id: ownerId,
         },
         transaction,
     });
-
-    return work;
 }
 
-async function getWorksByOwnerId(ownerId, { transaction } = {}) {
-    const works = await Work.findAll({
+async function getWorks(ownerId, { transaction } = {}) {
+    return Work.findAll({
         where: {
             owner_id: ownerId,
         },
         transaction,
     });
-
-    return works;
 }
 
 async function updateWork(work, payload, { transaction } = {}) {
@@ -41,7 +35,7 @@ async function destroyWork(work, { transaction } = {}) {
 export default {
     createWork,
     getWork,
-    getWorksByOwnerId,
+    getWorks,
     updateWork,
     destroyWork,
 };

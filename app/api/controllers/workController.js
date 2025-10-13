@@ -40,7 +40,7 @@ const getWork = async (req, res) => {
 };
 
 const getWorks = async (req, res) => {
-    const works = await workService.getWorksByOwnerId(req.appUser.id);
+    const works = await workService.getWorks(req.appUser.id);
 
     res.json(works.map(stripWorkResponse));
 };
