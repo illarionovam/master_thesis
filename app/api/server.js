@@ -3,8 +3,10 @@ import express from 'express';
 import cors from 'cors';
 import apiRouter from './routes/index.js';
 import { handleErrors } from './middlewares/handleErrors.js';
-
 import { sequelize } from './db/db.js';
+import { initModels } from './db/initModels.js';
+
+await initModels();
 
 const app = express();
 const SERVER_PORT = process.env.SERVER_PORT || 3000;
@@ -16,10 +18,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api', apiRouter);
 
 app.use(handleErrors);
-
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
 
 try {
     await sequelize.authenticate();

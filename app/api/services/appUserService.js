@@ -1,9 +1,7 @@
 import { AppUser } from '../models/appUser.js';
 
 async function createAppUser(payload, { transaction } = {}) {
-    const appUser = await AppUser.create(payload, { transaction });
-
-    return appUser;
+    await AppUser.create(payload, { transaction });
 }
 
 async function getAppUser(id, { transaction } = {}) {
@@ -26,8 +24,6 @@ async function getAppUserByEmail(email, { transaction } = {}) {
 async function updateAppUser(appUser, payload, { transaction } = {}) {
     appUser.set(payload);
     await appUser.save({ transaction });
-
-    return appUser;
 }
 
 export default {

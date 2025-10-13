@@ -43,6 +43,11 @@ const authMiddleware = async (req, res, next) => {
 
         const appUser = await appUserService.getAppUser(decoded.sub);
 
+        if (!appUser.verified && token.scope !== 'email_verify') {
+            res.set('WWW-Authenticate', 'Bearer error="insufficient_scope", scope="email_verify"');
+            return next(createHttpError(403, 'Unverified email'));
+        }
+
         req.appUser = appUser;
         req.token = token;
 

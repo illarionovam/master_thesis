@@ -13,7 +13,9 @@ const stripAppUserResponse = appUser => {
         username: appUser.username,
         email: appUser.email,
         name: appUser.name,
-        avatar_url: appUser.avatar_url,
+        avatarUrl: appUser.avatar_url,
+        updatedAt: appUser.updated_at,
+        createdAt: appUser.created_at,
     };
 };
 
@@ -24,8 +26,8 @@ const signUpAppUser = async (req, res) => {
 
     try {
         await appUserService.createAppUser({
-            username,
-            email,
+            username: username.trim(),
+            email: email.trim(),
             hash_password: hashPassword,
             name: normalizeOptionalText(name),
         });
@@ -34,10 +36,6 @@ const signUpAppUser = async (req, res) => {
             throw err;
         }
     }
-
-    // тут сказати, що відправили імейл на підтвердження
-    // якщо в нас Sequelize.UniqueConstraintError; - значить, такий юзер вже є, але це небезпечно показувати 209 конфлікт, так як це загроза enumeration
-    // тому в такому випадку просто кажемо, що відправили імейл, але не відправляємо
 
     res.sendStatus(201);
 };
@@ -59,10 +57,6 @@ const signInAppUser = async (req, res) => {
 
     if (!appUser.verified) {
         throw createHttpError(403, 'Unverified email');
-        // тут показуємо плашку, шо ніфіга, треба підтвердити імейл, проглянь свою пошту
-        // якщо загубив, запропонувати прислати знову
-        // так як введено правильний пароль, то це не енумерація, дозволено показати, що відправляємо мейл
-        // у такому разі не даємо юзеру токен
     }
 
     const token = jwt.sign({ sub: appUser.id, scope: '*' }, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -90,22 +84,13 @@ const resetAppUserPassword = async (req, res) => {
     const appUser = await appUserService.getAppUserByEmail(email);
 
     if (appUser != null) {
-        // якщо null, то юзера з таким імейлом нема, тож ми ішноруємо, але показуємо на-гора 200, щоб не дозволити енумерейтити
-
-        // тут саме forgot password, тобто ендпойнт працює без токена, відправка на імейл юзера лінки з токеном із scope=password_reset
-        // там вже дозволяється замінити пароль, і тоді вже викликається updateAppUserNormalFields
         const token = jwt.sign({ sub: appUser.id, scope: 'password_reset' }, process.env.JWT_SECRET, {
             expiresIn: '15m',
         });
         await tokenService.createToken({ owner_id: appUser.id, token, scope: 'password_reset' });
-
-        res.json({ token });
-    } else {
-        res.sendStatus(200); // потім прибрати else, бо воно завжди видаватиме на-гора 200
     }
 
-    //res.sendStatus(200); // завжди 200, щоб не було енумерації, просто пишемо, що відправили на мейл, навіть якщо такий мейл вже є в базі
-    // - потім замінити, щоб не викидати токен у респонс, поки для тестування без імейлів мені потрібен респонс
+    res.sendStatus(200);
 };
 
 const confirmAppUserPassword = async (req, res) => {
@@ -115,7 +100,7 @@ const confirmAppUserPassword = async (req, res) => {
 
     await sequelize.transaction(async t => {
         await appUserService.updateAppUser(req.appUser, { hash_password: hashPassword }, { transaction: t });
-        await tokenService.destroyToken(req.token, { transaction: t }); // одразу зносимо токен зі скоупом пасворд ресет
+        await tokenService.destroyToken(req.token, { transaction: t });
     });
 
     res.sendStatus(200);
@@ -125,7 +110,7 @@ const updateAppUserEmail = async (req, res) => {
     const { newEmail } = req.body;
 
     if (newEmail != null) {
-        const token = await sequelize.transaction(async t => {
+        await sequelize.transaction(async t => {
             await appUserService.updateAppUser(req.appUser, { new_email: newEmail.trim() }, { transaction: t });
             const token = jwt.sign({ sub: req.appUser.id, scope: 'email_verify' }, process.env.JWT_SECRET, {
                 expiresIn: '15m',
@@ -134,17 +119,10 @@ const updateAppUserEmail = async (req, res) => {
                 { owner_id: req.appUser.id, token, scope: 'email_verify' },
                 { transaction: t }
             );
-            return token;
         });
-
-        res.json({ token });
-        // тут відправляємо імейл на підтвердження з токеном scope=email_verify
-    } else {
-        res.sendStatus(200); // потім прибрати else, бо воно завжди видаватиме на-гора 200
     }
 
-    //res.sendStatus(200); // завжди 200, щоб не було енумерації, просто пишемо, що відправили на мейл, навіть якщо такий мейл вже є в базі
-    // - потім замінити, щоб не викидати токен у респонс, поки для тестування без імейлів мені потрібен респонс
+    res.sendStatus(200);
 };
 
 const confirmAppUserEmail = async (req, res) => {
@@ -159,7 +137,7 @@ const confirmAppUserEmail = async (req, res) => {
 
     await sequelize.transaction(async t => {
         await appUserService.updateAppUser(req.appUser, payload, { transaction: t });
-        await tokenService.destroyToken(req.token, { transaction: t }); // одразу зносимо токен зі скоупом веріфай імейл
+        await tokenService.destroyToken(req.token, { transaction: t });
     });
 
     res.sendStatus(200);
@@ -170,9 +148,9 @@ const updateAppUserNormalFields = async (req, res) => {
 
     const payload = {};
 
-    if (typeof name !== 'undefined') payload.name = normalizeOptionalText(name); // дозволяємо занулити
-    if (username != null) payload.username = username.trim(); // тут лише замінити, занулити НЕ дозволяємо
-    if (typeof avatarUrl !== 'undefined') payload.avatar_url = normalizeOptionalText(avatarUrl); // дозволяємо занулити
+    if (typeof name !== 'undefined') payload.name = normalizeOptionalText(name);
+    if (username != null) payload.username = username.trim();
+    if (typeof avatarUrl !== 'undefined') payload.avatar_url = normalizeOptionalText(avatarUrl);
 
     const wantsPasswordChange = typeof newPassword === 'string' && newPassword.trim() !== '';
 
