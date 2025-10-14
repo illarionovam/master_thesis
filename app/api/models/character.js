@@ -79,6 +79,13 @@ export const Character = sequelize.define(
             type: DataTypes.JSONB,
             allowNull: false,
             defaultValue: {},
+            validate: {
+                isObject(value) {
+                    if (value == null || typeof value !== 'object' || Array.isArray(value)) {
+                        throw new Error('Attributes must be a JSON object');
+                    }
+                },
+            },
         },
     },
     {
