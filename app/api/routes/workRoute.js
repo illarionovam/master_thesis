@@ -6,7 +6,7 @@ import workController from '../controllers/workController.js';
 
 const workRoute = express.Router();
 
-workRoute.use(authMiddleware.authMiddleware);
+workRoute.use(controllerWrapper(authMiddleware.authMiddleware));
 
 workRoute.get('/', controllerWrapper(workController.getWorks));
 workRoute.post('/', controllerWrapper(workController.createWork));
