@@ -23,6 +23,26 @@ async function getCharacters(ownerId, { transaction } = {}) {
     });
 }
 
+async function getCharactersNotLinkedToWork(workId, ownerId, { transaction } = {}) {
+    return Character.findAll({
+        where: {
+            owner_id: ownerId,
+            '$appearances.id$': null,
+        },
+        include: [
+            {
+                model: CharacterInWork,
+                as: 'appearances',
+                attributes: [],
+                required: false,
+                where: { work_id: workId },
+            },
+        ],
+        transaction,
+        subQuery: false,
+    });
+}
+
 async function updateCharacter(character, payload, { transaction } = {}) {
     character.set(payload);
     await character.save({ transaction });
@@ -36,6 +56,7 @@ export default {
     createCharacter,
     getCharacter,
     getCharacters,
+    getCharactersNotLinkedToWork,
     updateCharacter,
     destroyCharacter,
 };

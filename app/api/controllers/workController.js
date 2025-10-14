@@ -3,6 +3,8 @@ import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
+import characterInWorkController from './characterController.js';
+import characterController from './characterController.js';
 
 const stripWorkResponse = work => {
     return {
@@ -108,11 +110,54 @@ const linkCharacter = async (req, res) => {
     res.status(201).json(characterInWork);
 };
 
+const unlinkCharacter = async (req, res) => {
+    const { characterInWorkId } = req.params;
+
+    const characterInWork = await characterInWorkService.getCharacterInWork({
+        characterInWorkId,
+        ownerId,
+    });
+
+    if (characterInWork == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    await characterInWorkService.destroyCharacterInWork(characterInWork);
+
+    res.sendStatus(204);
+};
+
+const getWorkCast = async (req, res) => {
+    const { id } = req.params;
+
+    const cast = await characterInWorkService.getCharactersInWorkByWorkId(id, req.appUser.id);
+
+    res.json(cast.map(characterInWorkController.stripCharacterInWorkResponse));
+};
+
+const getWorkPossibleCast = async (req, res) => {
+    const { id } = req.params;
+
+    const work = await workService.getWork(id, req.appUser.id);
+
+    if (work == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const possibleCast = await characterService.getCharactersNotLinkedToWork(id, req.appUser.id);
+
+    res.json(possibleCast.map(characterController.stripCharacterResponse));
+};
+
 export default {
+    stripWorkResponse,
     createWork,
     getWork,
     getWorks,
     updateWork,
     destroyWork,
     linkCharacter,
+    unlinkCharacter,
+    getWorkCast,
+    getWorkPossibleCast,
 };

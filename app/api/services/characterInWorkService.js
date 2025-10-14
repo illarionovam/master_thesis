@@ -120,7 +120,7 @@ async function updateCharacterInWork(characterInWork, payload, { transaction } =
     await characterInWork.save({ transaction });
 }
 
-async function destroyCharacter(characterInWork, { transaction } = {}) {
+async function destroyCharacterInWork(characterInWork, { transaction } = {}) {
     await characterInWork.destroy({ transaction });
 }
 
@@ -132,5 +132,5 @@ export default {
     getCharactersInWorkByCharacterId,
     getCharactersInWorkByWorkId,
     updateCharacterInWork,
-    destroyCharacter,
+    destroyCharacterInWork,
 };
