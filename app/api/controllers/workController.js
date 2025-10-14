@@ -1,6 +1,8 @@
 import createHttpError from 'http-errors';
 import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 import workService from '../services/workService.js';
+import characterService from '../services/characterService.js';
+import characterInWorkService from '../services/characterInWorkService.js';
 
 const stripWorkResponse = work => {
     return {
@@ -82,10 +84,35 @@ const destroyWork = async (req, res) => {
     res.sendStatus(204);
 };
 
+const linkCharacter = async (req, res) => {
+    const { id } = req.params;
+    const { characterId } = req.body;
+
+    const work = await workService.getWork(id, req.appUser.id);
+
+    if (work == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const character = await characterService.getCharacter(characterId, req.appUser.id);
+
+    if (character == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const characterInWork = await characterInWorkService.createCharacterInWork({
+        work_id: id,
+        character_id: characterId,
+    });
+
+    res.status(201).json(characterInWork);
+};
+
 export default {
     createWork,
     getWork,
     getWorks,
     updateWork,
     destroyWork,
+    linkCharacter,
 };
