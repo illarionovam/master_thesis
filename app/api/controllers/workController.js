@@ -3,7 +3,7 @@ import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
-import characterInWorkController from './characterController.js';
+import characterInWorkController from './characterInWorkController.js';
 import characterController from './characterController.js';
 
 const stripWorkResponse = work => {
@@ -113,10 +113,7 @@ const linkCharacter = async (req, res) => {
 const unlinkCharacter = async (req, res) => {
     const { characterInWorkId } = req.params;
 
-    const characterInWork = await characterInWorkService.getCharacterInWork({
-        characterInWorkId,
-        ownerId,
-    });
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId, req.appUser.id);
 
     if (characterInWork == null) {
         throw createHttpError(403, 'Forbidden');

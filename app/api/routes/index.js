@@ -9,7 +9,7 @@ const apiRouter = express.Router();
 apiRouter.use('/auth', appUserRoute);
 apiRouter.use('/works', workRoute);
 apiRouter.use('/characters', characterRoute);
-apiRouter.use('/characters-in-work', characterInWorkRoute);
+apiRouter.use('/characters-in-works', characterInWorkRoute);
 
 apiRouter.use((req, res) => res.status(404).json({ message: 'Page not found' }));
 

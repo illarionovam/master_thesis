@@ -3,6 +3,7 @@ export default function controllerWrapper(controllerFn) {
         try {
             await Promise.resolve(controllerFn(req, res, next));
         } catch (err) {
+            console.log(err);
             next(err);
         }
     };

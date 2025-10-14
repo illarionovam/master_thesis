@@ -3,6 +3,7 @@ import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
+import characterInWorkController from './characterInWorkController.js';
 import workController from './workController.js';
 
 const stripCharacterResponse = character => {
@@ -21,14 +22,13 @@ const stripCharacterResponse = character => {
 };
 
 const createCharacter = async (req, res) => {
-    const { name, appearance, personality, bio, imageUrl, attributes } = req.body;
+    const { name, appearance, personality, bio, attributes } = req.body;
 
     const character = await characterService.createCharacter({
         name: name.trim(),
         appearance: appearance.trim(),
         personality: personality.trim(),
         bio: bio.trim(),
-        image_url: normalizeOptionalText(imageUrl),
         attributes,
         owner_id: req.appUser.id,
     });
@@ -49,7 +49,7 @@ const getCharacter = async (req, res) => {
 };
 
 const getCharacters = async (req, res) => {
-    const characters = await characterService.getCharacter(req.appUser.id);
+    const characters = await characterService.getCharacters(req.appUser.id);
 
     res.json(characters.map(stripCharacterResponse));
 };
@@ -121,10 +121,7 @@ const linkWork = async (req, res) => {
 const unlinkWork = async (req, res) => {
     const { characterInWorkId } = req.params;
 
-    const characterInWork = await characterInWorkService.getCharacterInWork({
-        characterInWorkId,
-        ownerId,
-    });
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId, req.appUser.id);
 
     if (characterInWork == null) {
         throw createHttpError(403, 'Forbidden');

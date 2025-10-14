@@ -1,4 +1,5 @@
 import { Work } from '../models/work.js';
+import { CharacterInWork } from '../models/characterInWork.js';
 
 async function createWork(payload, { transaction } = {}) {
     return Work.create(payload, { transaction });
