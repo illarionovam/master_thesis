@@ -1,5 +1,6 @@
 import { Work } from '../models/work.js';
 import { CharacterInWork } from '../models/characterInWork.js';
+import { LocationInWork } from '../models/locationInWork.js';
 
 async function createWork(payload, { transaction } = {}) {
     return Work.create(payload, { transaction });
@@ -44,6 +45,26 @@ async function getWorksNotLinkedToCharacter(characterId, ownerId, { transaction 
     });
 }
 
+async function getWorksNotLinkedToLocation(locationId, ownerId, { transaction } = {}) {
+    return Work.findAll({
+        where: {
+            owner_id: ownerId,
+            '$locationLinks.id$': null,
+        },
+        include: [
+            {
+                model: LocationInWork,
+                as: 'locationLinks',
+                attributes: [],
+                required: false,
+                where: { location_id: locationId },
+            },
+        ],
+        transaction,
+        subQuery: false,
+    });
+}
+
 async function updateWork(work, payload, { transaction } = {}) {
     work.set(payload);
     await work.save({ transaction });
@@ -58,6 +79,7 @@ export default {
     getWork,
     getWorks,
     getWorksNotLinkedToCharacter,
+    getWorksNotLinkedToLocation,
     updateWork,
     destroyWork,
 };
