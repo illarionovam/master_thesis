@@ -4,7 +4,11 @@ import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
 import characterInWorkController from './characterInWorkController.js';
+import locationInWorkController from './locationInWorkController.js';
 import characterController from './characterController.js';
+import locationController from './locationController.js';
+import locationService from '../services/locationService.js';
+import locationInWorkService from '../services/locationInWorkService.js';
 
 const stripWorkResponse = work => {
     return {
@@ -146,6 +150,66 @@ const getWorkPossibleCast = async (req, res) => {
     res.json(possibleCast.map(characterController.stripCharacterResponse));
 };
 
+const linkLocation = async (req, res) => {
+    const { id } = req.params;
+    const { locationId } = req.body;
+
+    const work = await workService.getWork(id, req.appUser.id);
+
+    if (work == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const location = await locationService.getLocation(locationId, req.appUser.id);
+
+    if (location == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const locationInWork = await locationInWorkService.createLocationInWork({
+        work_id: id,
+        location_id: locationId,
+    });
+
+    res.status(201).json(locationInWork);
+};
+
+const unlinkLocation = async (req, res) => {
+    const { locationInWorkId } = req.params;
+
+    const locationInWork = await locationInWorkService.getLocationInWork(locationInWorkId, req.appUser.id);
+
+    if (locationInWork == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    await locationInWorkService.destroyLocationInWork(locationInWork);
+
+    res.sendStatus(204);
+};
+
+const getWorkLocationLinks = async (req, res) => {
+    const { id } = req.params;
+
+    const cast = await locationInWorkService.getLocationsInWorkByWorkId(id, req.appUser.id);
+
+    res.json(cast.map(locationInWorkController.stripLocationInWorkResponse));
+};
+
+const getWorkPossibleLocationLinks = async (req, res) => {
+    const { id } = req.params;
+
+    const work = await workService.getWork(id, req.appUser.id);
+
+    if (work == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const possibleLocationLinks = await locationService.getLocationsNotLinkedToWork(id, req.appUser.id);
+
+    res.json(possibleLocationLinks.map(locationController.stripLocationResponse));
+};
+
 export default {
     stripWorkResponse,
     createWork,
@@ -157,4 +221,8 @@ export default {
     unlinkCharacter,
     getWorkCast,
     getWorkPossibleCast,
+    linkLocation,
+    unlinkLocation,
+    getWorkLocationLinks,
+    getWorkPossibleLocationLinks,
 };

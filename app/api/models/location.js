@@ -15,6 +15,19 @@ export const Location = sequelize.define(
             allowNull: false,
             references: { model: 'app_user', key: 'id' },
         },
+        title: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+            validate: {
+                len: {
+                    args: [1, 300],
+                    msg: 'Title must contain no more than 300 characters',
+                },
+            },
+            set(v) {
+                this.setDataValue('title', v?.trim());
+            },
+        },
         description: {
             type: DataTypes.TEXT,
             allowNull: false,

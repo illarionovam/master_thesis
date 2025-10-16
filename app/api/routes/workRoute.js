@@ -13,9 +13,15 @@ workRoute.post('/', controllerWrapper(workController.createWork));
 workRoute.get('/:id', controllerWrapper(workController.getWork));
 workRoute.patch('/:id', controllerWrapper(workController.updateWork));
 workRoute.delete('/:id', controllerWrapper(workController.destroyWork));
+
 workRoute.get('/:id/cast', controllerWrapper(workController.getWorkCast));
 workRoute.get('/:id/cast/available', controllerWrapper(workController.getWorkPossibleCast));
 workRoute.post('/:id/cast', controllerWrapper(workController.linkCharacter));
 workRoute.delete('/:id/cast/:characterInWorkId', controllerWrapper(workController.unlinkCharacter));
+
+workRoute.get('/:id/location-links', controllerWrapper(workController.getWorkLocationLinks));
+workRoute.get('/:id/location-links/available', controllerWrapper(workController.getWorkPossibleLocationLinks));
+workRoute.post('/:id/location-links', controllerWrapper(workController.linkLocation));
+workRoute.delete('/:id/location-links/:locationInWorkId', controllerWrapper(workController.unlinkLocation));
 
 export default workRoute;

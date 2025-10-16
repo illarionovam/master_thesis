@@ -1,6 +1,7 @@
 import characterInWorkService from '../services/characterInWorkService.js';
-import characterController from '../controllers/characterController.js';
-import workController from '../controllers/workController.js';
+import characterController from './characterController.js';
+import workController from './workController.js';
+import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 
 const stripCharacterInWorkResponse = characterInWork => {
     return {
@@ -30,16 +31,21 @@ const getCharacterInWork = async (req, res) => {
 
 const updateCharacterInWork = async (req, res) => {
     const { id } = req.params;
-    const { attributes } = req.body;
+    const { attributes, imageUrl } = req.body;
 
-    if (attributes != null) {
+    const payload = {};
+
+    if (attributes != null) payload.attributes = attributes;
+    if (typeof imageUrl !== 'undefined') payload.image_url = normalizeOptionalText(imageUrl);
+
+    if (Object.keys(payload).length > 0) {
         const characterInWork = await characterInWorkService.getCharacterInWork(id, req.appUser.id);
 
         if (characterInWork == null) {
             throw createHttpError(403, 'Forbidden');
         }
 
-        await characterInWorkService.updateCharacterInWork(characterInWork, { attributes });
+        await characterInWorkService.updateCharacterInWork(characterInWork, payload);
     }
 
     res.sendStatus(200);
