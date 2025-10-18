@@ -10,5 +10,9 @@ characterInWorkRoute.use(controllerWrapper(authMiddleware.authMiddleware));
 
 characterInWorkRoute.get('/:id', controllerWrapper(characterInWorkController.getCharacterInWork));
 characterInWorkRoute.patch('/:id', controllerWrapper(characterInWorkController.updateCharacterInWork));
+characterInWorkRoute.get(
+    '/:id/relationships',
+    controllerWrapper(characterInWorkController.getCharacterInWorkRelationships)
+);
 
 export default characterInWorkRoute;

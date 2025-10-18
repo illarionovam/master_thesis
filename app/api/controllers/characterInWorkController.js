@@ -2,6 +2,8 @@ import characterInWorkService from '../services/characterInWorkService.js';
 import characterController from './characterController.js';
 import workController from './workController.js';
 import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
+import relationshipService from '../services/relationshipService.js';
+import relationshipController from './relationshipController.js';
 
 const stripCharacterInWorkResponse = characterInWork => {
     return {
@@ -29,6 +31,18 @@ const getCharacterInWork = async (req, res) => {
     res.json(stripCharacterInWorkResponse(characterInWork));
 };
 
+const getCharacterInWorkRelationships = async (req, res) => {
+    const { id } = req.params;
+
+    const fromRelationships = relationshipService.getRelationshipsByFromId(id, req.appUser.id);
+    const toRelationships = relationshipService.getRelationshipsByToId(id, req.appUser.id);
+
+    res.json({
+        from: fromRelationships.map(relationshipController.stripRelationshipResponse),
+        to: toRelationships.map(relationshipController.stripRelationshipResponse),
+    });
+};
+
 const updateCharacterInWork = async (req, res) => {
     const { id } = req.params;
     const { attributes, imageUrl } = req.body;
@@ -54,5 +68,6 @@ const updateCharacterInWork = async (req, res) => {
 export default {
     stripCharacterInWorkResponse,
     getCharacterInWork,
+    getCharacterInWorkRelationships,
     updateCharacterInWork,
 };
