@@ -34,7 +34,7 @@ export const Work = sequelize.define(
             allowNull: true,
             validate: {
                 len: {
-                    args: [0, 3000],
+                    args: [1, 3000],
                     msg: 'Annotation must contain no more than 3000 characters',
                 },
             },
@@ -47,7 +47,7 @@ export const Work = sequelize.define(
             allowNull: true,
             validate: {
                 len: {
-                    args: [0, 1500],
+                    args: [1, 1500],
                     msg: 'Synopsis must contain no more than 1500 characters',
                 },
             },

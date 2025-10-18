@@ -31,10 +31,6 @@ export const Token = sequelize.define(
             type: DataTypes.TEXT,
             allowNull: false,
             validate: {
-                len: {
-                    args: [1, 255],
-                    msg: 'Scope must contain from 1 to 255 characters',
-                },
                 isIn: {
                     args: [ALLOWED_SCOPES],
                     msg: `Scope must be one of: ${ALLOWED_SCOPES.join(', ')}`,

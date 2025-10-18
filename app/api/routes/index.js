@@ -5,6 +5,7 @@ import characterRoute from './characterRoute.js';
 import locationRoute from './locationRoute.js';
 import characterInWorkRoute from './characterInWorkRoute.js';
 import locationInWorkRoute from './locationInWorkRoute.js';
+import relationshipRoute from './relationshipRoute.js';
 
 const apiRouter = express.Router();
 
@@ -14,6 +15,7 @@ apiRouter.use('/characters', characterRoute);
 apiRouter.use('/locations', locationRoute);
 apiRouter.use('/characters-in-works', characterInWorkRoute);
 apiRouter.use('/locations-in-works', locationInWorkRoute);
+apiRouter.use('/relationships', relationshipRoute);
 
 apiRouter.use((req, res) => res.status(404).json({ message: 'Page not found' }));
 

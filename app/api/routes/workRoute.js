@@ -3,6 +3,7 @@ import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import controllerWrapper from '../decorators/controllerWrapper.js';
 import workController from '../controllers/workController.js';
+import relationshipController from '../controllers/relationshipController.js';
 
 const workRoute = express.Router();
 
@@ -18,6 +19,12 @@ workRoute.get('/:id/cast', controllerWrapper(workController.getWorkCast));
 workRoute.get('/:id/cast/available', controllerWrapper(workController.getWorkPossibleCast));
 workRoute.post('/:id/cast', controllerWrapper(workController.linkCharacter));
 workRoute.delete('/:id/cast/:characterInWorkId', controllerWrapper(workController.unlinkCharacter));
+
+workRoute.post('/:id/cast/relationships', controllerWrapper(relationshipController.createRelationship));
+workRoute.post(
+    '/:id/cast/relationships/:fromId/:toId',
+    controllerWrapper(relationshipController.getRelationshipByFromIdAndToId)
+);
 
 workRoute.get('/:id/location-links', controllerWrapper(workController.getWorkLocationLinks));
 workRoute.get('/:id/location-links/available', controllerWrapper(workController.getWorkPossibleLocationLinks));

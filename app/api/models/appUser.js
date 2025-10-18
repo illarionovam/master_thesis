@@ -17,7 +17,7 @@ export const AppUser = sequelize.define(
             validate: {
                 len: {
                     args: [1, 255],
-                    msg: 'Name must contain from 1 to 255 characters',
+                    msg: 'Name must contain no more than 255 characters',
                 },
             },
             set(v) {

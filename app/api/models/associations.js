@@ -10,6 +10,7 @@ export async function initAssociations() {
     const { CharacterInWork } = await import('./characterInWork.js');
     const { Location } = await import('./location.js');
     const { LocationInWork } = await import('./locationInWork.js');
+    const { Relationship } = await import('./relationship.js');
 
     if (!AppUser.associations?.works) {
         AppUser.hasMany(Work, { foreignKey: 'owner_id', sourceKey: 'id', as: 'works' });
@@ -109,4 +110,47 @@ export async function initAssociations() {
             as: 'locationLinks',
         });
     }
+
+    if (!Relationship.associations?.from) {
+        Relationship.belongsTo(CharacterInWork, {
+            as: 'from',
+            foreignKey: 'from_character_in_work_id',
+            targetKey: 'id',
+        });
+    }
+    if (!Relationship.associations?.to) {
+        Relationship.belongsTo(CharacterInWork, {
+            as: 'to',
+            foreignKey: 'to_character_in_work_id',
+            targetKey: 'id',
+        });
+    }
+
+    if (!CharacterInWork.associations?.outgoingRelationships) {
+        CharacterInWork.hasMany(Relationship, {
+            as: 'outgoingRelationships',
+            foreignKey: 'from_character_in_work_id',
+            sourceKey: 'id',
+        });
+    }
+    if (!CharacterInWork.associations?.incomingRelationships) {
+        CharacterInWork.hasMany(Relationship, {
+            as: 'incomingRelationships',
+            foreignKey: 'to_character_in_work_id',
+            sourceKey: 'id',
+        });
+    }
+
+    CharacterInWork.belongsToMany(CharacterInWork, {
+        through: Relationship,
+        as: 'relatedTo', // from > to
+        foreignKey: 'from_character_in_work_id',
+        otherKey: 'to_character_in_work_id',
+    });
+    CharacterInWork.belongsToMany(CharacterInWork, {
+        through: Relationship,
+        as: 'relatedFrom', // to < from
+        foreignKey: 'to_character_in_work_id',
+        otherKey: 'from_character_in_work_id',
+    });
 }
