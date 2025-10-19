@@ -4,6 +4,7 @@ import authMiddleware from '../middlewares/authMiddleware.js';
 import controllerWrapper from '../decorators/controllerWrapper.js';
 import workController from '../controllers/workController.js';
 import relationshipController from '../controllers/relationshipController.js';
+import eventController from '../controllers/eventController.js';
 
 const workRoute = express.Router();
 
@@ -30,5 +31,21 @@ workRoute.get('/:id/location-links', controllerWrapper(workController.getWorkLoc
 workRoute.get('/:id/location-links/available', controllerWrapper(workController.getWorkPossibleLocationLinks));
 workRoute.post('/:id/location-links', controllerWrapper(workController.linkLocation));
 workRoute.delete('/:id/location-links/:locationInWorkId', controllerWrapper(workController.unlinkLocation));
+
+workRoute.get('/:id/events', controllerWrapper(eventController.getEventsByWorkId));
+workRoute.get('/:workId/events/:id', controllerWrapper(eventController.getEvent));
+workRoute.post('/:workId/events/:id', controllerWrapper(eventController.updateEvent));
+workRoute.delete('/:workId/events/:id', controllerWrapper(eventController.destroyEvent));
+
+workRoute.get('/:workId/events/:id/participants', controllerWrapper(eventController.getEventParticipants));
+workRoute.get(
+    '/:workId/events/:id/participants/available',
+    controllerWrapper(eventController.getEventPossibleParticipants)
+);
+workRoute.post('/:workId/events/:id/participants', controllerWrapper(eventController.linkParticipant));
+workRoute.delete(
+    '/:workId/events/:id/participants/:eventParticipantId',
+    controllerWrapper(eventController.unlinkParticipant)
+);
 
 export default workRoute;
