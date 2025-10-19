@@ -7,7 +7,14 @@ import appUserService from '../services/appUserService.js';
 import tokenService from '../services/tokenService.js';
 
 const stripAppUserResponse = appUser => {
-    return appUser;
+    return {
+        id: appUser.id,
+        username: appUser.username,
+        email: appUser.email,
+        avatar_url: appUser.avatar_url,
+        created_at: appUser.created_at,
+        updated_at: appUser.updated_at,
+    };
 };
 
 const signUpAppUser = async (req, res) => {
@@ -130,9 +137,28 @@ const confirmAppUserEmail = async (req, res) => {
 };
 
 const updateAppUserNormalFields = async (req, res) => {
-    await appUserService.updateAppUser(req.appUser, req.body);
+    const { new_password, password } = req.body;
+    const wantsPasswordChange = password != null && new_password != null;
+
+    const payload = req.body;
+
+    if (wantsPasswordChange) {
+        const passwordIsCorrect = await bcrypt.compare(password, req.appUser.hash_password);
+
+        if (!passwordIsCorrect) {
+            throw createHttpError(401, 'Incorrect credentials');
+        }
+
+        payload.hash_password = await bcrypt.hash(new_password, 10);
+    }
+
+    await appUserService.updateAppUser(req.appUser, payload);
 
     res.sendStatus(200);
+};
+
+const getAppUser = async (req, res) => {
+    res.json(stripAppUserResponse(req.appUser));
 };
 
 export default {
@@ -144,4 +170,5 @@ export default {
     updateAppUserEmail,
     confirmAppUserEmail,
     updateAppUserNormalFields,
+    getAppUser,
 };

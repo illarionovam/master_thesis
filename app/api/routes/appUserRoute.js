@@ -34,6 +34,7 @@ appUserRoute.post(
 
 appUserRoute.use(controllerWrapper(authMiddleware.authMiddleware));
 
+appUserRoute.get('/user-info', controllerWrapper(appUserController.getAppUser));
 appUserRoute.post(
     '/sign-out',
     controllerWrapper(validateBody(signOutAppUserValidator)),
