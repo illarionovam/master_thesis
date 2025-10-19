@@ -5,18 +5,9 @@ import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
 import appUserService from '../services/appUserService.js';
 import tokenService from '../services/tokenService.js';
-import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 
 const stripAppUserResponse = appUser => {
-    return {
-        id: appUser.id,
-        username: appUser.username,
-        email: appUser.email,
-        name: appUser.name,
-        avatarUrl: appUser.avatar_url,
-        updatedAt: appUser.updated_at,
-        createdAt: appUser.created_at,
-    };
+    return appUser;
 };
 
 const signUpAppUser = async (req, res) => {
@@ -26,10 +17,10 @@ const signUpAppUser = async (req, res) => {
 
     try {
         await appUserService.createAppUser({
-            username: username.trim(),
-            email: email.trim(),
+            username,
+            email,
             hash_password: hashPassword,
-            name: normalizeOptionalText(name),
+            name,
         });
     } catch (err) {
         if (!(err instanceof Sequelize.UniqueConstraintError)) {
@@ -69,8 +60,8 @@ const signInAppUser = async (req, res) => {
 };
 
 const signOutAppUser = async (req, res) => {
-    const { terminateAllSessions } = req.body ?? {};
-    if (terminateAllSessions === true) {
+    const { terminate_all_sessions } = req.body;
+    if (terminate_all_sessions) {
         await tokenService.destroyTokenByOwnerId(req.appUser.id);
     } else {
         await tokenService.destroyToken(req.token);
@@ -94,9 +85,9 @@ const resetAppUserPassword = async (req, res) => {
 };
 
 const confirmAppUserPassword = async (req, res) => {
-    const { newPassword } = req.body;
+    const { new_password } = req.body;
 
-    const hashPassword = await bcrypt.hash(newPassword, 10);
+    const hashPassword = await bcrypt.hash(new_password, 10);
 
     await sequelize.transaction(async t => {
         await appUserService.updateAppUser(req.appUser, { hash_password: hashPassword }, { transaction: t });
@@ -107,20 +98,15 @@ const confirmAppUserPassword = async (req, res) => {
 };
 
 const updateAppUserEmail = async (req, res) => {
-    const { newEmail } = req.body;
+    const { new_email } = req.body;
 
-    if (newEmail != null) {
-        await sequelize.transaction(async t => {
-            await appUserService.updateAppUser(req.appUser, { new_email: newEmail.trim() }, { transaction: t });
-            const token = jwt.sign({ sub: req.appUser.id, scope: 'email_verify' }, process.env.JWT_SECRET, {
-                expiresIn: '15m',
-            });
-            await tokenService.createToken(
-                { owner_id: req.appUser.id, token, scope: 'email_verify' },
-                { transaction: t }
-            );
+    await sequelize.transaction(async t => {
+        await appUserService.updateAppUser(req.appUser, { new_email }, { transaction: t });
+        const token = jwt.sign({ sub: req.appUser.id, scope: 'email_verify' }, process.env.JWT_SECRET, {
+            expiresIn: '15m',
         });
-    }
+        await tokenService.createToken({ owner_id: req.appUser.id, token, scope: 'email_verify' }, { transaction: t });
+    });
 
     res.sendStatus(200);
 };
@@ -144,33 +130,7 @@ const confirmAppUserEmail = async (req, res) => {
 };
 
 const updateAppUserNormalFields = async (req, res) => {
-    const { name, username, newPassword, avatarUrl, password } = req.body ?? {};
-
-    const payload = {};
-
-    if (typeof name !== 'undefined') payload.name = normalizeOptionalText(name);
-    if (username != null) payload.username = username.trim();
-    if (typeof avatarUrl !== 'undefined') payload.avatar_url = normalizeOptionalText(avatarUrl);
-
-    const wantsPasswordChange = typeof newPassword === 'string' && newPassword.trim() !== '';
-
-    if (wantsPasswordChange) {
-        if (typeof password !== 'string' || password.length === 0) {
-            throw createHttpError(400, 'Current password is required to set a new password');
-        }
-
-        const passwordIsCorrect = await bcrypt.compare(password, req.appUser.hash_password);
-
-        if (!passwordIsCorrect) {
-            throw createHttpError(401, 'Incorrect credentials');
-        }
-
-        payload.hash_password = await bcrypt.hash(newPassword, 10);
-    }
-
-    if (Object.keys(payload).length > 0) {
-        await appUserService.updateAppUser(req.appUser, payload);
-    }
+    await appUserService.updateAppUser(req.appUser, req.body);
 
     res.sendStatus(200);
 };

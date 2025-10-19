@@ -1,13 +1,13 @@
 import { CharacterInWork } from '../models/characterInWork.js';
-import { Relation } from '../models/relationship.js';
+import { Relationship } from '../models/relationship.js';
 import { Character } from '../models/character.js';
 
 async function createRelationship(payload, { transaction } = {}) {
-    return Relation.create(payload, { transaction });
+    return Relationship.create(payload, { transaction });
 }
 
 async function getRelationship(id, ownerId, { transaction } = {}) {
-    return Relation.findOne({
+    return Relationship.findOne({
         where: { id },
         include: [
             {
@@ -55,7 +55,7 @@ async function getRelationship(id, ownerId, { transaction } = {}) {
 }
 
 async function getRelationshipByFromIdAndToId(fromId, toId, ownerId, { transaction } = {}) {
-    return Relation.findOne({
+    return Relationship.findOne({
         where: { from_character_in_work_id: fromId, to_character_in_work_id: toId },
         include: [
             {
@@ -103,7 +103,7 @@ async function getRelationshipByFromIdAndToId(fromId, toId, ownerId, { transacti
 }
 
 async function getRelationshipsByFromId(fromId, ownerId, { transaction } = {}) {
-    return Relation.findAll({
+    return Relationship.findAll({
         where: { from_character_in_work_id: fromId },
         include: [
             {
@@ -151,7 +151,7 @@ async function getRelationshipsByFromId(fromId, ownerId, { transaction } = {}) {
 }
 
 async function getRelationshipsByToId(toId, ownerId, { transaction } = {}) {
-    return Relation.findAll({
+    return Relationship.findAll({
         where: { to_character_in_work_id: toId },
         include: [
             {

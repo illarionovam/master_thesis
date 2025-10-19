@@ -176,6 +176,7 @@ const getEventPossibleParticipants = async (req, res) => {
 };
 
 export default {
+    stripEventResponse,
     createEvent,
     getEvent,
     getEventsByWorkId,
