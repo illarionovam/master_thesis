@@ -18,16 +18,14 @@ const stripAppUserResponse = appUser => {
 };
 
 const signUpAppUser = async (req, res) => {
-    const { username, email, password, name } = req.body;
+    const { password } = req.body;
 
     const hashPassword = await bcrypt.hash(password, 10);
 
     try {
         await appUserService.createAppUser({
-            username,
-            email,
             hash_password: hashPassword,
-            name,
+            ...req.body,
         });
     } catch (err) {
         if (!(err instanceof Sequelize.UniqueConstraintError)) {

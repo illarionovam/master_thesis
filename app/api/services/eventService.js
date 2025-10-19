@@ -1,48 +1,45 @@
+import { Event } from '../models/event.js';
 import { Work } from '../models/work.js';
 
-async function createEvent(payload, { transaction } = {}) {
-    return Event.create(payload, { transaction });
-}
+const withOwnerWorkInclude = ownerId => [
+    {
+        model: Work,
+        as: 'work',
+        required: true,
+        where: { owner_id: ownerId },
+    },
+];
 
-async function getEvent(id, ownerId, { transaction } = {}) {
+const createEvent = async (payload, { transaction } = {}) => {
+    return Event.create(payload, { transaction });
+};
+
+const getEvent = async (id, ownerId, { transaction } = {}) => {
     return Event.findOne({
         where: { id },
-        include: [
-            {
-                model: Work,
-                as: 'work',
-                required: true,
-                where: { owner_id: ownerId },
-            },
-        ],
+        include: withOwnerWorkInclude(ownerId),
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function getEventsByWorkId(workId, ownerId, { transaction } = {}) {
+const getEventsByWorkId = async (workId, ownerId, { transaction } = {}) => {
     return Event.findAll({
-        include: [
-            {
-                model: Work,
-                as: 'work',
-                required: true,
-                where: { id: workId, owner_id: ownerId },
-            },
-        ],
+        where: { work_id: workId },
+        include: withOwnerWorkInclude(ownerId),
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function updateEvent(event, payload, { transaction } = {}) {
+const updateEvent = async (event, payload, { transaction } = {}) => {
     event.set(payload);
     await event.save({ transaction });
-}
+};
 
-async function destroyEvent(event, { transaction } = {}) {
+const destroyEvent = async (event, { transaction } = {}) => {
     await event.destroy({ transaction });
-}
+};
 
 export default {
     createEvent,

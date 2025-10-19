@@ -2,30 +2,25 @@ import { Work } from '../models/work.js';
 import { CharacterInWork } from '../models/characterInWork.js';
 import { LocationInWork } from '../models/locationInWork.js';
 
-async function createWork(payload, { transaction } = {}) {
+const createWork = async (payload, { transaction } = {}) => {
     return Work.create(payload, { transaction });
-}
+};
 
-async function getWork(id, ownerId, { transaction } = {}) {
+const getWork = async (id, ownerId, { transaction } = {}) => {
     return Work.findOne({
-        where: {
-            id,
-            owner_id: ownerId,
-        },
+        where: { id, owner_id: ownerId },
         transaction,
     });
-}
+};
 
-async function getWorks(ownerId, { transaction } = {}) {
+const getWorks = async (ownerId, { transaction } = {}) => {
     return Work.findAll({
-        where: {
-            owner_id: ownerId,
-        },
+        where: { owner_id: ownerId },
         transaction,
     });
-}
+};
 
-async function getWorksNotLinkedToCharacter(characterId, ownerId, { transaction } = {}) {
+const getWorksNotLinkedToCharacter = async (characterId, ownerId, { transaction } = {}) => {
     return Work.findAll({
         where: {
             owner_id: ownerId,
@@ -35,7 +30,6 @@ async function getWorksNotLinkedToCharacter(characterId, ownerId, { transaction 
             {
                 model: CharacterInWork,
                 as: 'cast',
-                attributes: [],
                 required: false,
                 where: { character_id: characterId },
             },
@@ -43,9 +37,9 @@ async function getWorksNotLinkedToCharacter(characterId, ownerId, { transaction 
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function getWorksNotLinkedToLocation(locationId, ownerId, { transaction } = {}) {
+const getWorksNotLinkedToLocation = async (locationId, ownerId, { transaction } = {}) => {
     return Work.findAll({
         where: {
             owner_id: ownerId,
@@ -55,7 +49,6 @@ async function getWorksNotLinkedToLocation(locationId, ownerId, { transaction } 
             {
                 model: LocationInWork,
                 as: 'locationLinks',
-                attributes: [],
                 required: false,
                 where: { location_id: locationId },
             },
@@ -63,16 +56,16 @@ async function getWorksNotLinkedToLocation(locationId, ownerId, { transaction } 
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function updateWork(work, payload, { transaction } = {}) {
+const updateWork = async (work, payload, { transaction } = {}) => {
     work.set(payload);
     await work.save({ transaction });
-}
+};
 
-async function destroyWork(work, { transaction } = {}) {
+const destroyWork = async (work, { transaction } = {}) => {
     await work.destroy({ transaction });
-}
+};
 
 export default {
     createWork,

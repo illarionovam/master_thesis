@@ -1,26 +1,25 @@
+import { Op } from 'sequelize';
 import { AppUser } from '../models/appUser.js';
 
-async function createAppUser(payload, { transaction } = {}) {
-    await AppUser.create(payload, { transaction });
-}
+export const createAppUser = async (payload, { transaction } = {}) => {
+    return AppUser.create(payload, { transaction });
+};
 
-async function getAppUser(id, { transaction } = {}) {
+export const getAppUser = async (id, { transaction } = {}) => {
     return AppUser.findByPk(id, { transaction });
-}
+};
 
-async function getAppUserByEmail(email, { transaction } = {}) {
+export const getAppUserByEmail = async (email, { transaction } = {}) => {
     return AppUser.findOne({
-        where: {
-            email: email,
-        },
+        where: { email },
         transaction,
     });
-}
+};
 
-async function updateAppUser(appUser, payload, { transaction } = {}) {
+export const updateAppUser = async (appUser, payload, { transaction } = {}) => {
     appUser.set(payload);
     await appUser.save({ transaction });
-}
+};
 
 export default {
     createAppUser,

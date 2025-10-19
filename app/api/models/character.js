@@ -19,53 +19,29 @@ export const Character = sequelize.define(
         name: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 200],
-                    msg: 'Name must contain no more than 200 characters',
-                },
-            },
             set(v) {
-                this.setDataValue('name', v?.trim());
+                this.setDataValue('name', v.trim());
             },
         },
         appearance: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 3000],
-                    msg: 'Appearance must contain no more than 3000 characters',
-                },
-            },
             set(v) {
-                this.setDataValue('appearance', v?.trim());
+                this.setDataValue('appearance', v.trim());
             },
         },
         personality: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 3000],
-                    msg: 'Personality must contain no more than 3000 characters',
-                },
-            },
             set(v) {
-                this.setDataValue('personality', v?.trim());
+                this.setDataValue('personality', v.trim());
             },
         },
         bio: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 6000],
-                    msg: 'Bio must contain no more than 6000 characters',
-                },
-            },
             set(v) {
-                this.setDataValue('bio', v?.trim());
+                this.setDataValue('bio', v.trim());
             },
         },
         image_url: {
@@ -79,13 +55,6 @@ export const Character = sequelize.define(
             type: DataTypes.JSONB,
             allowNull: false,
             defaultValue: {},
-            validate: {
-                isObject(value) {
-                    if (value == null || typeof value !== 'object' || Array.isArray(value)) {
-                        throw new Error('Attributes must be a JSON object');
-                    }
-                },
-            },
         },
     },
     {

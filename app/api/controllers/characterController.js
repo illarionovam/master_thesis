@@ -10,27 +10,21 @@ const stripCharacterResponse = character => {
     return {
         id: character.id,
         name: character.name,
-        ownerId: character.owner_id,
+        owner_id: character.owner_id,
         appearance: character.appearance,
         personality: character.personality,
         bio: character.bio,
         attributes: character.attributes,
-        imageUrl: character.image_url,
-        updatedAt: character.updated_at,
-        createdAt: character.created_at,
+        image_url: character.image_url,
+        updated_at: character.updated_at,
+        created_at: character.created_at,
     };
 };
 
 const createCharacter = async (req, res) => {
-    const { name, appearance, personality, bio, attributes } = req.body;
-
     const character = await characterService.createCharacter({
-        name: name.trim(),
-        appearance: appearance.trim(),
-        personality: personality.trim(),
-        bio: bio.trim(),
-        attributes,
         owner_id: req.appUser.id,
+        ...req.body,
     });
 
     res.status(201).json(stripCharacterResponse(character));

@@ -5,7 +5,7 @@ const passwordRule = Joi.string()
     .max(20)
     .pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/);
 
-export const signUpAppUserValidator = Joi.object({
+const signUpAppUserValidator = Joi.object({
     username: Joi.string().trim().min(3).max(60).required().messages({
         'string.base': 'Username must be a string',
         'string.empty': 'Username is required',
@@ -37,7 +37,7 @@ export const signUpAppUserValidator = Joi.object({
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
-export const signInAppUserValidator = Joi.object({
+const signInAppUserValidator = Joi.object({
     email: Joi.string().trim().lowercase().required().messages({
         'string.empty': 'email is required',
         'any.required': 'email is required',
@@ -48,20 +48,20 @@ export const signInAppUserValidator = Joi.object({
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
-export const resetAppUserPasswordValidator = Joi.object({
+const resetAppUserPasswordValidator = Joi.object({
     email: Joi.string().trim().lowercase().required().messages({
         'string.empty': 'email is required',
         'any.required': 'email is required',
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
-export const signOutAppUserValidator = Joi.object({
+const signOutAppUserValidator = Joi.object({
     terminate_all_sessions: Joi.boolean().truthy('true', '1', 1).falsy('false', '0', 0, '').default(false).messages({
         'boolean.base': 'terminate_all_sessions must be a boolean-like value',
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
-export const updateAppUserNormalFieldsValidator = Joi.alternatives()
+const updateAppUserNormalFieldsValidator = Joi.alternatives()
     .try(
         Joi.object({
             password: Joi.string().required().messages({
@@ -83,6 +83,7 @@ export const updateAppUserNormalFieldsValidator = Joi.alternatives()
         Joi.object({
             avatar_url: Joi.string().trim().uri().required().messages({
                 'string.empty': 'avatar_url is required',
+                'string.uri': 'avatar_url must be a valid URI',
                 'any.required': 'avatar_url is required',
             }),
             name: Joi.forbidden(),
@@ -117,7 +118,7 @@ export const updateAppUserNormalFieldsValidator = Joi.alternatives()
     )
     .prefs({ abortEarly: false, stripUnknown: true });
 
-export const updateAppUserEmailValidator = Joi.object({
+const updateAppUserEmailValidator = Joi.object({
     new_email: Joi.string()
         .trim()
         .lowercase()
@@ -132,7 +133,7 @@ export const updateAppUserEmailValidator = Joi.object({
         }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
-export const confirmAppUserPasswordValidator = Joi.object({
+const confirmAppUserPasswordValidator = Joi.object({
     new_password: passwordRule.required().messages({
         'string.empty': 'new_password is required',
         'string.min': 'new_password must contain at least 8 characters',
@@ -141,3 +142,13 @@ export const confirmAppUserPasswordValidator = Joi.object({
         'any.required': 'new_password is required',
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
+
+export default {
+    signUpAppUserValidator,
+    signInAppUserValidator,
+    resetAppUserPasswordValidator,
+    signOutAppUserValidator,
+    updateAppUserNormalFieldsValidator,
+    updateAppUserEmailValidator,
+    confirmAppUserPasswordValidator,
+};

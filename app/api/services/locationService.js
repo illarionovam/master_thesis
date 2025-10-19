@@ -1,30 +1,25 @@
 import { Location } from '../models/location.js';
 import { LocationInWork } from '../models/locationInWork.js';
 
-async function createLocation(payload, { transaction } = {}) {
+const createLocation = async (payload, { transaction } = {}) => {
     return Location.create(payload, { transaction });
-}
+};
 
-async function getLocation(id, ownerId, { transaction } = {}) {
+const getLocation = async (id, ownerId, { transaction } = {}) => {
     return Location.findOne({
-        where: {
-            id,
-            owner_id: ownerId,
-        },
+        where: { id, owner_id: ownerId },
         transaction,
     });
-}
+};
 
-async function getLocations(ownerId, { transaction } = {}) {
+const getLocations = async (ownerId, { transaction } = {}) => {
     return Location.findAll({
-        where: {
-            owner_id: ownerId,
-        },
+        where: { owner_id: ownerId },
         transaction,
     });
-}
+};
 
-async function getLocationsNotLinkedToWork(workId, ownerId, { transaction } = {}) {
+const getLocationsNotLinkedToWork = async (workId, ownerId, { transaction } = {}) => {
     return Location.findAll({
         where: {
             owner_id: ownerId,
@@ -42,16 +37,16 @@ async function getLocationsNotLinkedToWork(workId, ownerId, { transaction } = {}
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function updateLocation(location, payload, { transaction } = {}) {
+const updateLocation = async (location, payload, { transaction } = {}) => {
     location.set(payload);
     await location.save({ transaction });
-}
+};
 
-async function destroyLocation(location, { transaction } = {}) {
+const destroyLocation = async (location, { transaction } = {}) => {
     await location.destroy({ transaction });
-}
+};
 
 export default {
     createLocation,

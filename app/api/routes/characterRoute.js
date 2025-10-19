@@ -3,13 +3,18 @@ import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import controllerWrapper from '../decorators/controllerWrapper.js';
 import characterController from '../controllers/characterController.js';
+import characterValidator from '../validators/characterValidator.js';
 
 const characterRoute = express.Router();
 
 characterRoute.use(controllerWrapper(authMiddleware.authMiddleware));
 
 characterRoute.get('/', controllerWrapper(characterController.getCharacters));
-characterRoute.post('/', controllerWrapper(characterController.createCharacter));
+characterRoute.post(
+    '/',
+    controllerWrapper(validateBody(characterValidator.createCharacterValidator)),
+    controllerWrapper(characterController.createCharacter)
+);
 characterRoute.get('/:id', controllerWrapper(characterController.getCharacter));
 characterRoute.patch('/:id', controllerWrapper(characterController.updateCharacter));
 characterRoute.delete('/:id', controllerWrapper(characterController.destroyCharacter));

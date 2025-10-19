@@ -3,139 +3,70 @@ import { Work } from '../models/work.js';
 import { Character } from '../models/character.js';
 import { EventParticipant } from '../models/eventParticipant.js';
 
-async function createCharacterInWork(payload, { transaction } = {}) {
-    return CharacterInWork.create(payload, { transaction });
-}
+const withOwnerInclude = ownerId => [
+    { model: Work, as: 'work', where: { owner_id: ownerId }, required: true, attributes: [] },
+    { model: Character, as: 'character', where: { owner_id: ownerId }, required: true, attributes: [] },
+];
 
-async function getCharacterInWork(id, ownerId, { transaction } = {}) {
+export const createCharacterInWork = async (payload, { transaction } = {}) => {
+    return CharacterInWork.create(payload, { transaction });
+};
+
+export const getCharacterInWork = async (id, ownerId, { transaction } = {}) => {
     return CharacterInWork.findOne({
         where: { id },
-        include: [
-            {
-                model: Work,
-                as: 'work',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-            {
-                model: Character,
-                as: 'character',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-        ],
+        include: withOwnerInclude(ownerId),
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function getCharacterInWorkByWorkIdAndCharacterId(workId, characterId, ownerId, { transaction } = {}) {
+export const getCharacterInWorkByWorkIdAndCharacterId = async (workId, characterId, ownerId, { transaction } = {}) => {
     return CharacterInWork.findOne({
         where: { work_id: workId, character_id: characterId },
-        include: [
-            {
-                model: Work,
-                as: 'work',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-            {
-                model: Character,
-                as: 'character',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-        ],
+        include: withOwnerInclude(ownerId),
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function getCharactersInWorkByWorkId(workId, ownerId, { transaction } = {}) {
+export const getCharactersInWorkByWorkId = async (workId, ownerId, { transaction } = {}) => {
     return CharacterInWork.findAll({
         where: { work_id: workId },
-        include: [
-            {
-                model: Work,
-                as: 'work',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-            {
-                model: Character,
-                as: 'character',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-        ],
+        include: withOwnerInclude(ownerId),
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function getCharactersInWorkByCharacterId(characterId, ownerId, { transaction } = {}) {
+export const getCharactersInWorkByCharacterId = async (characterId, ownerId, { transaction } = {}) => {
     return CharacterInWork.findAll({
         where: { character_id: characterId },
-        include: [
-            {
-                model: Work,
-                as: 'work',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-            {
-                model: Character,
-                as: 'character',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-        ],
+        include: withOwnerInclude(ownerId),
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function getCharactersInWork(ownerId, { transaction } = {}) {
+export const getCharactersInWork = async (ownerId, { transaction } = {}) => {
     return CharacterInWork.findAll({
-        include: [
-            {
-                model: Work,
-                as: 'work',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-            {
-                model: Character,
-                as: 'character',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-        ],
+        include: withOwnerInclude(ownerId),
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function getCharactersInWorkNotLinkedToEvent(event, ownerId, { transaction } = {}) {
+export const getCharactersInWorkNotLinkedToEvent = async (event, ownerId, { transaction } = {}) => {
     return CharacterInWork.findAll({
-        where: { work_id: event.work_id, '$participations.id$': null },
+        where: {
+            work_id: event.work_id,
+            '$participations.id$': null,
+        },
         include: [
-            {
-                model: Work,
-                as: 'work',
-                where: { owner_id: ownerId },
-                required: true,
-            },
-            {
-                model: Character,
-                as: 'character',
-                where: { owner_id: ownerId },
-                required: true,
-            },
+            ...withOwnerInclude(ownerId),
             {
                 model: EventParticipant,
                 as: 'participations',
-                attributes: [],
                 required: false,
                 where: { event_id: event.id },
             },
@@ -143,16 +74,16 @@ async function getCharactersInWorkNotLinkedToEvent(event, ownerId, { transaction
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function updateCharacterInWork(characterInWork, payload, { transaction } = {}) {
+export const updateCharacterInWork = async (characterInWork, payload, { transaction } = {}) => {
     characterInWork.set(payload);
     await characterInWork.save({ transaction });
-}
+};
 
-async function destroyCharacterInWork(characterInWork, { transaction } = {}) {
+export const destroyCharacterInWork = async (characterInWork, { transaction } = {}) => {
     await characterInWork.destroy({ transaction });
-}
+};
 
 export default {
     createCharacterInWork,

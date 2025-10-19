@@ -1,30 +1,25 @@
 import { Character } from '../models/character.js';
 import { CharacterInWork } from '../models/characterInWork.js';
 
-async function createCharacter(payload, { transaction } = {}) {
+const createCharacter = async (payload, { transaction } = {}) => {
     return Character.create(payload, { transaction });
-}
+};
 
-async function getCharacter(id, ownerId, { transaction } = {}) {
+const getCharacter = async (id, ownerId, { transaction } = {}) => {
     return Character.findOne({
-        where: {
-            id,
-            owner_id: ownerId,
-        },
+        where: { id, owner_id: ownerId },
         transaction,
     });
-}
+};
 
-async function getCharacters(ownerId, { transaction } = {}) {
+const getCharacters = async (ownerId, { transaction } = {}) => {
     return Character.findAll({
-        where: {
-            owner_id: ownerId,
-        },
+        where: { owner_id: ownerId },
         transaction,
     });
-}
+};
 
-async function getCharactersNotLinkedToWork(workId, ownerId, { transaction } = {}) {
+const getCharactersNotLinkedToWork = async (workId, ownerId, { transaction } = {}) => {
     return Character.findAll({
         where: {
             owner_id: ownerId,
@@ -42,16 +37,16 @@ async function getCharactersNotLinkedToWork(workId, ownerId, { transaction } = {
         transaction,
         subQuery: false,
     });
-}
+};
 
-async function updateCharacter(character, payload, { transaction } = {}) {
+const updateCharacter = async (character, payload, { transaction } = {}) => {
     character.set(payload);
     await character.save({ transaction });
-}
+};
 
-async function destroyCharacter(character, { transaction } = {}) {
+const destroyCharacter = async (character, { transaction } = {}) => {
     await character.destroy({ transaction });
-}
+};
 
 export default {
     createCharacter,
