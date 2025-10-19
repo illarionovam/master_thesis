@@ -11,6 +11,8 @@ export async function initAssociations() {
     const { Location } = await import('./location.js');
     const { LocationInWork } = await import('./locationInWork.js');
     const { Relationship } = await import('./relationship.js');
+    const { Event } = await import('./event.js');
+    const { EventParticipant } = await import('./eventParticipant.js');
 
     if (!AppUser.associations?.works) {
         AppUser.hasMany(Work, { foreignKey: 'owner_id', sourceKey: 'id', as: 'works' });
@@ -153,4 +155,72 @@ export async function initAssociations() {
         foreignKey: 'to_character_in_work_id',
         otherKey: 'from_character_in_work_id',
     });
+
+    if (!Event.associations?.work) {
+        Event.belongsTo(Work, { as: 'work', foreignKey: 'work_id', targetKey: 'id' });
+    }
+    if (!Work.associations?.events) {
+        Work.hasMany(Event, { as: 'events', foreignKey: 'work_id', sourceKey: 'id' });
+    }
+
+    if (!Event.associations?.locationLink) {
+        Event.belongsTo(LocationInWork, {
+            as: 'locationLink',
+            foreignKey: 'location_in_work_id',
+            targetKey: 'id',
+        });
+    }
+    if (!LocationInWork.associations?.events) {
+        LocationInWork.hasMany(Event, {
+            as: 'events',
+            foreignKey: 'location_in_work_id',
+            sourceKey: 'id',
+        });
+    }
+
+    if (!Event.associations?.participants) {
+        Event.belongsToMany(CharacterInWork, {
+            through: EventParticipant,
+            as: 'participants',
+            foreignKey: 'event_id',
+            otherKey: 'character_in_work_id',
+        });
+    }
+    if (!CharacterInWork.associations?.events) {
+        CharacterInWork.belongsToMany(Event, {
+            through: EventParticipant,
+            as: 'events',
+            foreignKey: 'character_in_work_id',
+            otherKey: 'event_id',
+        });
+    }
+
+    if (!Event.associations?.participantLinks) {
+        Event.hasMany(EventParticipant, {
+            as: 'participantLinks',
+            foreignKey: 'event_id',
+            sourceKey: 'id',
+        });
+    }
+    if (!EventParticipant.associations?.event) {
+        EventParticipant.belongsTo(Event, {
+            as: 'event',
+            foreignKey: 'event_id',
+            targetKey: 'id',
+        });
+    }
+    if (!EventParticipant.associations?.characterLink) {
+        EventParticipant.belongsTo(CharacterInWork, {
+            as: 'characterLink',
+            foreignKey: 'character_in_work_id',
+            targetKey: 'id',
+        });
+    }
+    if (!CharacterInWork.associations?.participations) {
+        CharacterInWork.hasMany(EventParticipant, {
+            as: 'participations',
+            foreignKey: 'character_in_work_id',
+            sourceKey: 'id',
+        });
+    }
 }

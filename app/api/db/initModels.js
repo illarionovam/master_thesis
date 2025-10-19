@@ -5,6 +5,8 @@ import '../models/characterInWork.js';
 import '../models/location.js';
 import '../models/locationInWork.js';
 import '../models/relationship.js';
+import '../models/event.js';
+import '../models/eventParticipant.js';
 import { initAssociations } from '../models/associations.js';
 
 export async function initModels() {
