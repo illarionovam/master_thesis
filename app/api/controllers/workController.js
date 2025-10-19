@@ -111,7 +111,7 @@ const linkCharacter = async (req, res) => {
         character_id: characterId,
     });
 
-    res.status(201).json(characterInWork);
+    res.status(201).json(characterInWorkController.stripCharacterInWorkResponse(characterInWork));
 };
 
 const unlinkCharacter = async (req, res) => {
@@ -171,7 +171,7 @@ const linkLocation = async (req, res) => {
         location_id: locationId,
     });
 
-    res.status(201).json(locationInWork);
+    res.status(201).json(locationInWorkController.stripLocationInWorkResponse(locationInWork));
 };
 
 const unlinkLocation = async (req, res) => {

@@ -1,4 +1,5 @@
 import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
+import characterInWorkService from '../services/characterInWorkService.js';
 import relationshipService from '../services/relationshipService.js';
 
 const stripRelationshipResponse = relationship => {
@@ -7,6 +8,18 @@ const stripRelationshipResponse = relationship => {
 
 const createRelationship = async (req, res) => {
     const { fromId, toId, type, notes } = req.body;
+
+    const characterInWorkFrom = characterInWorkService.getCharacterInWork(fromId, req.appUser.id);
+
+    if (characterInWorkFrom == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const characterInWorkTo = characterInWorkService.getCharacterInWork(toId, req.appUser.id);
+
+    if (characterInWorkTo == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
 
     const relationship = await relationshipService.createRelationship({
         from_character_in_work_id: fromId,

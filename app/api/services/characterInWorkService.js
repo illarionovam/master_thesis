@@ -1,6 +1,7 @@
 import { CharacterInWork } from '../models/characterInWork.js';
 import { Work } from '../models/work.js';
 import { Character } from '../models/character.js';
+import { EventParticipant } from '../models/eventParticipant.js';
 
 async function createCharacterInWork(payload, { transaction } = {}) {
     return CharacterInWork.create(payload, { transaction });
@@ -115,6 +116,35 @@ async function getCharactersInWork(ownerId, { transaction } = {}) {
     });
 }
 
+async function getCharactersInWorkNotLinkedToEvent(event, ownerId, { transaction } = {}) {
+    return CharacterInWork.findAll({
+        where: { work_id: event.work_id, '$participations.id$': null },
+        include: [
+            {
+                model: Work,
+                as: 'work',
+                where: { owner_id: ownerId },
+                required: true,
+            },
+            {
+                model: Character,
+                as: 'character',
+                where: { owner_id: ownerId },
+                required: true,
+            },
+            {
+                model: EventParticipant,
+                as: 'participations',
+                attributes: [],
+                required: false,
+                where: { event_id: event.id },
+            },
+        ],
+        transaction,
+        subQuery: false,
+    });
+}
+
 async function updateCharacterInWork(characterInWork, payload, { transaction } = {}) {
     characterInWork.set(payload);
     await characterInWork.save({ transaction });
@@ -131,6 +161,7 @@ export default {
     getCharactersInWork,
     getCharactersInWorkByCharacterId,
     getCharactersInWorkByWorkId,
+    getCharactersInWorkNotLinkedToEvent,
     updateCharacterInWork,
     destroyCharacterInWork,
 };
