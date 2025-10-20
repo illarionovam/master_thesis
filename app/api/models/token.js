@@ -20,12 +20,6 @@ export const Token = sequelize.define(
         token: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [16, 4096],
-                    msg: 'Token must contain from 16 to 4096 characters',
-                },
-            },
         },
         scope: {
             type: DataTypes.TEXT,

@@ -28,11 +28,7 @@ const getLocationInWork = async (req, res) => {
 
     const locationInWork = await locationInWorkService.getLocationInWork(locationInWorkId);
 
-    if (
-        locationInWork == null ||
-        (req.location && locationInWork.location_id !== req.location.id) ||
-        (req.work && locationInWork.work_id !== req.work.id)
-    ) {
+    if (locationInWork == null || locationInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
@@ -44,11 +40,7 @@ const updateLocationInWork = async (req, res) => {
 
     const locationInWork = await characterInWorkService.getCharacterInWork(locationInWorkId);
 
-    if (
-        locationInWork == null ||
-        (req.location && locationInWork.location_id !== req.location.id) ||
-        (req.work && locationInWork.work_id !== req.work.id)
-    ) {
+    if (locationInWork == null || locationInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
@@ -62,11 +54,7 @@ const destroyLocationInWork = async (req, res) => {
 
     const locationInWork = await locationInWorkService.getLocationInWork(locationInWorkId);
 
-    if (
-        locationInWork == null ||
-        (req.location && locationInWork.location_id !== req.location.id) ||
-        (req.work && locationInWork.work_id !== req.work.id)
-    ) {
+    if (locationInWork == null || locationInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 

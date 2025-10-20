@@ -1,5 +1,4 @@
 import createHttpError from 'http-errors';
-import workService from '../services/workService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
 import characterInWorkController from './characterInWorkController.js';
 import locationInWorkService from '../services/locationInWorkService.js';
@@ -7,40 +6,39 @@ import eventService from '../services/eventService.js';
 import eventParticipantService from '../services/eventParticipantService.js';
 import eventParticipantController from './eventParticipantController.js';
 
+const stripBulkEventResponse = event => {
+    return event;
+};
+
 const stripEventResponse = event => {
     return event;
 };
 
 const createEvent = async (req, res) => {
-    const { workId, locationInWorkId, description } = req.body;
+    const { location_in_work_id } = req.body;
 
-    const work = await workService.getWork(workId, req.appUser.id);
+    if (location_in_work_id != null) {
+        const locationInWork = await locationInWorkService.getLocationInWork(location_in_work_id);
 
-    if (work == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    const locationInWork = await locationInWorkService.getLocationInWork(locationInWorkId, req.appUser.id);
-
-    if (locationInWork == null) {
-        throw createHttpError(403, 'Forbidden');
+        if (locationInWork == null || locationInWork.work_id !== req.work.id) {
+            throw createHttpError(403, 'Forbidden');
+        }
     }
 
     const event = await eventService.createEvent({
-        work_id: workId,
-        location_in_work_id: locationInWorkId,
-        description: description.trim(),
+        work_id: req.work.id,
+        ...req.body,
     });
 
     res.status(201).json(stripEventResponse(event));
 };
 
 const getEvent = async (req, res) => {
-    const { id } = req.params;
+    const { eventId } = req.params;
 
-    const event = await eventService.getEvent(id, req.appUser.id);
+    const event = await eventService.getEvent(eventId);
 
-    if (event == null) {
+    if (event == null || event.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
@@ -48,56 +46,40 @@ const getEvent = async (req, res) => {
 };
 
 const getEventsByWorkId = async (req, res) => {
-    const { id } = req.params;
+    const events = await eventService.getEventsByWorkId(req.work.id);
 
-    const work = await workService.getWork(id, req.appUser.id);
-
-    if (work == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    const events = await eventService.getEventsByWorkId(id, req.appUser.id);
-
-    res.json(events.map(stripEventResponse));
+    res.json(events.map(stripBulkEventResponse));
 };
 
 const updateEvent = async (req, res) => {
-    const { id } = req.params;
-    const { locationInWorkId, description } = req.body;
+    const { eventId } = req.params;
+    const { location_in_work_id } = req.body;
 
-    const payload = {};
+    if (location_in_work_id != null) {
+        const locationInWork = await locationInWorkService.getLocationInWork(location_in_work_id);
 
-    if (locationInWorkId != null) {
-        const locationInWork = await locationInWorkService.getLocationInWork(locationInWorkId, req.appUser.id);
-
-        if (locationInWork == null) {
+        if (locationInWork == null || locationInWork.work_id !== req.work.id) {
             throw createHttpError(403, 'Forbidden');
         }
-
-        payload.location_in_work_id = locationInWorkId;
     }
 
-    if (description != null) payload.description = description.trim();
+    const event = await eventService.getEvent(eventId);
 
-    if (Object.keys(payload).length > 0) {
-        const event = await eventService.getEvent(id, req.appUser.id);
-
-        if (event == null) {
-            throw createHttpError(403, 'Forbidden');
-        }
-
-        await eventService.updateEvent(event, payload);
+    if (event == null || event.work_id !== req.work.id) {
+        throw createHttpError(403, 'Forbidden');
     }
+
+    await eventService.updateEvent(event, req.body);
 
     res.sendStatus(200);
 };
 
 const destroyEvent = async (req, res) => {
-    const { id } = req.params;
+    const { eventId } = req.params;
 
-    const event = await eventService.getEvent(id, req.appUser.id);
+    const event = await eventService.getEvent(eventId);
 
-    if (event == null) {
+    if (event == null || event.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
@@ -176,6 +158,7 @@ const getEventPossibleParticipants = async (req, res) => {
 };
 
 export default {
+    stripBulkEventResponse,
     stripEventResponse,
     createEvent,
     getEvent,

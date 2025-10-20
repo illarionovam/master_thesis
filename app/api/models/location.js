@@ -18,12 +18,6 @@ export const Location = sequelize.define(
         title: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 300],
-                    msg: 'Title must contain no more than 300 characters',
-                },
-            },
             set(v) {
                 this.setDataValue('title', v.trim());
             },
@@ -31,12 +25,6 @@ export const Location = sequelize.define(
         description: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 3000],
-                    msg: 'Description must contain no more than 3000 characters',
-                },
-            },
             set(v) {
                 this.setDataValue('description', v.trim());
             },

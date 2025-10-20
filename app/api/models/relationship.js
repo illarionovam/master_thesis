@@ -24,12 +24,6 @@ export const Relationship = sequelize.define(
         type: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 120],
-                    msg: 'Type must contain no more than 120 characters',
-                },
-            },
             set(v) {
                 this.setDataValue('type', v.trim());
             },
@@ -37,12 +31,6 @@ export const Relationship = sequelize.define(
         notes: {
             type: DataTypes.TEXT,
             allowNull: true,
-            validate: {
-                len: {
-                    args: [1, 500],
-                    msg: 'Notes must contain no more than 500 characters',
-                },
-            },
             set(v) {
                 this.setDataValue('notes', normalizeOptionalText(v));
             },

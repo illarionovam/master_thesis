@@ -77,7 +77,7 @@ const destroyLocation = async (req, res) => {
 };
 
 const getLocationPlacements = async (req, res) => {
-    const placements = await locationInWorkService.getLocationsInWorkByLocationId(req.location.id, req.appUser.id);
+    const placements = await locationInWorkService.getLocationsInWorkByLocationId(req.location.id);
 
     res.json(placements.map(locationInWorkController.stripBulkLocationInWorkResponse));
 };
