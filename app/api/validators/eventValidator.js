@@ -30,10 +30,11 @@ const updateEventValidator = Joi.object({
         .try(
             Joi.string()
                 .trim()
+                .min(1)
                 .guid({ version: ['uuidv4', 'uuidv1'] }),
+
             Joi.valid(null)
         )
-        .min(1)
         .messages({
             'string.min': 'location_in_work_id must be a valid UUID or null',
             'alternatives.match': 'location_in_work_id must be a valid UUID or null',
@@ -46,4 +47,28 @@ const updateEventValidator = Joi.object({
     })
     .prefs({ abortEarly: false, stripUnknown: true });
 
-export default { createEventValidator, updateEventValidator };
+const linkParticipantValidator = Joi.object({
+    event_id: Joi.string()
+        .trim()
+        .guid({ version: ['uuidv4', 'uuidv1'] })
+        .min(1)
+        .required()
+        .messages({
+            'string.min': 'event_id is required',
+            'string.guid': 'event_id must be a valid UUID',
+            'any.required': 'event_id is required',
+        }),
+
+    character_in_work_id: Joi.string()
+        .trim()
+        .guid({ version: ['uuidv4', 'uuidv1'] })
+        .min(1)
+        .required()
+        .messages({
+            'string.min': 'character_in_work_id is required',
+            'string.guid': 'character_in_work_id must be a valid UUID',
+            'any.required': 'character_in_work_id is required',
+        }),
+}).prefs({ abortEarly: false, stripUnknown: true });
+
+export default { createEventValidator, updateEventValidator, linkParticipantValidator };

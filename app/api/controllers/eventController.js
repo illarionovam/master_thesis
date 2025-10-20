@@ -89,35 +89,41 @@ const destroyEvent = async (req, res) => {
 };
 
 const linkParticipant = async (req, res) => {
-    const { id } = req.params;
-    const { characterInWorkId } = req.body;
+    const { eventId } = req.params;
+    const { character_in_work_id } = req.body;
 
-    const event = await eventService.getEvent(id, req.appUser.id);
+    const event = await eventService.getEvent(eventId);
 
-    if (event == null) {
+    if (event == null || event.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
+    const characterInWork = await characterInWorkService.getCharacterInWork(character_in_work_id);
 
-    if (characterInWork == null) {
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
     const eventParticipant = await eventParticipantService.createEventParticipant({
-        event_id: id,
-        character_in_work_id: characterInWorkId,
+        event_id: eventId,
+        ...req.body,
     });
 
     res.status(201).json(eventParticipant);
 };
 
 const unlinkParticipant = async (req, res) => {
-    const { eventParticipantId } = req.params;
+    const { eventId, eventParticipantId } = req.params;
 
-    const eventParticipant = await eventParticipantService.getEventParticipant(eventParticipantId, req.appUser.id);
+    const event = await eventService.getEvent(eventId);
 
-    if (eventParticipant == null) {
+    if (event == null || event.work_id !== req.work.id) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const eventParticipant = await eventParticipantService.getEventParticipant(eventParticipantId);
+
+    if (eventParticipant == null || eventParticipant.event_id !== eventId) {
         throw createHttpError(403, 'Forbidden');
     }
 
@@ -127,34 +133,31 @@ const unlinkParticipant = async (req, res) => {
 };
 
 const getEventParticipants = async (req, res) => {
-    const { id } = req.params;
+    const { eventId } = req.params;
 
-    const event = await eventService.getEvent(id, req.appUser.id);
+    const event = await eventService.getEvent(eventId);
 
-    if (event == null) {
+    if (event == null || event.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const eventParticipants = eventParticipantService.getEventParticipantsByEventId(id, req.appUser.id);
+    const eventParticipants = eventParticipantService.getEventParticipantsByEventId(id);
 
-    res.json(eventParticipants.map(eventParticipantController.stripEventParticipantResponse));
+    res.json(eventParticipants.map(eventParticipantController.stripBulkEventParticipantResponse));
 };
 
 const getEventPossibleParticipants = async (req, res) => {
-    const { id } = req.params;
+    const { eventId } = req.params;
 
-    const event = await eventService.getEvent(id, req.appUser.id);
+    const event = await eventService.getEvent(eventId);
 
-    if (event == null) {
+    if (event == null || event.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const possibleParticipants = await characterInWorkService.getCharactersInWorkNotLinkedToEvent(
-        event,
-        req.appUser.id
-    );
+    const possibleParticipants = await characterInWorkService.getCharactersInWorkNotLinkedToEvent(event);
 
-    res.json(possibleParticipants.map(characterInWorkController.stripCharacterInWorkResponse));
+    res.json(possibleParticipants.map(characterInWorkController.stripBulkCharacterInWorkResponse));
 };
 
 export default {

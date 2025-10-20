@@ -39,10 +39,10 @@ const updateLocationValidator = Joi.object({
         .try(
             Joi.string()
                 .trim()
+                .min(1)
                 .guid({ version: ['uuidv4', 'uuidv1'] }),
             Joi.valid(null)
         )
-        .min(1)
         .messages({
             'string.min': 'parent_location_id must be a valid UUID or null',
             'alternatives.match': 'parent_location_id must be a valid UUID or null',

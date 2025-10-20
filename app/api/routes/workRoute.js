@@ -6,12 +6,14 @@ import workController from '../controllers/workController.js';
 import relationshipController from '../controllers/relationshipController.js';
 import eventController from '../controllers/eventController.js';
 import characterInWorkController from '../controllers/characterInWorkController.js';
+import locationInWorkController from '../controllers/locationInWorkController.js';
 import characterInWorkValidator from '../validators/characterInWorkValidator.js';
 import validateBody from '../middlewares/validateBody.js';
 import { validateWorkId } from '../middlewares/validateId.js';
 import workValidator from '../validators/workValidator.js';
 import relationshipValidator from '../validators/relationshipValidator.js';
 import eventValidator from '../validators/eventValidator.js';
+import locationInWorkValidator from '../validators/locationInWorkValidator.js';
 
 const workRoute = express.Router();
 
@@ -142,7 +144,6 @@ workRoute.delete(
     controllerWrapper(validateWorkId()),
     controllerWrapper(eventController.destroyEvent)
 );
-/*
 workRoute.get(
     '/:id/events/:eventId/participants',
     controllerWrapper(validateWorkId()),
@@ -156,6 +157,7 @@ workRoute.get(
 workRoute.post(
     '/:id/events/:eventId/participants',
     controllerWrapper(validateWorkId()),
+    controllerWrapper(validateBody(eventValidator.linkParticipantValidator)),
     controllerWrapper(eventController.linkParticipant)
 );
 workRoute.delete(
@@ -163,5 +165,5 @@ workRoute.delete(
     controllerWrapper(validateWorkId()),
     controllerWrapper(eventController.unlinkParticipant)
 );
-*/
+
 export default workRoute;

@@ -3,8 +3,8 @@ import { Work } from '../models/work.js';
 import { Location } from '../models/location.js';
 
 const baseInclude = [
-    { model: Work, as: 'work', required: true, attributes: [title] },
-    { model: Location, as: 'location', required: true, attributes: [title] },
+    { model: Work, as: 'work', required: true, attributes: ['title'] },
+    { model: Location, as: 'location', required: true, attributes: ['title'] },
 ];
 
 const createLocationInWork = async (payload, { transaction } = {}) => {

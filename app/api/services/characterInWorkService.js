@@ -4,8 +4,8 @@ import { Character } from '../models/character.js';
 import { EventParticipant } from '../models/eventParticipant.js';
 
 const baseInclude = [
-    { model: Work, as: 'work', required: true, attributes: [title] },
-    { model: Character, as: 'character', required: true, attributes: [name] },
+    { model: Work, as: 'work', required: true, attributes: ['title'] },
+    { model: Character, as: 'character', required: true, attributes: ['name'] },
 ];
 
 const createCharacterInWork = async (payload, { transaction } = {}) => {

@@ -4,7 +4,7 @@ import { CharacterInWork } from '../models/characterInWork.js';
 import { Character } from '../models/character.js';
 import { Work } from '../models/work.js';
 
-const withOwnerInclude = ownerId => [
+const baseInclude = [
     {
         model: Event,
         as: 'event',
@@ -14,7 +14,6 @@ const withOwnerInclude = ownerId => [
                 model: Work,
                 as: 'work',
                 required: true,
-                where: { owner_id: ownerId },
             },
         ],
     },
@@ -27,7 +26,6 @@ const withOwnerInclude = ownerId => [
                 model: Character,
                 as: 'character',
                 required: true,
-                where: { owner_id: ownerId },
             },
         ],
     },
@@ -37,33 +35,19 @@ const createEventParticipant = async (payload, { transaction } = {}) => {
     return EventParticipant.create(payload, { transaction });
 };
 
-const getEventParticipant = async (id, ownerId, { transaction } = {}) => {
+const getEventParticipant = async (id, { transaction } = {}) => {
     return EventParticipant.findOne({
         where: { id },
-        include: withOwnerInclude(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });
 };
 
-const getEventParticipantByEventIdAndCharacterInWorkId = async (
-    eventId,
-    characterInWorkId,
-    ownerId,
-    { transaction } = {}
-) => {
-    return EventParticipant.findOne({
-        where: { event_id: eventId, character_in_work_id: characterInWorkId },
-        include: withOwnerInclude(ownerId),
-        transaction,
-        subQuery: false,
-    });
-};
-
-const getEventParticipantsByEventId = async (eventId, ownerId, { transaction } = {}) => {
+const getEventParticipantsByEventId = async (eventId, { transaction } = {}) => {
     return EventParticipant.findAll({
         where: { event_id: eventId },
-        include: withOwnerInclude(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });
@@ -76,7 +60,6 @@ const destroyEventParticipant = async (eventParticipant, { transaction } = {}) =
 export default {
     createEventParticipant,
     getEventParticipant,
-    getEventParticipantByEventIdAndCharacterInWorkId,
     getEventParticipantsByEventId,
     destroyEventParticipant,
 };

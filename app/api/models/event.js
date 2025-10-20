@@ -23,14 +23,8 @@ export const Event = sequelize.define(
         description: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 6000],
-                    msg: 'Description must contain no more than 3000 characters',
-                },
-            },
             set(v) {
-                this.setDataValue('description', v?.trim());
+                this.setDataValue('description', v.trim());
             },
         },
     },
