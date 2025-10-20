@@ -1,87 +1,64 @@
-import { Relationship as Relation } from '../models/relationship.js';
+import { Relationship } from '../models/relationship.js';
 import { CharacterInWork } from '../models/characterInWork.js';
-import { Character } from '../models/character.js';
-import { Work } from '../models/work.js';
+import characterInWorkService from './characterInWorkService.js';
+import { Op } from 'sequelize';
 
-const includeFromToWithOwner = ownerId => [
+const baseInclude = () => [
     {
         model: CharacterInWork,
         as: 'from',
         required: true,
-        include: [
-            {
-                model: Character,
-                as: 'character',
-                required: true,
-                where: { owner_id: ownerId },
-            },
-            {
-                model: Work,
-                as: 'work',
-                required: true,
-                where: { owner_id: ownerId },
-            },
-        ],
+        attributes: [],
+        include: characterInWorkService.baseInclude,
     },
     {
         model: CharacterInWork,
         as: 'to',
         required: true,
-        include: [
-            {
-                model: Character,
-                as: 'character',
-                required: true,
-                where: { owner_id: ownerId },
-            },
-            {
-                model: Work,
-                as: 'work',
-                required: true,
-                where: { owner_id: ownerId },
-            },
-        ],
+        attributes: [],
+        include: characterInWorkService.baseInclude,
     },
 ];
 
 const createRelationship = async (payload, { transaction } = {}) => {
-    return Relation.create(payload, { transaction });
+    return Relationship.create(payload, { transaction });
 };
 
-const getRelationship = async (id, ownerId, { transaction } = {}) => {
-    return Relation.findOne({
+const getRelationship = async (id, { transaction } = {}) => {
+    return Relationship.findOne({
         where: { id },
-        include: includeFromToWithOwner(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });
 };
 
-const getRelationshipByFromIdAndToId = async (fromId, toId, ownerId, { transaction } = {}) => {
-    return Relation.findOne({
+const getRelationships = async (characterInWorkId, { transaction } = {}) => {
+    return Relationship.findAll({
+        where: { from_character_in_work_id: characterInWorkId },
+        include: baseInclude,
+        transaction,
+        subQuery: false,
+    });
+};
+
+const getPossibleRelationships = async (characterInWorkId, workId, { transaction } = {}) => {
+    return CharacterInWork.findAll({
         where: {
-            from_character_in_work_id: fromId,
-            to_character_in_work_id: toId,
+            work_id: workId,
+            id: { [Op.ne]: characterInWorkId },
+            '$relsFromThis.id$': null,
         },
-        include: includeFromToWithOwner(ownerId),
-        transaction,
-        subQuery: false,
-    });
-};
-
-const getRelationshipsByFromId = async (fromId, ownerId, { transaction } = {}) => {
-    return Relation.findAll({
-        where: { from_character_in_work_id: fromId },
-        include: includeFromToWithOwner(ownerId),
-        transaction,
-        subQuery: false,
-    });
-};
-
-const getRelationshipsByToId = async (toId, ownerId, { transaction } = {}) => {
-    return Relation.findAll({
-        where: { to_character_in_work_id: toId },
-        include: includeFromToWithOwner(ownerId),
+        include: [
+            characterInWorkService.baseInclude,
+            {
+                model: Relationship,
+                as: 'incomingRelationships',
+                attributes: [],
+                required: false,
+                where: { from_character_in_work_id: characterInWorkId },
+            },
+        ],
         transaction,
         subQuery: false,
     });
@@ -99,9 +76,8 @@ const destroyRelationship = async (relationship, { transaction } = {}) => {
 export default {
     createRelationship,
     getRelationship,
-    getRelationshipByFromIdAndToId,
-    getRelationshipsByFromId,
-    getRelationshipsByToId,
+    getRelationships,
+    getPossibleRelationships,
     updateRelationship,
     destroyRelationship,
 };

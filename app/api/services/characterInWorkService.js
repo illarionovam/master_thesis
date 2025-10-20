@@ -3,7 +3,7 @@ import { Work } from '../models/work.js';
 import { Character } from '../models/character.js';
 import { EventParticipant } from '../models/eventParticipant.js';
 
-const baseInclude = () => [
+export const baseInclude = () => [
     { model: Work, as: 'work', required: true, attributes: [title] },
     { model: Character, as: 'character', required: true, attributes: [name] },
 ];
@@ -69,6 +69,7 @@ export const destroyCharacterInWork = async (characterInWork, { transaction } = 
 };
 
 export default {
+    baseInclude,
     createCharacterInWork,
     getCharacterInWork,
     getCharactersInWorkByWorkId,

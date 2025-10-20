@@ -31,7 +31,7 @@ export const Relationship = sequelize.define(
                 },
             },
             set(v) {
-                this.setDataValue('type', v?.trim());
+                this.setDataValue('type', v.trim());
             },
         },
         notes: {

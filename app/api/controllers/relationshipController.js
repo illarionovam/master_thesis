@@ -43,18 +43,6 @@ const getRelationship = async (req, res) => {
     res.json(stripRelationshipResponse(relationship));
 };
 
-const getRelationshipByFromIdAndToId = async (req, res) => {
-    const { fromId, toId } = req.params;
-
-    const relationship = await relationshipService.getRelationshipByFromIdAndToId(fromId, toId, req.appUser.id);
-
-    if (relationship == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    res.json(stripRelationshipResponse(relationship));
-};
-
 const updateRelationship = async (req, res) => {
     const { id } = req.params;
     const { type, notes } = req.body;

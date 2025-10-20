@@ -61,6 +61,11 @@ characterRoute.get(
     controllerWrapper(validateCharacterId()),
     controllerWrapper(characterInWorkController.getCharacterInWorkRelationships)
 );
+characterRoute.get(
+    '/:id/appearances/:characterInWorkId/relationships/available',
+    controllerWrapper(validateCharacterId()),
+    controllerWrapper(characterInWorkController.getCharacterInWorkPossibleRelationships)
+);
 characterRoute.patch(
     '/:id/appearances/:characterInWorkId',
     controllerWrapper(validateCharacterId()),

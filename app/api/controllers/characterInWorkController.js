@@ -57,13 +57,30 @@ const getCharacterInWorkRelationships = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const fromRelationships = relationshipService.getRelationshipsByFromId(characterInWorkId, req.appUser.id);
-    const toRelationships = relationshipService.getRelationshipsByToId(characterInWorkId, req.appUser.id);
+    const relationships = await relationshipService.getRelationships(characterInWorkId);
 
-    res.json({
-        from: fromRelationships.map(relationshipController.stripRelationshipResponse),
-        to: toRelationships.map(relationshipController.stripRelationshipResponse),
-    });
+    res.json(relationships);
+};
+
+const getCharacterInWorkPossibleRelationships = async (req, res) => {
+    const { characterInWorkId } = req.params;
+
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
+
+    if (
+        characterInWork == null ||
+        (req.character && characterInWork.character_id !== req.character.id) ||
+        (req.work && characterInWork.work_id !== req.work.id)
+    ) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const possibleRelationships = await relationshipService.getPossibleRelationships(
+        characterInWorkId,
+        characterInWork.work_id
+    );
+
+    res.json(possibleRelationships.map(stripBulkCharacterInWorkResponse));
 };
 
 const updateCharacterInWork = async (req, res) => {
@@ -107,6 +124,7 @@ export default {
     stripCharacterInWorkResponse,
     getCharacterInWork,
     getCharacterInWorkRelationships,
+    getCharacterInWorkPossibleRelationships,
     updateCharacterInWork,
     destroyCharacterInWork,
 };
