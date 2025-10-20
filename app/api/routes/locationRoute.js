@@ -3,20 +3,65 @@ import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import controllerWrapper from '../decorators/controllerWrapper.js';
 import locationController from '../controllers/locationController.js';
+import locationInWorkController from '../controllers/locationInWorkController.js';
+import validateBody from '../middlewares/validateBody.js';
+import { validateLocationId } from '../middlewares/validateId.js';
+import locationValidator from '../validators/locationValidator.js';
+import locationInWorkValidator from '../validators/locationInWorkValidator.js';
 
 const locationRoute = express.Router();
 
 locationRoute.use(controllerWrapper(authMiddleware.authMiddleware));
 
 locationRoute.get('/', controllerWrapper(locationController.getLocations));
-locationRoute.post('/', controllerWrapper(locationController.createLocation));
-locationRoute.get('/:id', controllerWrapper(locationController.getLocation));
-locationRoute.patch('/:id', controllerWrapper(locationController.updateLocation));
-locationRoute.delete('/:id', controllerWrapper(locationController.destroyLocation));
-
-locationRoute.get('/:id/placements', controllerWrapper(locationController.getLocationPlacements));
-locationRoute.get('/:id/placements/available', controllerWrapper(locationController.getLocationPossiblePlacements));
-locationRoute.post('/:id/placements', controllerWrapper(locationController.linkWork));
-locationRoute.delete('/:id/placements/:locationInWorkId', controllerWrapper(locationController.unlinkWork));
+locationRoute.post(
+    '/',
+    controllerWrapper(validateBody(locationValidator.createLocationValidator)),
+    controllerWrapper(locationController.createLocation)
+);
+locationRoute.get('/:id', controllerWrapper(validateLocationId()), controllerWrapper(locationController.getLocation));
+locationRoute.patch(
+    '/:id',
+    controllerWrapper(validateLocationId()),
+    controllerWrapper(validateBody(locationValidator.updateLocationValidator)),
+    controllerWrapper(locationController.updateLocation)
+);
+locationRoute.delete(
+    '/:id',
+    controllerWrapper(validateLocationId()),
+    controllerWrapper(locationController.destroyLocation)
+);
+locationRoute.get(
+    '/:id/placements',
+    controllerWrapper(validateLocationId()),
+    controllerWrapper(locationController.getLocationPlacements)
+);
+locationRoute.get(
+    '/:id/placements/available',
+    controllerWrapper(validateLocationId()),
+    controllerWrapper(locationController.getLocationPossiblePlacements)
+);
+locationRoute.post(
+    '/:id/placements',
+    controllerWrapper(validateLocationId()),
+    controllerWrapper(validateBody(locationValidator.linkWorkValidator)),
+    controllerWrapper(locationController.linkWork)
+);
+locationRoute.get(
+    '/:id/placements/:locationInWorkId',
+    controllerWrapper(validateLocationId()),
+    controllerWrapper(locationInWorkController.getLocationInWork)
+);
+locationRoute.patch(
+    '/:id/placements/:locationInWorkId',
+    controllerWrapper(validateLocationId()),
+    controllerWrapper(validateBody(locationInWorkValidator.updateLocationInWorkValidator)),
+    controllerWrapper(locationInWorkController.updateLocationInWork)
+);
+locationRoute.delete(
+    '/:id/placements/:locationInWorkId',
+    controllerWrapper(validateLocationId()),
+    controllerWrapper(locationInWorkController.destroyLocationInWork)
+);
 
 export default locationRoute;

@@ -1,51 +1,84 @@
 import locationInWorkService from '../services/locationInWorkService.js';
-import locationController from './locationController.js';
-import workController from './workController.js';
+
+const stripBulkLocationInWorkResponse = locationInWork => {
+    return {
+        id: locationInWork.id,
+        location_id: locationInWork.location_id,
+        work_id: locationInWork.work_id,
+        work: locationInWork.work,
+        location: locationInWork.location,
+    };
+};
 
 const stripLocationInWorkResponse = locationInWork => {
     return {
         id: locationInWork.id,
-        locationId: locationInWork.location_id,
-        workId: locationInWork.work_id,
+        location_id: locationInWork.location_id,
+        work_id: locationInWork.work_id,
         attributes: locationInWork.attributes,
-        updatedAt: locationInWork.updated_at,
-        createdAt: locationInWork.created_at,
-        work: workController.stripWorkResponse(locationInWork.work),
-        location: locationController.stripLocationResponse(locationInWork.location),
+        updated_at: locationInWork.updated_at,
+        created_at: locationInWork.created_at,
+        work: locationInWork.work,
+        location: locationInWork.location,
     };
 };
 
 const getLocationInWork = async (req, res) => {
-    const { id } = req.params;
+    const { locationInWorkId } = req.params;
 
-    const locationInWork = await locationInWorkService.getLocationInWork(id, req.appUser.id);
+    const locationInWork = await locationInWorkService.getLocationInWork(locationInWorkId);
 
-    if (locationInWork == null) {
+    if (
+        locationInWork == null ||
+        (req.location && locationInWork.location_id !== req.location.id) ||
+        (req.work && locationInWork.work_id !== req.work.id)
+    ) {
         throw createHttpError(403, 'Forbidden');
     }
 
-    res.json(stripLocationInWorkResponse(locationInWork));
+    return res.json(stripLocationInWorkResponse(locationInWork));
 };
 
 const updateLocationInWork = async (req, res) => {
-    const { id } = req.params;
-    const { attributes } = req.body;
+    const { locationInWorkId } = req.params;
 
-    if (attributes != null) {
-        const locationInWork = await locationInWorkService.getLocationInWork(id, req.appUser.id);
+    const locationInWork = await characterInWorkService.getCharacterInWork(locationInWorkId);
 
-        if (locationInWork == null) {
-            throw createHttpError(403, 'Forbidden');
-        }
-
-        await locationInWorkService.updateLocationInWork(locationInWork, { attributes });
+    if (
+        locationInWork == null ||
+        (req.location && locationInWork.location_id !== req.location.id) ||
+        (req.work && locationInWork.work_id !== req.work.id)
+    ) {
+        throw createHttpError(403, 'Forbidden');
     }
 
-    res.sendStatus(200);
+    await locationInWorkService.updateLocationInWork(locationInWork, req.body);
+
+    return res.sendStatus(200);
+};
+
+const destroyLocationInWork = async (req, res) => {
+    const { locationInWorkId } = req.params;
+
+    const locationInWork = await locationInWorkService.getLocationInWork(locationInWorkId);
+
+    if (
+        locationInWork == null ||
+        (req.location && locationInWork.location_id !== req.location.id) ||
+        (req.work && locationInWork.work_id !== req.work.id)
+    ) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    await locationInWorkService.destroyLocationInWork(locationInWork);
+
+    return res.sendStatus(204);
 };
 
 export default {
+    stripBulkLocationInWorkResponse,
     stripLocationInWorkResponse,
     getLocationInWork,
     updateLocationInWork,
+    destroyLocationInWork,
 };

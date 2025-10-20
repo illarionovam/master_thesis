@@ -51,6 +51,7 @@ const getWorksNotLinkedToLocation = async (locationId, ownerId, { transaction } 
                 model: LocationInWork,
                 as: 'locationLinks',
                 required: false,
+                attributes: [],
                 where: { location_id: locationId },
             },
         ],

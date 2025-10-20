@@ -2,54 +2,37 @@ import { LocationInWork } from '../models/locationInWork.js';
 import { Work } from '../models/work.js';
 import { Location } from '../models/location.js';
 
-const withOwnerInclude = ownerId => [
-    { model: Work, as: 'work', where: { owner_id: ownerId }, required: true },
-    { model: Location, as: 'location', where: { owner_id: ownerId }, required: true },
+const baseInclude = () => [
+    { model: Work, as: 'work', required: true, attributes: [title] },
+    { model: Location, as: 'location', required: true, attributes: [title] },
 ];
 
 const createLocationInWork = async (payload, { transaction } = {}) => {
     return LocationInWork.create(payload, { transaction });
 };
 
-const getLocationInWork = async (id, ownerId, { transaction } = {}) => {
+const getLocationInWork = async (id, { transaction } = {}) => {
     return LocationInWork.findOne({
         where: { id },
-        include: withOwnerInclude(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });
 };
 
-const getLocationInWorkByWorkIdAndLocationId = async (workId, locationId, ownerId, { transaction } = {}) => {
-    return LocationInWork.findOne({
-        where: { work_id: workId, location_id: locationId },
-        include: withOwnerInclude(ownerId),
-        transaction,
-        subQuery: false,
-    });
-};
-
-const getLocationsInWorkByWorkId = async (workId, ownerId, { transaction } = {}) => {
+const getLocationsInWorkByWorkId = async (workId, { transaction } = {}) => {
     return LocationInWork.findAll({
         where: { work_id: workId },
-        include: withOwnerInclude(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });
 };
 
-const getLocationsInWorkByLocationId = async (locationId, ownerId, { transaction } = {}) => {
+const getLocationsInWorkByLocationId = async (locationId, { transaction } = {}) => {
     return LocationInWork.findAll({
         where: { location_id: locationId },
-        include: withOwnerInclude(ownerId),
-        transaction,
-        subQuery: false,
-    });
-};
-
-const getLocationsInWork = async (ownerId, { transaction } = {}) => {
-    return LocationInWork.findAll({
-        include: withOwnerInclude(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });
@@ -67,8 +50,6 @@ const destroyLocationInWork = async (locationInWork, { transaction } = {}) => {
 export default {
     createLocationInWork,
     getLocationInWork,
-    getLocationInWorkByWorkIdAndLocationId,
-    getLocationsInWork,
     getLocationsInWorkByLocationId,
     getLocationsInWorkByWorkId,
     updateLocationInWork,

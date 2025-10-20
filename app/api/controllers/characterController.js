@@ -43,7 +43,7 @@ const getCharacter = async (req, res) => {
 const getCharacters = async (req, res) => {
     const characters = await characterService.getCharacters(req.appUser.id);
 
-    res.json(characters.map(stripCharacterResponse));
+    res.json(characters.map(stripBulkCharacterResponse));
 };
 
 const updateCharacter = async (req, res) => {

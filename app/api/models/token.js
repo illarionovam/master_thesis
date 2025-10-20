@@ -37,7 +37,7 @@ export const Token = sequelize.define(
                 },
             },
             set(v) {
-                this.setDataValue('scope', v?.trim());
+                this.setDataValue('scope', v.trim());
             },
         },
     },

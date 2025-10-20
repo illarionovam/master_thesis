@@ -26,7 +26,7 @@ export const Work = sequelize.define(
                 },
             },
             set(v) {
-                this.setDataValue('title', v?.trim());
+                this.setDataValue('title', v.trim());
             },
         },
         annotation: {
