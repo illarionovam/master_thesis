@@ -3,16 +3,16 @@ import { Work } from '../models/work.js';
 import { Character } from '../models/character.js';
 import { EventParticipant } from '../models/eventParticipant.js';
 
-export const baseInclude = () => [
+const baseInclude = [
     { model: Work, as: 'work', required: true, attributes: [title] },
     { model: Character, as: 'character', required: true, attributes: [name] },
 ];
 
-export const createCharacterInWork = async (payload, { transaction } = {}) => {
+const createCharacterInWork = async (payload, { transaction } = {}) => {
     return CharacterInWork.create(payload, { transaction });
 };
 
-export const getCharacterInWork = async (id, { transaction } = {}) => {
+const getCharacterInWork = async (id, { transaction } = {}) => {
     return CharacterInWork.findOne({
         where: { id },
         include: baseInclude,
@@ -21,7 +21,7 @@ export const getCharacterInWork = async (id, { transaction } = {}) => {
     });
 };
 
-export const getCharactersInWorkByWorkId = async (workId, { transaction } = {}) => {
+const getCharactersInWorkByWorkId = async (workId, { transaction } = {}) => {
     return CharacterInWork.findAll({
         where: { work_id: workId },
         include: baseInclude,
@@ -30,7 +30,7 @@ export const getCharactersInWorkByWorkId = async (workId, { transaction } = {}) 
     });
 };
 
-export const getCharactersInWorkByCharacterId = async (characterId, { transaction } = {}) => {
+const getCharactersInWorkByCharacterId = async (characterId, { transaction } = {}) => {
     return CharacterInWork.findAll({
         where: { character_id: characterId },
         include: baseInclude,
@@ -39,7 +39,7 @@ export const getCharactersInWorkByCharacterId = async (characterId, { transactio
     });
 };
 
-export const getCharactersInWorkNotLinkedToEvent = async (event, { transaction } = {}) => {
+const getCharactersInWorkNotLinkedToEvent = async (event, { transaction } = {}) => {
     return CharacterInWork.findAll({
         where: {
             work_id: event.work_id,
@@ -59,12 +59,12 @@ export const getCharactersInWorkNotLinkedToEvent = async (event, { transaction }
     });
 };
 
-export const updateCharacterInWork = async (characterInWork, payload, { transaction } = {}) => {
+const updateCharacterInWork = async (characterInWork, payload, { transaction } = {}) => {
     characterInWork.set(payload);
     await characterInWork.save({ transaction });
 };
 
-export const destroyCharacterInWork = async (characterInWork, { transaction } = {}) => {
+const destroyCharacterInWork = async (characterInWork, { transaction } = {}) => {
     await characterInWork.destroy({ transaction });
 };
 

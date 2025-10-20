@@ -2,7 +2,7 @@ import { LocationInWork } from '../models/locationInWork.js';
 import { Work } from '../models/work.js';
 import { Location } from '../models/location.js';
 
-const baseInclude = () => [
+const baseInclude = [
     { model: Work, as: 'work', required: true, attributes: [title] },
     { model: Location, as: 'location', required: true, attributes: [title] },
 ];

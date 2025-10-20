@@ -58,23 +58,6 @@ const destroyCharacter = async (req, res) => {
     res.sendStatus(204);
 };
 
-const linkWork = async (req, res) => {
-    const { work_id } = req.body;
-
-    const work = await workService.getWork(work_id, req.appUser.id);
-
-    if (work == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    const characterInWork = await characterInWorkService.createCharacterInWork({
-        work_id,
-        character_id: req.character.id,
-    });
-
-    res.status(201).json(characterInWorkController.stripCharacterInWorkResponse(characterInWork));
-};
-
 const getCharacterAppearances = async (req, res) => {
     const appearances = await characterInWorkService.getCharactersInWorkByCharacterId(req.character.id);
 
@@ -95,7 +78,6 @@ export default {
     getCharacters,
     updateCharacter,
     destroyCharacter,
-    linkWork,
     getCharacterAppearances,
     getCharacterPossibleAppearances,
 };

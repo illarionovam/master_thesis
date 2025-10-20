@@ -76,23 +76,6 @@ const destroyLocation = async (req, res) => {
     res.sendStatus(204);
 };
 
-const linkWork = async (req, res) => {
-    const { work_id } = req.body;
-
-    const work = await workService.getWork(work_id, req.appUser.id);
-
-    if (work == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    const locationInWork = await locationInWorkService.createLocationInWork({
-        work_id,
-        location_id: req.location.id,
-    });
-
-    res.status(201).json(locationInWorkController.stripLocationInWorkResponse(locationInWork));
-};
-
 const getLocationPlacements = async (req, res) => {
     const placements = await locationInWorkService.getLocationsInWorkByLocationId(req.location.id, req.appUser.id);
 
@@ -113,7 +96,6 @@ export default {
     getLocations,
     updateLocation,
     destroyLocation,
-    linkWork,
     getLocationPlacements,
     getLocationPossiblePlacements,
 };

@@ -1,40 +1,48 @@
-import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 import characterInWorkService from '../services/characterInWorkService.js';
 import relationshipService from '../services/relationshipService.js';
+
+const stripBulkRelationshipResponse = relationship => {
+    return relationship;
+};
 
 const stripRelationshipResponse = relationship => {
     return relationship;
 };
 
 const createRelationship = async (req, res) => {
-    const { fromId, toId, type, notes } = req.body;
+    const { characterInWorkId } = req.params;
+    const { to_character_in_work_id } = req.body;
 
-    const characterInWorkFrom = characterInWorkService.getCharacterInWork(fromId);
+    const characterInWork = characterInWorkService.getCharacterInWork(characterInWorkId);
 
-    if (characterInWorkFrom == null) {
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const characterInWorkTo = characterInWorkService.getCharacterInWork(toId);
+    const characterInWorkTo = characterInWorkService.getCharacterInWork(to_character_in_work_id);
 
-    if (characterInWorkTo == null) {
+    if (characterInWorkTo == null || characterInWorkTo.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
     const relationship = await relationshipService.createRelationship({
-        from_character_in_work_id: fromId,
-        to_character_in_work_id: toId,
-        type: type.trim(),
-        notes: normalizeOptionalText(notes),
+        from_character_in_work_id: characterInWorkId,
+        ...req.body,
     });
 
     res.status(201).json(stripRelationshipResponse(relationship));
 };
 
 const getRelationship = async (req, res) => {
-    const { id } = req.params;
+    const { characterInWorkId, relationshipId } = req.params;
 
-    const relationship = await relationshipService.getRelationship(id, req.appUser.id);
+    const characterInWork = characterInWorkService.getCharacterInWork(characterInWorkId);
+
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const relationship = await relationshipService.getRelationship(relationshipId);
 
     if (relationship == null) {
         throw createHttpError(403, 'Forbidden');
@@ -44,31 +52,35 @@ const getRelationship = async (req, res) => {
 };
 
 const updateRelationship = async (req, res) => {
-    const { id } = req.params;
-    const { type, notes } = req.body;
+    const { characterInWorkId, relationshipId } = req.params;
 
-    const payload = {};
+    const characterInWork = characterInWorkService.getCharacterInWork(characterInWorkId);
 
-    if (type != null) payload.type = type.trim();
-    if (typeof notes !== 'undefined') payload.notes = normalizeOptionalText(notes);
-
-    if (Object.keys(payload).length > 0) {
-        const relationship = await relationshipService.getRelationship(id, req.appUser.id);
-
-        if (relationship == null) {
-            throw createHttpError(403, 'Forbidden');
-        }
-
-        await relationshipService.updateRelationship(relationship, payload);
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
+        throw createHttpError(403, 'Forbidden');
     }
+
+    const relationship = await relationshipService.getRelationship(relationshipId);
+
+    if (relationship == null) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    await relationshipService.updateRelationship(relationship, req.body);
 
     res.sendStatus(200);
 };
 
 const destroyRelationship = async (req, res) => {
-    const { id } = req.params;
+    const { characterInWorkId, relationshipId } = req.params;
 
-    const relationship = await relationshipService.getRelationship(id, req.appUser.id);
+    const characterInWork = characterInWorkService.getCharacterInWork(characterInWorkId);
+
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const relationship = await relationshipService.getRelationship(relationshipId);
 
     if (relationship == null) {
         throw createHttpError(403, 'Forbidden');
@@ -80,10 +92,10 @@ const destroyRelationship = async (req, res) => {
 };
 
 export default {
+    stripBulkRelationshipResponse,
     stripRelationshipResponse,
     createRelationship,
     getRelationship,
-    getRelationshipByFromIdAndToId,
     updateRelationship,
     destroyRelationship,
 };

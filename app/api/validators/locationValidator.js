@@ -42,8 +42,9 @@ const updateLocationValidator = Joi.object({
                 .guid({ version: ['uuidv4', 'uuidv1'] }),
             Joi.valid(null)
         )
-        .empty('')
+        .min(1)
         .messages({
+            'string.min': 'parent_location_id must be a valid UUID or null',
             'alternatives.match': 'parent_location_id must be a valid UUID or null',
             'string.guid': 'parent_location_id must be a valid UUID',
         }),
@@ -54,19 +55,4 @@ const updateLocationValidator = Joi.object({
     })
     .prefs({ abortEarly: false, stripUnknown: true });
 
-const linkWorkValidator = Joi.object({
-    work_id: Joi.alternatives()
-        .try(
-            Joi.string()
-                .trim()
-                .guid({ version: ['uuidv4', 'uuidv1'] }),
-            Joi.valid(null)
-        )
-        .empty('')
-        .messages({
-            'alternatives.match': 'work_id must be a valid UUID or null',
-            'string.guid': 'work_id must be a valid UUID',
-        }),
-}).prefs({ abortEarly: false, stripUnknown: true });
-
-export default { createLocationValidator, updateLocationValidator, linkWorkValidator };
+export default { createLocationValidator, updateLocationValidator };

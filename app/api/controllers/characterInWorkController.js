@@ -33,11 +33,7 @@ const getCharacterInWork = async (req, res) => {
 
     const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
 
-    if (
-        characterInWork == null ||
-        (req.character && characterInWork.character_id !== req.character.id) ||
-        (req.work && characterInWork.work_id !== req.work.id)
-    ) {
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
@@ -49,17 +45,13 @@ const getCharacterInWorkRelationships = async (req, res) => {
 
     const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
 
-    if (
-        characterInWork == null ||
-        (req.character && characterInWork.character_id !== req.character.id) ||
-        (req.work && characterInWork.work_id !== req.work.id)
-    ) {
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const relationships = await relationshipService.getRelationships(characterInWorkId);
+    const relationships = await relationshipService.getRelationships(characterInWorkId, characterInWork.work_id);
 
-    res.json(relationships);
+    res.json(relationships.map(relationshipController.stripBulkRelationshipResponse));
 };
 
 const getCharacterInWorkPossibleRelationships = async (req, res) => {
@@ -67,11 +59,7 @@ const getCharacterInWorkPossibleRelationships = async (req, res) => {
 
     const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
 
-    if (
-        characterInWork == null ||
-        (req.character && characterInWork.character_id !== req.character.id) ||
-        (req.work && characterInWork.work_id !== req.work.id)
-    ) {
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 

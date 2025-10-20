@@ -41,27 +41,5 @@ locationRoute.get(
     controllerWrapper(validateLocationId()),
     controllerWrapper(locationController.getLocationPossiblePlacements)
 );
-locationRoute.post(
-    '/:id/placements',
-    controllerWrapper(validateLocationId()),
-    controllerWrapper(validateBody(locationValidator.linkWorkValidator)),
-    controllerWrapper(locationController.linkWork)
-);
-locationRoute.get(
-    '/:id/placements/:locationInWorkId',
-    controllerWrapper(validateLocationId()),
-    controllerWrapper(locationInWorkController.getLocationInWork)
-);
-locationRoute.patch(
-    '/:id/placements/:locationInWorkId',
-    controllerWrapper(validateLocationId()),
-    controllerWrapper(validateBody(locationInWorkValidator.updateLocationInWorkValidator)),
-    controllerWrapper(locationInWorkController.updateLocationInWork)
-);
-locationRoute.delete(
-    '/:id/placements/:locationInWorkId',
-    controllerWrapper(validateLocationId()),
-    controllerWrapper(locationInWorkController.destroyLocationInWork)
-);
 
 export default locationRoute;

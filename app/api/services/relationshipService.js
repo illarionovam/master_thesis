@@ -3,7 +3,7 @@ import { CharacterInWork } from '../models/characterInWork.js';
 import characterInWorkService from './characterInWorkService.js';
 import { Op } from 'sequelize';
 
-const baseInclude = () => [
+const baseInclude = [
     {
         model: CharacterInWork,
         as: 'from',
@@ -33,9 +33,9 @@ const getRelationship = async (id, { transaction } = {}) => {
     });
 };
 
-const getRelationships = async (characterInWorkId, { transaction } = {}) => {
+const getRelationships = async (characterInWorkId, workId, { transaction } = {}) => {
     return Relationship.findAll({
-        where: { from_character_in_work_id: characterInWorkId },
+        where: { from_character_in_work_id: characterInWorkId, '$to.work_id$': workId },
         include: baseInclude,
         transaction,
         subQuery: false,

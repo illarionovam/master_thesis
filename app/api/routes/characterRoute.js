@@ -45,37 +45,5 @@ characterRoute.get(
     controllerWrapper(validateCharacterId()),
     controllerWrapper(characterController.getCharacterPossibleAppearances)
 );
-characterRoute.post(
-    '/:id/appearances',
-    controllerWrapper(validateCharacterId()),
-    controllerWrapper(validateBody(characterValidator.linkWorkValidator)),
-    controllerWrapper(characterController.linkWork)
-);
-characterRoute.get(
-    '/:id/appearances/:characterInWorkId',
-    controllerWrapper(validateCharacterId()),
-    controllerWrapper(characterInWorkController.getCharacterInWork)
-);
-characterRoute.get(
-    '/:id/appearances/:characterInWorkId/relationships',
-    controllerWrapper(validateCharacterId()),
-    controllerWrapper(characterInWorkController.getCharacterInWorkRelationships)
-);
-characterRoute.get(
-    '/:id/appearances/:characterInWorkId/relationships/available',
-    controllerWrapper(validateCharacterId()),
-    controllerWrapper(characterInWorkController.getCharacterInWorkPossibleRelationships)
-);
-characterRoute.patch(
-    '/:id/appearances/:characterInWorkId',
-    controllerWrapper(validateCharacterId()),
-    controllerWrapper(validateBody(characterInWorkValidator.updateCharacterInWork)),
-    controllerWrapper(characterInWorkController.updateCharacterInWork)
-);
-characterRoute.delete(
-    '/:id/appearances/:characterInWorkId',
-    controllerWrapper(validateCharacterId()),
-    controllerWrapper(characterInWorkController.destroyCharacterInWork)
-);
 
 export default characterRoute;
