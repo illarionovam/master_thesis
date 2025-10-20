@@ -9,13 +9,13 @@ const stripRelationshipResponse = relationship => {
 const createRelationship = async (req, res) => {
     const { fromId, toId, type, notes } = req.body;
 
-    const characterInWorkFrom = characterInWorkService.getCharacterInWork(fromId, req.appUser.id);
+    const characterInWorkFrom = characterInWorkService.getCharacterInWork(fromId);
 
     if (characterInWorkFrom == null) {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const characterInWorkTo = characterInWorkService.getCharacterInWork(toId, req.appUser.id);
+    const characterInWorkTo = characterInWorkService.getCharacterInWork(toId);
 
     if (characterInWorkTo == null) {
         throw createHttpError(403, 'Forbidden');

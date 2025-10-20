@@ -3,19 +3,19 @@ import { Work } from '../models/work.js';
 import { Character } from '../models/character.js';
 import { EventParticipant } from '../models/eventParticipant.js';
 
-const withOwnerInclude = ownerId => [
-    { model: Work, as: 'work', where: { owner_id: ownerId }, required: true, attributes: [] },
-    { model: Character, as: 'character', where: { owner_id: ownerId }, required: true, attributes: [] },
+const baseInclude = () => [
+    { model: Work, as: 'work', required: true, attributes: [name] },
+    { model: Character, as: 'character', required: true, attributes: [title] },
 ];
 
 export const createCharacterInWork = async (payload, { transaction } = {}) => {
     return CharacterInWork.create(payload, { transaction });
 };
 
-export const getCharacterInWork = async (id, ownerId, { transaction } = {}) => {
+export const getCharacterInWork = async (id, { transaction } = {}) => {
     return CharacterInWork.findOne({
         where: { id },
-        include: withOwnerInclude(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });
@@ -30,19 +30,19 @@ export const getCharacterInWorkByWorkIdAndCharacterId = async (workId, character
     });
 };
 
-export const getCharactersInWorkByWorkId = async (workId, ownerId, { transaction } = {}) => {
+export const getCharactersInWorkByWorkId = async (workId, { transaction } = {}) => {
     return CharacterInWork.findAll({
         where: { work_id: workId },
-        include: withOwnerInclude(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });
 };
 
-export const getCharactersInWorkByCharacterId = async (characterId, ownerId, { transaction } = {}) => {
+export const getCharactersInWorkByCharacterId = async (characterId, { transaction } = {}) => {
     return CharacterInWork.findAll({
         where: { character_id: characterId },
-        include: withOwnerInclude(ownerId),
+        include: baseInclude,
         transaction,
         subQuery: false,
     });

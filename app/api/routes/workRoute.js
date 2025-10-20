@@ -5,6 +5,10 @@ import controllerWrapper from '../decorators/controllerWrapper.js';
 import workController from '../controllers/workController.js';
 import relationshipController from '../controllers/relationshipController.js';
 import eventController from '../controllers/eventController.js';
+import characterInWorkController from '../controllers/characterInWorkController.js';
+import characterInWorkValidator from '../validators/characterInWorkValidator.js';
+import validateBody from '../middlewares/validateBody.js';
+import { validateWorkId } from '../middlewares/validateId.js';
 
 const workRoute = express.Router();
 
@@ -19,7 +23,16 @@ workRoute.delete('/:id', controllerWrapper(workController.destroyWork));
 workRoute.get('/:id/cast', controllerWrapper(workController.getWorkCast));
 workRoute.get('/:id/cast/available', controllerWrapper(workController.getWorkPossibleCast));
 workRoute.post('/:id/cast', controllerWrapper(workController.linkCharacter));
-workRoute.delete('/:id/cast/:characterInWorkId', controllerWrapper(workController.unlinkCharacter));
+workRoute.get('/:workId/cast/:characterInWorkId', controllerWrapper(characterInWorkController.getCharacterInWork));
+workRoute.patch(
+    '/:workId/cast/:characterInWorkId',
+    controllerWrapper(validateBody(characterInWorkValidator.updateCharacterInWork)),
+    controllerWrapper(characterInWorkController.updateCharacterInWork)
+);
+workRoute.delete(
+    '/:workId/cast/:characterInWorkId',
+    controllerWrapper(characterInWorkController.destroyCharacterInWork)
+);
 
 workRoute.post('/:id/cast/relationships', controllerWrapper(relationshipController.createRelationship));
 workRoute.post(

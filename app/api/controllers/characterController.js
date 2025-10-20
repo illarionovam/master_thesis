@@ -1,10 +1,16 @@
 import createHttpError from 'http-errors';
-import { normalizeOptionalText } from '../helpers/normalizeOptionalText.js';
 import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
 import characterInWorkController from './characterInWorkController.js';
 import workController from './workController.js';
+
+const stripBulkCharacterResponse = character => {
+    return {
+        id: character.id,
+        name: character.name,
+    };
+};
 
 const stripCharacterResponse = character => {
     return {
@@ -31,15 +37,7 @@ const createCharacter = async (req, res) => {
 };
 
 const getCharacter = async (req, res) => {
-    const { id } = req.params;
-
-    const character = await characterService.getCharacter(id, req.appUser.id);
-
-    if (character == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    res.json(stripCharacterResponse(character));
+    res.json(stripCharacterResponse(req.character));
 };
 
 const getCharacters = async (req, res) => {
@@ -49,106 +47,48 @@ const getCharacters = async (req, res) => {
 };
 
 const updateCharacter = async (req, res) => {
-    const { id } = req.params;
-    const { name, appearance, personality, bio, imageUrl, attributes } = req.body;
-
-    const payload = {};
-
-    if (name != null) payload.name = name.trim();
-    if (appearance != null) payload.appearance = appearance.trim();
-    if (personality != null) payload.personality = personality.trim();
-    if (bio != null) payload.bio = bio.trim();
-    if (typeof imageUrl !== 'undefined') payload.image_url = normalizeOptionalText(imageUrl);
-    if (attributes != null) payload.attributes = attributes;
-
-    if (Object.keys(payload).length > 0) {
-        const character = await characterService.getCharacter(id, req.appUser.id);
-
-        if (character == null) {
-            throw createHttpError(403, 'Forbidden');
-        }
-
-        await characterService.updateCharacter(character, payload);
-    }
+    await characterService.updateCharacter(req.character, req.body);
 
     res.sendStatus(200);
 };
 
 const destroyCharacter = async (req, res) => {
-    const { id } = req.params;
-
-    const character = await characterService.getCharacter(id, req.appUser.id);
-
-    if (character == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    await characterService.destroyCharacter(character);
+    await characterService.destroyCharacter(req.character);
 
     res.sendStatus(204);
 };
 
 const linkWork = async (req, res) => {
-    const { id } = req.params;
-    const { workId } = req.body;
+    const { work_id } = req.body;
 
-    const character = await characterService.getCharacter(id, req.appUser.id);
-
-    if (character == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    const work = await workService.getWork(workId, req.appUser.id);
+    const work = await workService.getWork(work_id, req.appUser.id);
 
     if (work == null) {
         throw createHttpError(403, 'Forbidden');
     }
 
     const characterInWork = await characterInWorkService.createCharacterInWork({
-        work_id: workId,
-        character_id: id,
+        work_id,
+        character_id: req.character.id,
     });
 
-    res.status(201).json(characterInWork);
-};
-
-const unlinkWork = async (req, res) => {
-    const { characterInWorkId } = req.params;
-
-    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId, req.appUser.id);
-
-    if (characterInWork == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    await characterInWorkService.destroyCharacterInWork(characterInWork);
-
-    res.sendStatus(204);
+    res.status(201).json(characterInWorkController.stripCharacterInWorkResponse(characterInWork));
 };
 
 const getCharacterAppearances = async (req, res) => {
-    const { id } = req.params;
+    const appearances = await characterInWorkService.getCharactersInWorkByCharacterId(req.character.id);
 
-    const appearances = await characterInWorkService.getCharactersInWorkByCharacterId(id, req.appUser.id);
-
-    res.json(appearances.map(characterInWorkController.stripCharacterInWorkResponse));
+    res.json(appearances.map(characterInWorkController.stripBulkCharacterInWorkResponse));
 };
 
 const getCharacterPossibleAppearances = async (req, res) => {
-    const { id } = req.params;
+    const possibleAppearances = await workService.getWorksNotLinkedToCharacter(req.character.id, req.appUser.id);
 
-    const character = await characterService.getCharacter(id, req.appUser.id);
-
-    if (character == null) {
-        throw createHttpError(403, 'Forbidden');
-    }
-
-    const possibleAppearances = await workService.getWorksNotLinkedToCharacter(id, req.appUser.id);
-
-    res.json(possibleAppearances.map(workController.stripWorkResponse));
+    res.json(possibleAppearances.map(workController.stripBulkWorkResponse));
 };
 
 export default {
+    stripBulkCharacterResponse,
     stripCharacterResponse,
     createCharacter,
     getCharacter,
@@ -156,7 +96,6 @@ export default {
     updateCharacter,
     destroyCharacter,
     linkWork,
-    unlinkWork,
     getCharacterAppearances,
     getCharacterPossibleAppearances,
 };

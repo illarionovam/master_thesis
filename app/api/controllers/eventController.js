@@ -116,7 +116,7 @@ const linkParticipant = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId, req.appUser.id);
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
 
     if (characterInWork == null) {
         throw createHttpError(403, 'Forbidden');

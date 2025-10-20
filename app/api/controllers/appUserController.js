@@ -138,8 +138,6 @@ const updateAppUserNormalFields = async (req, res) => {
     const { new_password, password } = req.body;
     const wantsPasswordChange = password != null && new_password != null;
 
-    const payload = req.body;
-
     if (wantsPasswordChange) {
         const passwordIsCorrect = await bcrypt.compare(password, req.appUser.hash_password);
 
@@ -147,10 +145,10 @@ const updateAppUserNormalFields = async (req, res) => {
             throw createHttpError(401, 'Incorrect credentials');
         }
 
-        payload.hash_password = await bcrypt.hash(new_password, 10);
+        req.body.hash_password = await bcrypt.hash(new_password, 10);
     }
 
-    await appUserService.updateAppUser(req.appUser, payload);
+    await appUserService.updateAppUser(req.appUser, req.body);
 
     res.sendStatus(200);
 };
