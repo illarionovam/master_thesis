@@ -19,12 +19,6 @@ export const Work = sequelize.define(
         title: {
             type: DataTypes.TEXT,
             allowNull: false,
-            validate: {
-                len: {
-                    args: [1, 300],
-                    msg: 'Title must contain no more than 300 characters',
-                },
-            },
             set(v) {
                 this.setDataValue('title', v.trim());
             },
@@ -32,12 +26,6 @@ export const Work = sequelize.define(
         annotation: {
             type: DataTypes.TEXT,
             allowNull: true,
-            validate: {
-                len: {
-                    args: [1, 3000],
-                    msg: 'Annotation must contain no more than 3000 characters',
-                },
-            },
             set(v) {
                 this.setDataValue('annotation', normalizeOptionalText(v));
             },
@@ -45,12 +33,6 @@ export const Work = sequelize.define(
         synopsis: {
             type: DataTypes.TEXT,
             allowNull: true,
-            validate: {
-                len: {
-                    args: [1, 1500],
-                    msg: 'Synopsis must contain no more than 1500 characters',
-                },
-            },
             set(v) {
                 this.setDataValue('synopsis', normalizeOptionalText(v));
             },

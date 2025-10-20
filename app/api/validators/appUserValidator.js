@@ -7,50 +7,51 @@ const passwordRule = Joi.string()
 
 const signUpAppUserValidator = Joi.object({
     username: Joi.string().trim().min(3).max(60).required().messages({
-        'string.base': 'Username must be a string',
-        'string.empty': 'Username is required',
-        'string.min': 'Username must contain at least 3 characters',
-        'string.max': 'Username must contain no more than 60 characters',
-        'any.required': 'Username is required',
+        'string.base': 'username must be a string',
+        'string.empty': 'username is required',
+        'string.min': 'username must contain at least 3 characters',
+        'string.max': 'username must contain no more than 60 characters',
+        'any.required': 'username is required',
     }),
     email: Joi.string()
         .trim()
         .lowercase()
         .email({ tlds: { allow: false } })
+        .min(1)
         .max(255)
         .required()
         .messages({
-            'string.empty': 'Email is required',
-            'string.email': 'Email must be a valid email address',
-            'string.max': 'Email must contain no more than 255 characters',
-            'any.required': 'Email is required',
+            'string.min': 'email is required',
+            'string.email': 'email must be a valid email address',
+            'string.max': 'email must contain no more than 255 characters',
+            'any.required': 'email is required',
         }),
     name: Joi.string().trim().max(255).empty('').default(null).messages({
-        'string.max': 'Name must contain no more than 255 characters',
+        'string.max': 'name must contain no more than 255 characters',
     }),
     password: passwordRule.required().messages({
-        'string.empty': 'Password is required',
-        'string.min': 'Password must contain at least 8 characters',
-        'string.max': 'Password must contain no more than 20 characters',
-        'string.pattern.base': 'Password must include at least 1 lowercase letter, 1 uppercase letter, and 1 digit',
-        'any.required': 'Password is required',
+        'string.empty': 'password is required',
+        'string.min': 'password must contain at least 8 characters',
+        'string.max': 'password must contain no more than 20 characters',
+        'string.pattern.base': 'password must include at least 1 lowercase letter, 1 uppercase letter, and 1 digit',
+        'any.required': 'password is required',
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
 const signInAppUserValidator = Joi.object({
-    email: Joi.string().trim().lowercase().required().messages({
-        'string.empty': 'email is required',
+    email: Joi.string().trim().lowercase().min(1).required().messages({
+        'string.min': 'email is required',
         'any.required': 'email is required',
     }),
-    password: Joi.string().required().messages({
-        'string.empty': 'password is required',
+    password: Joi.string().min(1).required().messages({
+        'string.min': 'password is required',
         'any.required': 'password is required',
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
 const resetAppUserPasswordValidator = Joi.object({
-    email: Joi.string().trim().lowercase().required().messages({
-        'string.empty': 'email is required',
+    email: Joi.string().trim().lowercase().min(1).required().messages({
+        'string.min': 'email is required',
         'any.required': 'email is required',
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
@@ -64,8 +65,8 @@ const signOutAppUserValidator = Joi.object({
 const updateAppUserNormalFieldsValidator = Joi.alternatives()
     .try(
         Joi.object({
-            password: Joi.string().required().messages({
-                'string.empty': 'password is required',
+            password: Joi.string().min(1).required().messages({
+                'string.min': 'password is required',
                 'any.required': 'password is required',
             }),
             new_password: passwordRule.required().messages({
@@ -81,8 +82,8 @@ const updateAppUserNormalFieldsValidator = Joi.alternatives()
             avatar_url: Joi.forbidden(),
         }),
         Joi.object({
-            avatar_url: Joi.string().trim().uri().required().messages({
-                'string.empty': 'avatar_url is required',
+            avatar_url: Joi.string().trim().uri().min(1).required().messages({
+                'string.min': 'avatar_url is required',
                 'string.uri': 'avatar_url must be a valid URI',
                 'any.required': 'avatar_url is required',
             }),
@@ -92,9 +93,9 @@ const updateAppUserNormalFieldsValidator = Joi.alternatives()
             new_password: Joi.forbidden(),
         }),
         Joi.object({
-            name: Joi.string().trim().max(255).required().messages({
+            name: Joi.string().trim().min(1).max(255).required().messages({
                 'string.max': 'name must contain no more than 255 characters',
-                'string.empty': 'name is required',
+                'string.min': 'name is required',
                 'any.required': 'name is required',
             }),
             username: Joi.forbidden(),
@@ -123,10 +124,11 @@ const updateAppUserEmailValidator = Joi.object({
         .trim()
         .lowercase()
         .email({ tlds: { allow: false } })
+        .min(1)
         .max(255)
         .required()
         .messages({
-            'string.empty': 'new_email is required',
+            'string.min': 'new_email is required',
             'string.email': 'new_email must be a valid email address',
             'string.max': 'new_email must contain no more than 255 characters',
             'any.required': 'new_email is required',

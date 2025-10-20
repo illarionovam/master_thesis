@@ -1,23 +1,23 @@
 import Joi from 'joi';
 
 const createCharacterValidator = Joi.object({
-    name: Joi.string().trim().max(200).required().messages({
-        'string.empty': 'name is required',
+    name: Joi.string().trim().min(1).max(200).required().messages({
+        'string.min': 'name is required',
         'string.max': 'name must contain no more than 200 characters',
         'any.required': 'name is required',
     }),
-    appearance: Joi.string().trim().max(3000).required().messages({
-        'string.empty': 'appearance is required',
+    appearance: Joi.string().trim().min(1).max(3000).required().messages({
+        'string.min': 'appearance is required',
         'string.max': 'appearance must contain no more than 3000 characters',
         'any.required': 'appearance is required',
     }),
-    personality: Joi.string().trim().max(3000).required().messages({
-        'string.empty': 'personality is required',
+    personality: Joi.string().trim().min(1).max(3000).required().messages({
+        'string.min': 'personality is required',
         'string.max': 'personality must contain no more than 3000 characters',
         'any.required': 'personality is required',
     }),
-    bio: Joi.string().trim().max(6000).required().messages({
-        'string.empty': 'bio is required',
+    bio: Joi.string().trim().min(1).max(6000).required().messages({
+        'string.min': 'bio is required',
         'string.max': 'bio must contain no more than 6000 characters',
         'any.required': 'bio is required',
     }),
@@ -56,7 +56,8 @@ const coreUpdate = Joi.object({
 const imageOnly = Joi.object({
     image_url: Joi.alternatives()
         .try(
-            Joi.string().trim().uri().messages({
+            Joi.string().trim().uri().min(1).messages({
+                'string.min': 'image_url is required',
                 'string.uri': 'image_url must be a valid URI',
             }),
             Joi.valid(null)
@@ -79,10 +80,18 @@ const updateCharacterValidator = Joi.alternatives()
     .prefs({ abortEarly: false, stripUnknown: true });
 
 const linkWorkValidator = Joi.object({
-    work_id: Joi.string().required().messages({
-        'string.empty': 'work_id is required',
-        'any.required': 'work_id is required',
-    }),
+    work_id: Joi.alternatives()
+        .try(
+            Joi.string()
+                .trim()
+                .guid({ version: ['uuidv4', 'uuidv1'] }),
+            Joi.valid(null)
+        )
+        .empty('')
+        .messages({
+            'alternatives.match': 'work_id must be a valid UUID or null',
+            'string.guid': 'work_id must be a valid UUID',
+        }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
 export default { createCharacterValidator, updateCharacterValidator, linkWorkValidator };

@@ -30,6 +30,7 @@ const getCharactersNotLinkedToWork = async (workId, ownerId, { transaction } = {
                 model: CharacterInWork,
                 as: 'appearances',
                 required: false,
+                attributes: [],
                 where: { work_id: workId },
             },
         ],

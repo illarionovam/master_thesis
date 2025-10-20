@@ -5,7 +5,8 @@ const updateCharacterInWork = Joi.alternatives()
         Joi.object({
             image_url: Joi.alternatives()
                 .try(
-                    Joi.string().trim().uri().messages({
+                    Joi.string().trim().uri().min(1).messages({
+                        'string.min': 'image_url is required',
                         'string.uri': 'image_url must be a valid URI',
                     }),
                     Joi.valid(null)

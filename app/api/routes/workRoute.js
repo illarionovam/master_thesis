@@ -9,56 +9,129 @@ import characterInWorkController from '../controllers/characterInWorkController.
 import characterInWorkValidator from '../validators/characterInWorkValidator.js';
 import validateBody from '../middlewares/validateBody.js';
 import { validateWorkId } from '../middlewares/validateId.js';
+import workValidator from '../validators/workValidator.js';
 
 const workRoute = express.Router();
 
 workRoute.use(controllerWrapper(authMiddleware.authMiddleware));
 
 workRoute.get('/', controllerWrapper(workController.getWorks));
-workRoute.post('/', controllerWrapper(workController.createWork));
-workRoute.get('/:id', controllerWrapper(workController.getWork));
-workRoute.patch('/:id', controllerWrapper(workController.updateWork));
-workRoute.delete('/:id', controllerWrapper(workController.destroyWork));
-
-workRoute.get('/:id/cast', controllerWrapper(workController.getWorkCast));
-workRoute.get('/:id/cast/available', controllerWrapper(workController.getWorkPossibleCast));
-workRoute.post('/:id/cast', controllerWrapper(workController.linkCharacter));
-workRoute.get('/:workId/cast/:characterInWorkId', controllerWrapper(characterInWorkController.getCharacterInWork));
+workRoute.post(
+    '/',
+    controllerWrapper(validateBody(workValidator.createWorkValidator)),
+    controllerWrapper(workController.createWork)
+);
+workRoute.get('/:id', controllerWrapper(validateWorkId()), controllerWrapper(workController.getWork));
 workRoute.patch(
-    '/:workId/cast/:characterInWorkId',
+    '/:id',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(validateBody(workValidator.updateWorkValidator)),
+    controllerWrapper(workController.updateWork)
+);
+workRoute.delete('/:id', controllerWrapper(validateWorkId()), controllerWrapper(workController.destroyWork));
+workRoute.get('/:id/cast', controllerWrapper(validateWorkId()), controllerWrapper(workController.getWorkCast));
+workRoute.post(
+    '/:id/cast',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(validateBody(workValidator.linkCharacterValidator)),
+    controllerWrapper(workController.linkCharacter)
+);
+workRoute.get(
+    '/:id/cast/available',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(workController.getWorkPossibleCast)
+);
+workRoute.get(
+    '/:id/cast/:characterInWorkId',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(characterInWorkController.getCharacterInWork)
+);
+workRoute.get(
+    '/:id/cast/:characterInWorkId/relationships',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(characterInWorkController.getCharacterInWorkRelationships)
+);
+workRoute.get(
+    '/:id/cast/:characterInWorkId/relationships/available',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(characterInWorkController.getCharacterInWorkPossibleRelationships)
+);
+workRoute.patch(
+    '/:id/cast/:characterInWorkId',
+    controllerWrapper(validateWorkId()),
     controllerWrapper(validateBody(characterInWorkValidator.updateCharacterInWork)),
     controllerWrapper(characterInWorkController.updateCharacterInWork)
 );
 workRoute.delete(
-    '/:workId/cast/:characterInWorkId',
+    '/:id/cast/:characterInWorkId',
+    controllerWrapper(validateWorkId()),
     controllerWrapper(characterInWorkController.destroyCharacterInWork)
 );
-
-workRoute.post('/:id/cast/relationships', controllerWrapper(relationshipController.createRelationship));
+workRoute.get(
+    '/:id/location-links',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(workController.getWorkLocationLinks)
+);
+workRoute.get(
+    '/:id/location-links/available',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(workController.getWorkPossibleLocationLinks)
+);
 workRoute.post(
-    '/:id/cast/relationships/:fromId/:toId',
-    controllerWrapper(relationshipController.getRelationshipByFromIdAndToId)
+    '/:id/location-links',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(validateBody(workValidator.linkLocationValidator)),
+    controllerWrapper(workController.linkLocation)
+);
+workRoute.get(
+    '/:id/location-links/:locationInWorkId',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(locationInWorkController.getLocationInWork)
+);
+workRoute.patch(
+    '/:id/location-links/:locationInWorkId',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(validateBody(locationInWorkValidator.updateLocationInWorkValidator)),
+    controllerWrapper(locationInWorkController.updateLocationInWork)
+);
+workRoute.delete(
+    '/:id/location-links/:locationInWorkId',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(locationInWorkController.destroyLocationInWork)
+);
+/*
+workRoute.get('/:id/events', controllerWrapper(validateWorkId()), controllerWrapper(eventController.getEventsByWorkId));
+workRoute.get('/:id/events/:eventId', controllerWrapper(validateWorkId()), controllerWrapper(eventController.getEvent));
+workRoute.post(
+    '/:id/events/:eventId',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(eventController.updateEvent)
+);
+workRoute.delete(
+    '/:id/events/:eventId',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(eventController.destroyEvent)
 );
 
-workRoute.get('/:id/location-links', controllerWrapper(workController.getWorkLocationLinks));
-workRoute.get('/:id/location-links/available', controllerWrapper(workController.getWorkPossibleLocationLinks));
-workRoute.post('/:id/location-links', controllerWrapper(workController.linkLocation));
-workRoute.delete('/:id/location-links/:locationInWorkId', controllerWrapper(workController.unlinkLocation));
-
-workRoute.get('/:id/events', controllerWrapper(eventController.getEventsByWorkId));
-workRoute.get('/:workId/events/:id', controllerWrapper(eventController.getEvent));
-workRoute.post('/:workId/events/:id', controllerWrapper(eventController.updateEvent));
-workRoute.delete('/:workId/events/:id', controllerWrapper(eventController.destroyEvent));
-
-workRoute.get('/:workId/events/:id/participants', controllerWrapper(eventController.getEventParticipants));
 workRoute.get(
-    '/:workId/events/:id/participants/available',
+    '/:id/events/:eventId/participants',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(eventController.getEventParticipants)
+);
+workRoute.get(
+    '/:id/events/:eventId/participants/available',
+    controllerWrapper(validateWorkId()),
     controllerWrapper(eventController.getEventPossibleParticipants)
 );
-workRoute.post('/:workId/events/:id/participants', controllerWrapper(eventController.linkParticipant));
+workRoute.post(
+    '/:id/events/:eventId/participants',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(eventController.linkParticipant)
+);
 workRoute.delete(
-    '/:workId/events/:id/participants/:eventParticipantId',
+    '/:id/events/:eventId/participants/:eventParticipantId',
+    controllerWrapper(validateWorkId()),
     controllerWrapper(eventController.unlinkParticipant)
 );
-
+*/
 export default workRoute;
