@@ -32,7 +32,7 @@ const getLocationInWork = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    return res.json(stripLocationInWorkResponse(locationInWork));
+    res.json(stripLocationInWorkResponse(locationInWork));
 };
 
 const updateLocationInWork = async (req, res) => {
@@ -46,7 +46,7 @@ const updateLocationInWork = async (req, res) => {
 
     await locationInWorkService.updateLocationInWork(locationInWork, req.body);
 
-    return res.sendStatus(200);
+    res.json(stripLocationInWorkResponse(locationInWork));
 };
 
 const destroyLocationInWork = async (req, res) => {
@@ -60,7 +60,7 @@ const destroyLocationInWork = async (req, res) => {
 
     await locationInWorkService.destroyLocationInWork(locationInWork);
 
-    return res.sendStatus(204);
+    res.sendStatus(204);
 };
 
 export default {

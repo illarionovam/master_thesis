@@ -37,7 +37,7 @@ const getCharacterInWork = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    return res.json(stripCharacterInWorkResponse(characterInWork));
+    res.json(stripCharacterInWorkResponse(characterInWork));
 };
 
 const getCharacterInWorkRelationships = async (req, res) => {
@@ -86,7 +86,7 @@ const updateCharacterInWork = async (req, res) => {
 
     await characterInWorkService.updateCharacterInWork(characterInWork, req.body);
 
-    return res.sendStatus(200);
+    res.json(stripCharacterInWorkResponse(characterInWork));
 };
 
 const destroyCharacterInWork = async (req, res) => {
@@ -104,7 +104,7 @@ const destroyCharacterInWork = async (req, res) => {
 
     await characterInWorkService.destroyCharacterInWork(characterInWork);
 
-    return res.sendStatus(204);
+    res.sendStatus(204);
 };
 
 export default {

@@ -61,7 +61,7 @@ const getCharactersInWorkNotLinkedToEvent = async (event, { transaction } = {}) 
 
 const updateCharacterInWork = async (characterInWork, payload, { transaction } = {}) => {
     characterInWork.set(payload);
-    await characterInWork.save({ transaction });
+    return characterInWork.save({ transaction });
 };
 
 const destroyCharacterInWork = async (characterInWork, { transaction } = {}) => {

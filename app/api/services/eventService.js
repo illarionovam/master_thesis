@@ -39,7 +39,7 @@ const getEventsByWorkId = async (workId, { transaction } = {}) => {
 
 const updateEvent = async (event, payload, { transaction } = {}) => {
     event.set(payload);
-    await event.save({ transaction });
+    return event.save({ transaction });
 };
 
 const destroyEvent = async (event, { transaction } = {}) => {

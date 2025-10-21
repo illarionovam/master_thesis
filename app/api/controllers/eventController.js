@@ -71,7 +71,7 @@ const updateEvent = async (req, res) => {
 
     await eventService.updateEvent(event, req.body);
 
-    res.sendStatus(200);
+    res.json(stripEventResponse(event));
 };
 
 const destroyEvent = async (req, res) => {

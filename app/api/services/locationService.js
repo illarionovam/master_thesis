@@ -41,7 +41,7 @@ const getLocationsNotLinkedToWork = async (workId, ownerId, { transaction } = {}
 
 const updateLocation = async (location, payload, { transaction } = {}) => {
     location.set(payload);
-    await location.save({ transaction });
+    return location.save({ transaction });
 };
 
 const destroyLocation = async (location, { transaction } = {}) => {

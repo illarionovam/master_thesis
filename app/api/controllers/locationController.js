@@ -67,7 +67,7 @@ const updateLocation = async (req, res) => {
 
     await locationService.updateLocation(req.location, req.body);
 
-    res.sendStatus(200);
+    res.json(stripLocationResponse(req.location));
 };
 
 const destroyLocation = async (req, res) => {

@@ -50,7 +50,7 @@ const getWorks = async (req, res) => {
 const updateWork = async (req, res) => {
     await workService.updateWork(req.work, req.body);
 
-    res.sendStatus(200);
+    res.json(stripWorkResponse(req.work));
 };
 
 const destroyWork = async (req, res) => {

@@ -17,7 +17,7 @@ const getAppUserByEmail = async (email, { transaction } = {}) => {
 
 const updateAppUser = async (appUser, payload, { transaction } = {}) => {
     appUser.set(payload);
-    await appUser.save({ transaction });
+    return appUser.save({ transaction });
 };
 
 export default {

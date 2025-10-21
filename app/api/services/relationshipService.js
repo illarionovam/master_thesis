@@ -66,7 +66,7 @@ const getPossibleRelationships = async (characterInWorkId, workId, { transaction
 
 const updateRelationship = async (relationship, payload, { transaction } = {}) => {
     relationship.set(payload);
-    await relationship.save({ transaction });
+    return relationship.save({ transaction });
 };
 
 const destroyRelationship = async (relationship, { transaction } = {}) => {

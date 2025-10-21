@@ -99,7 +99,7 @@ const confirmAppUserPassword = async (req, res) => {
         await tokenService.destroyToken(req.token, { transaction: t });
     });
 
-    res.sendStatus(200);
+    res.json(stripAppUserResponse(req.appUser));
 };
 
 const updateAppUserEmail = async (req, res) => {
@@ -113,7 +113,7 @@ const updateAppUserEmail = async (req, res) => {
         await tokenService.createToken({ owner_id: req.appUser.id, token, scope: 'email_verify' }, { transaction: t });
     });
 
-    res.sendStatus(200);
+    res.json(stripAppUserResponse(req.appUser));
 };
 
 const confirmAppUserEmail = async (req, res) => {
@@ -131,7 +131,7 @@ const confirmAppUserEmail = async (req, res) => {
         await tokenService.destroyToken(req.token, { transaction: t });
     });
 
-    res.sendStatus(200);
+    res.json(stripAppUserResponse(req.appUser));
 };
 
 const updateAppUserNormalFields = async (req, res) => {
@@ -150,7 +150,7 @@ const updateAppUserNormalFields = async (req, res) => {
 
     await appUserService.updateAppUser(req.appUser, req.body);
 
-    res.sendStatus(200);
+    res.json(stripAppUserResponse(req.appUser));
 };
 
 const getAppUser = async (req, res) => {

@@ -1,4 +1,3 @@
-import createHttpError from 'http-errors';
 import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
@@ -49,7 +48,7 @@ const getCharacters = async (req, res) => {
 const updateCharacter = async (req, res) => {
     await characterService.updateCharacter(req.character, req.body);
 
-    res.sendStatus(200);
+    res.json(stripCharacterResponse(req.character));
 };
 
 const destroyCharacter = async (req, res) => {

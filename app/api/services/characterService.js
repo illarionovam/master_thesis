@@ -41,7 +41,7 @@ const getCharactersNotLinkedToWork = async (workId, ownerId, { transaction } = {
 
 const updateCharacter = async (character, payload, { transaction } = {}) => {
     character.set(payload);
-    await character.save({ transaction });
+    return character.save({ transaction });
 };
 
 const destroyCharacter = async (character, { transaction } = {}) => {

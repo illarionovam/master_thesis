@@ -68,7 +68,7 @@ const updateRelationship = async (req, res) => {
 
     await relationshipService.updateRelationship(relationship, req.body);
 
-    res.sendStatus(200);
+    res.json(stripRelationshipResponse(relationship));
 };
 
 const destroyRelationship = async (req, res) => {

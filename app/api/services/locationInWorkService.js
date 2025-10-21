@@ -40,7 +40,7 @@ const getLocationsInWorkByLocationId = async (locationId, { transaction } = {}) 
 
 const updateLocationInWork = async (locationInWork, payload, { transaction } = {}) => {
     locationInWork.set(payload);
-    await locationInWork.save({ transaction });
+    return locationInWork.save({ transaction });
 };
 
 const destroyLocationInWork = async (locationInWork, { transaction } = {}) => {
