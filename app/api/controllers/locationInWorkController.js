@@ -1,25 +1,14 @@
 import locationInWorkService from '../services/locationInWorkService.js';
+import locationController from './locationController.js';
+import workController from './workController.js';
 
 const stripBulkLocationInWorkResponse = locationInWork => {
     return {
         id: locationInWork.id,
         location_id: locationInWork.location_id,
         work_id: locationInWork.work_id,
-        work: locationInWork.work,
-        location: locationInWork.location,
-    };
-};
-
-const stripLocationInWorkResponse = locationInWork => {
-    return {
-        id: locationInWork.id,
-        location_id: locationInWork.location_id,
-        work_id: locationInWork.work_id,
-        attributes: locationInWork.attributes,
-        updated_at: locationInWork.updated_at,
-        created_at: locationInWork.created_at,
-        work: locationInWork.work,
-        location: locationInWork.location,
+        work: workController.stripBulkWorkResponse(locationInWork.work),
+        location: locationController.stripBulkLocationResponse(locationInWork.location),
     };
 };
 
@@ -32,7 +21,7 @@ const getLocationInWork = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    res.json(stripLocationInWorkResponse(locationInWork));
+    res.json(locationInWork);
 };
 
 const updateLocationInWork = async (req, res) => {
@@ -46,7 +35,7 @@ const updateLocationInWork = async (req, res) => {
 
     await locationInWorkService.updateLocationInWork(locationInWork, req.body);
 
-    res.json(stripLocationInWorkResponse(locationInWork));
+    res.json(locationInWork);
 };
 
 const destroyLocationInWork = async (req, res) => {
@@ -65,7 +54,6 @@ const destroyLocationInWork = async (req, res) => {
 
 export default {
     stripBulkLocationInWorkResponse,
-    stripLocationInWorkResponse,
     getLocationInWork,
     updateLocationInWork,
     destroyLocationInWork,

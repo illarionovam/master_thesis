@@ -1,24 +1,8 @@
 import { Relationship } from '../models/relationship.js';
 import { CharacterInWork } from '../models/characterInWork.js';
-import characterInWorkService from './characterInWorkService.js';
+import { Work } from '../models/work.js';
+import { Character } from '../models/character.js';
 import { Op } from 'sequelize';
-
-const baseInclude = [
-    {
-        model: CharacterInWork,
-        as: 'from',
-        required: true,
-        attributes: [],
-        include: characterInWorkService.baseInclude,
-    },
-    {
-        model: CharacterInWork,
-        as: 'to',
-        required: true,
-        attributes: [],
-        include: characterInWorkService.baseInclude,
-    },
-];
 
 const createRelationship = async (payload, { transaction } = {}) => {
     return Relationship.create(payload, { transaction });
@@ -27,7 +11,26 @@ const createRelationship = async (payload, { transaction } = {}) => {
 const getRelationship = async (id, { transaction } = {}) => {
     return Relationship.findOne({
         where: { id },
-        include: baseInclude,
+        include: [
+            {
+                model: CharacterInWork,
+                as: 'from',
+                required: true,
+                include: [
+                    { model: Work, as: 'work', required: true },
+                    { model: Character, as: 'character', required: true },
+                ],
+            },
+            {
+                model: CharacterInWork,
+                as: 'to',
+                required: true,
+                include: [
+                    { model: Work, as: 'work', required: true },
+                    { model: Character, as: 'character', required: true },
+                ],
+            },
+        ],
         transaction,
         subQuery: false,
     });
@@ -35,8 +38,28 @@ const getRelationship = async (id, { transaction } = {}) => {
 
 const getRelationships = async (characterInWorkId, workId, { transaction } = {}) => {
     return Relationship.findAll({
-        where: { from_character_in_work_id: characterInWorkId, '$to.work_id$': workId },
-        include: baseInclude,
+        where: { from_character_in_work_id: characterInWorkId },
+        include: [
+            {
+                model: CharacterInWork,
+                as: 'from',
+                required: true,
+                include: [
+                    { model: Work, as: 'work', required: true },
+                    { model: Character, as: 'character', required: true },
+                ],
+            },
+            {
+                model: CharacterInWork,
+                as: 'to',
+                required: true,
+                where: { work_id: workId },
+                include: [
+                    { model: Work, as: 'work', required: true },
+                    { model: Character, as: 'character', required: true },
+                ],
+            },
+        ],
         transaction,
         subQuery: false,
     });
@@ -47,14 +70,15 @@ const getPossibleRelationships = async (characterInWorkId, workId, { transaction
         where: {
             work_id: workId,
             id: { [Op.ne]: characterInWorkId },
-            '$relsFromThis.id$': null,
+            '$incomingRelationships.id$': null,
         },
         include: [
-            characterInWorkService.baseInclude,
+            { model: Work, as: 'work', required: true },
+            { model: Character, as: 'character', required: true },
+
             {
                 model: Relationship,
                 as: 'incomingRelationships',
-                attributes: [],
                 required: false,
                 where: { from_character_in_work_id: characterInWorkId },
             },

@@ -1,5 +1,6 @@
 import { Event } from '../models/event.js';
 import { Work } from '../models/work.js';
+import { LocationInWork } from '../models/locationInWork.js';
 import { Location } from '../models/location.js';
 
 const baseInclude = [
@@ -9,9 +10,16 @@ const baseInclude = [
         required: true,
     },
     {
-        model: Location,
-        as: 'work',
+        model: LocationInWork,
+        as: 'locationLink',
         required: false,
+        include: [
+            {
+                model: Location,
+                as: 'location',
+                required: true,
+            },
+        ],
     },
 ];
 

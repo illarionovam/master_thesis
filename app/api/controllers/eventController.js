@@ -4,14 +4,27 @@ import characterInWorkController from './characterInWorkController.js';
 import locationInWorkService from '../services/locationInWorkService.js';
 import eventService from '../services/eventService.js';
 import eventParticipantService from '../services/eventParticipantService.js';
-import eventParticipantController from './eventParticipantController.js';
+import workController from './workController.js';
+import locationController from './locationController.js';
+import characterController from './characterController.js';
 
 const stripBulkEventResponse = event => {
-    return event;
+    return {
+        id: event.id,
+        work_id: event.work_id,
+        location_in_work_id: event.location_in_work_id,
+        work: workController.stripBulkWorkResponse(event.work),
+        location: event.locationLink ? locationController.stripBulkLocationResponse(event.locationLink.location) : null,
+    };
 };
 
-const stripEventResponse = event => {
-    return event;
+const stripBulkEventParticipantResponse = eventParticipant => {
+    return {
+        id: eventParticipant.id,
+        event_id: eventParticipant.event_id,
+        character_in_work_id: eventParticipant.character_in_work_id,
+        character: characterController.stripBulkCharacterResponse(eventParticipant.characterLink.character),
+    };
 };
 
 const createEvent = async (req, res) => {
@@ -30,7 +43,7 @@ const createEvent = async (req, res) => {
         ...req.body,
     });
 
-    res.status(201).json(stripEventResponse(event));
+    res.status(201).json(event);
 };
 
 const getEvent = async (req, res) => {
@@ -42,7 +55,7 @@ const getEvent = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    res.json(stripEventResponse(event));
+    res.json(event);
 };
 
 const getEventsByWorkId = async (req, res) => {
@@ -71,7 +84,7 @@ const updateEvent = async (req, res) => {
 
     await eventService.updateEvent(event, req.body);
 
-    res.json(stripEventResponse(event));
+    res.json(event);
 };
 
 const destroyEvent = async (req, res) => {
@@ -141,9 +154,9 @@ const getEventParticipants = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const eventParticipants = eventParticipantService.getEventParticipantsByEventId(id);
+    const eventParticipants = await eventParticipantService.getEventParticipantsByEventId(eventId);
 
-    res.json(eventParticipants.map(eventParticipantController.stripBulkEventParticipantResponse));
+    res.json(eventParticipants.map(stripBulkEventParticipantResponse));
 };
 
 const getEventPossibleParticipants = async (req, res) => {
@@ -162,7 +175,6 @@ const getEventPossibleParticipants = async (req, res) => {
 
 export default {
     stripBulkEventResponse,
-    stripEventResponse,
     createEvent,
     getEvent,
     getEventsByWorkId,

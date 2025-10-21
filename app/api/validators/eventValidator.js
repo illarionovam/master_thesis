@@ -48,17 +48,6 @@ const updateEventValidator = Joi.object({
     .prefs({ abortEarly: false, stripUnknown: true });
 
 const linkParticipantValidator = Joi.object({
-    event_id: Joi.string()
-        .trim()
-        .guid({ version: ['uuidv4', 'uuidv1'] })
-        .min(1)
-        .required()
-        .messages({
-            'string.min': 'event_id is required',
-            'string.guid': 'event_id must be a valid UUID',
-            'any.required': 'event_id is required',
-        }),
-
     character_in_work_id: Joi.string()
         .trim()
         .guid({ version: ['uuidv4', 'uuidv1'] })

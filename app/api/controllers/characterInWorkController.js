@@ -1,30 +1,16 @@
 import characterInWorkService from '../services/characterInWorkService.js';
-import characterController from './characterController.js';
-import workController from './workController.js';
 import relationshipService from '../services/relationshipService.js';
+import characterController from './characterController.js';
 import relationshipController from './relationshipController.js';
+import workController from './workController.js';
 
 const stripBulkCharacterInWorkResponse = characterInWork => {
     return {
         id: characterInWork.id,
         character_id: characterInWork.character_id,
         work_id: characterInWork.work_id,
-        work: characterInWork.work,
-        character: characterInWork.character,
-    };
-};
-
-const stripCharacterInWorkResponse = characterInWork => {
-    return {
-        id: characterInWork.id,
-        character_id: characterInWork.character_id,
-        work_id: characterInWork.work_id,
-        image_url: characterInWork.image_url,
-        attributes: characterInWork.attributes,
-        updated_at: characterInWork.updated_at,
-        created_at: characterInWork.created_at,
-        work: workController.stripWorkResponse(characterInWork.work),
-        character: characterController.stripCharacterResponse(characterInWork.character),
+        work: workController.stripBulkWorkResponse(characterInWork.work),
+        character: characterController.stripBulkCharacterResponse(characterInWork.character),
     };
 };
 
@@ -37,7 +23,7 @@ const getCharacterInWork = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    res.json(stripCharacterInWorkResponse(characterInWork));
+    res.json(characterInWork);
 };
 
 const getCharacterInWorkRelationships = async (req, res) => {
@@ -86,7 +72,7 @@ const updateCharacterInWork = async (req, res) => {
 
     await characterInWorkService.updateCharacterInWork(characterInWork, req.body);
 
-    res.json(stripCharacterInWorkResponse(characterInWork));
+    res.json(characterInWork);
 };
 
 const destroyCharacterInWork = async (req, res) => {
@@ -109,7 +95,6 @@ const destroyCharacterInWork = async (req, res) => {
 
 export default {
     stripBulkCharacterInWorkResponse,
-    stripCharacterInWorkResponse,
     getCharacterInWork,
     getCharacterInWorkRelationships,
     getCharacterInWorkPossibleRelationships,

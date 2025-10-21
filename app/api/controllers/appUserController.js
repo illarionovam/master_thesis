@@ -11,6 +11,7 @@ const stripAppUserResponse = appUser => {
         id: appUser.id,
         username: appUser.username,
         email: appUser.email,
+        name: appUser.name,
         avatar_url: appUser.avatar_url,
         created_at: appUser.created_at,
         updated_at: appUser.updated_at,

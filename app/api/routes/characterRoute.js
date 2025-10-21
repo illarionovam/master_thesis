@@ -3,10 +3,8 @@ import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import controllerWrapper from '../decorators/controllerWrapper.js';
 import characterController from '../controllers/characterController.js';
-import characterInWorkController from '../controllers/characterInWorkController.js';
 import validateBody from '../middlewares/validateBody.js';
 import characterValidator from '../validators/characterValidator.js';
-import characterInWorkValidator from '../validators/characterInWorkValidator.js';
 import { validateCharacterId } from '../middlewares/validateId.js';
 
 const characterRoute = express.Router();

@@ -12,19 +12,6 @@ const stripBulkLocationResponse = location => {
     };
 };
 
-const stripLocationResponse = location => {
-    return {
-        id: location.id,
-        owner_id: location.owner_id,
-        title: location.title,
-        description: location.description,
-        attributes: location.attributes,
-        parent_location_id: location.parent_location_id,
-        updated_at: location.updated_at,
-        created_at: location.created_at,
-    };
-};
-
 const createLocation = async (req, res) => {
     const { parent_location_id } = req.body;
 
@@ -41,11 +28,11 @@ const createLocation = async (req, res) => {
         ...req.body,
     });
 
-    res.status(201).json(stripLocationResponse(location));
+    res.status(201).json(location);
 };
 
 const getLocation = async (req, res) => {
-    res.json(stripLocationResponse(req.location));
+    res.json(req.location);
 };
 
 const getLocations = async (req, res) => {
@@ -67,7 +54,7 @@ const updateLocation = async (req, res) => {
 
     await locationService.updateLocation(req.location, req.body);
 
-    res.json(stripLocationResponse(req.location));
+    res.json(req.location);
 };
 
 const destroyLocation = async (req, res) => {
@@ -90,7 +77,6 @@ const getLocationPossiblePlacements = async (req, res) => {
 
 export default {
     stripBulkLocationResponse,
-    stripLocationResponse,
     createLocation,
     getLocation,
     getLocations,

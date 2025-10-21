@@ -11,32 +11,17 @@ const stripBulkCharacterResponse = character => {
     };
 };
 
-const stripCharacterResponse = character => {
-    return {
-        id: character.id,
-        name: character.name,
-        owner_id: character.owner_id,
-        appearance: character.appearance,
-        personality: character.personality,
-        bio: character.bio,
-        attributes: character.attributes,
-        image_url: character.image_url,
-        updated_at: character.updated_at,
-        created_at: character.created_at,
-    };
-};
-
 const createCharacter = async (req, res) => {
     const character = await characterService.createCharacter({
         owner_id: req.appUser.id,
         ...req.body,
     });
 
-    res.status(201).json(stripCharacterResponse(character));
+    res.status(201).json(character);
 };
 
 const getCharacter = async (req, res) => {
-    res.json(stripCharacterResponse(req.character));
+    res.json(req.character);
 };
 
 const getCharacters = async (req, res) => {
@@ -48,7 +33,7 @@ const getCharacters = async (req, res) => {
 const updateCharacter = async (req, res) => {
     await characterService.updateCharacter(req.character, req.body);
 
-    res.json(stripCharacterResponse(req.character));
+    res.json(req.character);
 };
 
 const destroyCharacter = async (req, res) => {
@@ -71,7 +56,6 @@ const getCharacterPossibleAppearances = async (req, res) => {
 
 export default {
     stripBulkCharacterResponse,
-    stripCharacterResponse,
     createCharacter,
     getCharacter,
     getCharacters,

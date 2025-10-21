@@ -3,11 +3,9 @@ import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import controllerWrapper from '../decorators/controllerWrapper.js';
 import locationController from '../controllers/locationController.js';
-import locationInWorkController from '../controllers/locationInWorkController.js';
 import validateBody from '../middlewares/validateBody.js';
 import { validateLocationId } from '../middlewares/validateId.js';
 import locationValidator from '../validators/locationValidator.js';
-import locationInWorkValidator from '../validators/locationInWorkValidator.js';
 
 const locationRoute = express.Router();
 

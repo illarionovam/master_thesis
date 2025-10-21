@@ -1,25 +1,33 @@
 import characterInWorkService from '../services/characterInWorkService.js';
 import relationshipService from '../services/relationshipService.js';
+import createHttpError from 'http-errors';
+import characterController from './characterController.js';
 
 const stripBulkRelationshipResponse = relationship => {
-    return relationship;
-};
-
-const stripRelationshipResponse = relationship => {
-    return relationship;
+    return {
+        id: relationship.id,
+        from_character_in_work_id: relationship.from_character_in_work_id,
+        to_character_in_work_id: relationship.to_character_in_work_id,
+        type: relationship.type,
+        from: characterController.stripBulkCharacterResponse(relationship.from.character),
+        to: characterController.stripBulkCharacterResponse(relationship.to.character),
+    };
 };
 
 const createRelationship = async (req, res) => {
     const { characterInWorkId } = req.params;
     const { to_character_in_work_id } = req.body;
 
-    const characterInWork = characterInWorkService.getCharacterInWork(characterInWorkId);
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
+
+    console.log(characterInWork.work_id);
+    console.log(req.work.id);
 
     if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }
 
-    const characterInWorkTo = characterInWorkService.getCharacterInWork(to_character_in_work_id);
+    const characterInWorkTo = await characterInWorkService.getCharacterInWork(to_character_in_work_id);
 
     if (characterInWorkTo == null || characterInWorkTo.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
@@ -30,13 +38,13 @@ const createRelationship = async (req, res) => {
         ...req.body,
     });
 
-    res.status(201).json(stripRelationshipResponse(relationship));
+    res.status(201).json(relationship);
 };
 
 const getRelationship = async (req, res) => {
     const { characterInWorkId, relationshipId } = req.params;
 
-    const characterInWork = characterInWorkService.getCharacterInWork(characterInWorkId);
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
 
     if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
@@ -48,13 +56,13 @@ const getRelationship = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    res.json(stripRelationshipResponse(relationship));
+    res.json(relationship);
 };
 
 const updateRelationship = async (req, res) => {
     const { characterInWorkId, relationshipId } = req.params;
 
-    const characterInWork = characterInWorkService.getCharacterInWork(characterInWorkId);
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
 
     if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
@@ -68,13 +76,13 @@ const updateRelationship = async (req, res) => {
 
     await relationshipService.updateRelationship(relationship, req.body);
 
-    res.json(stripRelationshipResponse(relationship));
+    res.json(relationship);
 };
 
 const destroyRelationship = async (req, res) => {
     const { characterInWorkId, relationshipId } = req.params;
 
-    const characterInWork = characterInWorkService.getCharacterInWork(characterInWorkId);
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
 
     if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
@@ -93,7 +101,6 @@ const destroyRelationship = async (req, res) => {
 
 export default {
     stripBulkRelationshipResponse,
-    stripRelationshipResponse,
     createRelationship,
     getRelationship,
     updateRelationship,
