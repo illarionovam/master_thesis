@@ -24,9 +24,15 @@ const signUpAppUser = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, 10);
 
     try {
-        await appUserService.createAppUser({
-            hash_password: hashPassword,
-            ...req.body,
+        await sequelize.transaction(async t => {
+            const appUser = await appUserService.createAppUser({
+                hash_password: hashPassword,
+                ...req.body,
+            });
+            const token = jwt.sign({ sub: appUser.id, scope: 'email_verify' }, process.env.JWT_SECRET, {
+                expiresIn: '15m',
+            });
+            await tokenService.createToken({ owner_id: appUser.id, token, scope: 'email_verify' }, { transaction: t });
         });
     } catch (err) {
         if (!(err instanceof Sequelize.UniqueConstraintError)) {
