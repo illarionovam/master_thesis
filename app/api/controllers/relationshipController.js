@@ -44,7 +44,7 @@ const getRelationship = async (req, res) => {
 
     const relationship = await relationshipService.getRelationship(relationshipId);
 
-    if (relationship == null) {
+    if (relationship == null || relationship.from_character_in_work_id !== characterInWorkId) {
         throw createHttpError(403, 'Forbidden');
     }
 
@@ -62,7 +62,7 @@ const updateRelationship = async (req, res) => {
 
     const relationship = await relationshipService.getRelationship(relationshipId);
 
-    if (relationship == null) {
+    if (relationship == null || relationship.from_character_in_work_id !== characterInWorkId) {
         throw createHttpError(403, 'Forbidden');
     }
 
@@ -82,7 +82,7 @@ const destroyRelationship = async (req, res) => {
 
     const relationship = await relationshipService.getRelationship(relationshipId);
 
-    if (relationship == null) {
+    if (relationship == null || relationship.from_character_in_work_id !== characterInWorkId) {
         throw createHttpError(403, 'Forbidden');
     }
 

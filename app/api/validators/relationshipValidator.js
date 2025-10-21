@@ -1,17 +1,6 @@
 import Joi from 'joi';
 
 const createRelationshipValidator = Joi.object({
-    from_character_in_work_id: Joi.string()
-        .trim()
-        .guid({ version: ['uuidv4', 'uuidv1'] })
-        .min(1)
-        .required()
-        .messages({
-            'string.min': 'from_character_in_work_id is required',
-            'string.guid': 'from_character_in_work_id must be a valid UUID',
-            'any.required': 'from_character_in_work_id is required',
-        }),
-
     to_character_in_work_id: Joi.string()
         .trim()
         .guid({ version: ['uuidv4', 'uuidv1'] })
