@@ -11,11 +11,24 @@ export const getEmailedToken = async (email, scope) => {
     return token.token;
 };
 
-export const getToken = async () => {
+const getToken = async () => {
     const { user, rawPassword } = await createUser({ verified: true });
     const signInRes = await api().post('/api/auth/sign-in').send({
         email: user.email,
         password: rawPassword,
     });
-    return { user, token: signInRes.body.token };
+    return { user, rawPassword, token: signInRes.body.token };
+};
+
+const authApi = token => ({
+    get: url => api().get(url).set('Authorization', `Bearer ${token}`),
+    post: url => api().post(url).set('Authorization', `Bearer ${token}`),
+    patch: url => api().patch(url).set('Authorization', `Bearer ${token}`),
+    delete: url => api().delete(url).set('Authorization', `Bearer ${token}`),
+});
+
+export const withAuth = async () => {
+    const { user, token, rawPassword } = await getToken();
+    const http = authApi(token);
+    return { user, token, http, rawPassword };
 };

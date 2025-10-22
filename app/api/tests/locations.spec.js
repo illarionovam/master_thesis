@@ -1,8 +1,14 @@
 import { api } from './helpers/request.js';
-import { withAuth } from './helpers/auth.js';
-import { createCharacter, createWork, linkCharacterToWork } from './helpers/factories.js';
+import { getToken } from './helpers/auth.js';
+import { createLocation, createWork, linkLocationToWork } from './helpers/factories.js';
 
 const base = '/api/characters';
+
+const withAuth = async () => {
+    const { user, token } = await getToken();
+    const http = authApi(token);
+    return { user, token, http };
+};
 
 describe('Character API', () => {
     test('no token', async () => {

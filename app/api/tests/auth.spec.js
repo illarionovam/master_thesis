@@ -1,4 +1,5 @@
 import { api } from './helpers/request.js';
+import { withAuth } from './helpers/auth.js';
 import { createUser } from './helpers/factories.js';
 import { getEmailedToken } from './helpers/auth.js';
 
@@ -55,21 +56,11 @@ describe('Auth', () => {
     });
 
     test('sign-in + update-email + confirm-email', async () => {
-        const { user, rawPassword } = await createUser({ verified: true });
-        const signInRes = await api().post(`${base}/sign-in`).send({
-            email: user.email,
-            password: rawPassword,
-        });
-        expect(signInRes.status).toBe(200);
-        expect(signInRes.body).toHaveProperty('token');
+        const { http, user } = await withAuth();
 
-        const token = signInRes.body.token;
         const newEmail = 'newemail@ex.com';
 
-        const updateEmailRes = await api()
-            .post(`${base}/update-email`)
-            .set('Authorization', `Bearer ${token}`)
-            .send({ new_email: newEmail });
+        const updateEmailRes = await http.post(`${base}/update-email`).send({ new_email: newEmail });
         expect(updateEmailRes.status).toBe(200);
 
         const emailVerifyToken = await getEmailedToken(user.email, 'email_verify');
@@ -83,36 +74,29 @@ describe('Auth', () => {
     });
 
     test('sign-in + update + user-info + sign-out', async () => {
-        const { user, rawPassword } = await createUser({ verified: true });
-        const signInRes = await api().post(`${base}/sign-in`).send({
-            email: user.email,
-            password: rawPassword,
-        });
-        expect(signInRes.status).toBe(200);
-        expect(signInRes.body).toHaveProperty('token');
+        const { http, user, rawPassword } = await withAuth();
 
-        const token = signInRes.body.token;
         const newPassword = 'P@ssw0rd2';
         const newUsername = 'test2';
 
-        const updatePasswordRes = await api().post(`${base}/update`).set('Authorization', `Bearer ${token}`).send({
+        const updatePasswordRes = await http.post(`${base}/update`).send({
             password: rawPassword,
             new_password: newPassword,
         });
         expect(updatePasswordRes.status).toBe(200);
 
-        const updateRes = await api().post(`${base}/update`).set('Authorization', `Bearer ${token}`).send({
+        const updateRes = await http.post(`${base}/update`).send({
             username: newUsername,
         });
         expect(updateRes.status).toBe(200);
         expect(updateRes.body).toHaveProperty('username', newUsername);
 
-        const userInfoRes = await api().get(`${base}/user-info`).set('Authorization', `Bearer ${token}`);
+        const userInfoRes = await http.get(`${base}/user-info`);
         expect(userInfoRes.status).toBe(200);
         expect(userInfoRes.body).toHaveProperty('username', newUsername);
         expect(userInfoRes.body).toHaveProperty('email', user.email);
 
-        const signOutRes = await api().post(`${base}/sign-out`).set('Authorization', `Bearer ${token}`);
+        const signOutRes = await http.post(`${base}/sign-out`);
         expect(signOutRes.status).toBe(204);
     });
 
