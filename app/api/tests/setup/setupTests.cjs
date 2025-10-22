@@ -21,7 +21,7 @@ afterEach(async () => {
     const tables = await qi.showAllTables();
     const toTruncate = tables.filter(t => t !== 'SequelizeMeta');
     for (const t of toTruncate) {
-        await sequelize.query(`TRUNCATE TABLE "${t}" RESTART IDENTITY CASCADE;`);
+        await sequelize.query(`TRUNCATE TABLE "${t}" RESTART IDENTITY CASCADE;`, { logging: false });
     }
 });
 
