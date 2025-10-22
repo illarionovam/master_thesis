@@ -35,7 +35,7 @@ export const createCharacter = async (owner_id, attrs = {}) => {
         name: attrs.name ?? 'Tyrel',
         appearance: attrs.appearance ?? 'Tall, steel gaze',
         personality: attrs.personality ?? 'Calm strategist',
-        bio: attrs.bio ?? 'Commander of ...',
+        bio: attrs.bio ?? 'Commander of the North Division',
         image_url: attrs.image_url ?? null,
         attributes: attrs.attributes ?? {},
     });

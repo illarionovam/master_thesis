@@ -1,6 +1,6 @@
 import { api } from './helpers/request.js';
 import { getToken } from './helpers/auth.js';
-import { createCharacter } from './helpers/factories.js';
+import { createCharacter, createWork, linkCharacterToWork } from './helpers/factories.js';
 
 const base = '/api/characters';
 
@@ -87,26 +87,39 @@ describe('Character API', () => {
         expect(res.body).toHaveProperty('name', newName);
     });
 
-    test('get character appearances > empty', async () => {
+    test('get character appearances + available appearances', async () => {
         const { http, user } = await withAuth();
 
         const character = await createCharacter(user.id);
+        const work = await createWork(user.id);
 
-        const res = await http.get(`${base}/${character.id}/appearances`);
+        const res1 = await http.get(`${base}/${character.id}/appearances`);
 
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-    });
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
+        expect(res1.body.length === 0);
 
-    test('get character available appearances > empty', async () => {
-        const { http, user } = await withAuth();
+        const res2 = await http.get(`${base}/${character.id}/appearances/available`);
 
-        const character = await createCharacter(user.id);
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body.length === 1);
+        expect(res2.body[0].id === work.id);
 
-        const res = await http.get(`${base}/${character.id}/appearances/available`);
+        const characterInWork = await linkCharacterToWork(character.id, work.id);
 
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
+        const res3 = await http.get(`${base}/${character.id}/appearances`);
+
+        expect(res3.status).toBe(200);
+        expect(Array.isArray(res3.body)).toBe(true);
+        expect(res3.body.length === 1);
+        expect(res3.body[0].id === characterInWork.id);
+
+        const res4 = await http.get(`${base}/${character.id}/appearances/available`);
+
+        expect(res4.status).toBe(200);
+        expect(Array.isArray(res4.body)).toBe(true);
+        expect(res4.body.length === 0);
     });
 
     test('delete character', async () => {
