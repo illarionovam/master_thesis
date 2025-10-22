@@ -9,8 +9,12 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup/setupTests.cjs"],
-    "testMatch": ["**/tests/**/*.spec.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup/setupTests.cjs"
+    ],
+    "testMatch": [
+      "**/tests/**/*.spec.js"
+    ],
     "testPathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/tests/helpers/"
@@ -29,7 +33,11 @@
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "swagger-autogen": "^2.23.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "cross-env": "^10.1.0",
