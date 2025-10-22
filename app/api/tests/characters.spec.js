@@ -24,10 +24,9 @@ describe('Character API', () => {
     });
 
     test('create character', async () => {
-        const { http, user } = await withAuth();
+        const { http } = await withAuth();
 
         const characterToCreate = {
-            owner_id: user.id,
             name: 'Tyrel',
             appearance: 'Tall, steel gaze',
             personality: 'Calm strategist',

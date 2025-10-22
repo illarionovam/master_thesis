@@ -5,7 +5,7 @@ import { getEmailedToken } from './helpers/auth.js';
 
 const base = '/api/auth';
 
-describe('Auth', () => {
+describe('Auth API', () => {
     test('sign-up + confirm-email + sign-in', async () => {
         const userToCreate = {
             username: `u_${Date.now()}`,
