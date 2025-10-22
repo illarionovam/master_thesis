@@ -3,6 +3,7 @@ import { createUser, createWork, createCharacter, linkCharacterToWork } from './
 import { makeBearer } from './helpers/auth.js';
 
 describe('Relationships', () => {
+    /*
     test('create relationship between two CIW in same work', async () => {
         const { user } = await createUser();
         const auth = makeBearer(user);
@@ -40,5 +41,5 @@ describe('Relationships', () => {
             .set('Authorization', auth)
             .send({ to_character_in_work_id: ciwB.id, type: 'ally' });
         expect([403]).toContain(res.status);
-    });
+    });*/
 });

@@ -60,7 +60,9 @@ const signOutAppUserValidator = Joi.object({
     terminate_all_sessions: Joi.boolean().truthy('true', '1', 1).falsy('false', '0', 0, '').default(false).messages({
         'boolean.base': 'terminate_all_sessions must be a boolean-like value',
     }),
-}).prefs({ abortEarly: false, stripUnknown: true });
+})
+    .default({ terminate_all_sessions: false })
+    .prefs({ abortEarly: false, stripUnknown: true });
 
 const updateAppUserNormalFieldsValidator = Joi.alternatives()
     .try(
