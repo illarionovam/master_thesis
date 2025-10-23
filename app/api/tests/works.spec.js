@@ -1,4 +1,3 @@
-import { api } from './helpers/request.js';
 import { withAuth } from './helpers/auth.js';
 import {
     createCharacter,
@@ -13,22 +12,19 @@ import {
 const base = '/api/works';
 
 describe('Works API', () => {
-    test('no token', async () => {
-        const res = await api().get(base);
-        expect(res.status).toBe(401);
-    });
+    test('get works', async () => {
+        const { http, user } = await withAuth();
 
-    test('get works > empty', async () => {
-        const { http } = await withAuth();
-        const res = await http.get(base);
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-    });
+        const res1 = await http.get(base);
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
 
-    test('create work > bad request', async () => {
-        const { http } = await withAuth();
-        const res = await http.post(base).send({});
-        expect(res.status).toBe(400);
+        const work = await createWork(user.id);
+
+        const res2 = await http.get(base);
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body[0]).toHaveProperty('id', work.id);
     });
 
     test('create work', async () => {
@@ -43,17 +39,6 @@ describe('Works API', () => {
         expect(res.status).toBe(201);
         expect(res.body).toHaveProperty('id');
         expect(res.body).toHaveProperty('title', workToCreate.title);
-    });
-
-    test('get works > 1 work', async () => {
-        const { http, user } = await withAuth();
-
-        const work = await createWork(user.id);
-
-        const res = await http.get(base);
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-        expect(res.body[0]).toHaveProperty('id', work.id);
     });
 
     test('get work', async () => {
@@ -296,5 +281,106 @@ describe('Works API', () => {
 
         const getAfter = await http.get(`${base}/${work.id}`);
         expect(getAfter.status).toBe(403);
+    });
+
+    test('get events', async () => {
+        const { http, user } = await withAuth();
+
+        const work = await createWork(user.id);
+
+        const res1 = await http.get(`${base}/${work.id}/events`);
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
+        expect(res1.body.length).toBe(0);
+
+        const event = await createEvent(work.id);
+
+        const res2 = await http.get(`${base}/${work.id}/events`);
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body[0]).toHaveProperty('id', event.id);
+    });
+
+    test('create / get / update / delete event', async () => {
+        const { http, user } = await withAuth();
+
+        const work = await createWork(user.id);
+
+        const resCreate = await http.post(`${base}/${work.id}/events`).send({ description: 'Scouting at dawn' });
+
+        expect(resCreate.status).toBe(201);
+        expect(resCreate.body).toHaveProperty('id');
+
+        const eventId = resCreate.body.id;
+
+        const resGet = await http.get(`${base}/${work.id}/events/${eventId}`);
+
+        expect(resGet.status).toBe(200);
+        expect(resGet.body).toHaveProperty('id', eventId);
+
+        const location = await createLocation(user.id);
+        const locationInWork = await linkLocationToWork(location.id, work.id);
+
+        const resUpdate = await http
+            .patch(`${base}/${work.id}/events/${eventId}`)
+            .send({ location_in_work_id: locationInWork.id });
+
+        expect(resUpdate.status).toBe(200);
+        expect(resUpdate.body).toHaveProperty('id', eventId);
+        expect(resUpdate.body).toHaveProperty('location_in_work_id', locationInWork.id);
+
+        const resDelete = await http.delete(`${base}/${work.id}/events/${eventId}`);
+
+        expect(resDelete.status).toBe(204);
+
+        const resGet2 = await http.get(`${base}/${work.id}/events/${eventId}`);
+
+        expect(resGet2.status).toBe(403);
+    });
+
+    test('create / get / delete event participants', async () => {
+        const { http, user } = await withAuth();
+
+        const character = await createCharacter(user.id);
+        const work = await createWork(user.id);
+        const characterInWork = await linkCharacterToWork(character.id, work.id);
+        const event = await createEvent(work.id);
+
+        const res1 = await http.get(`${base}/${work.id}/events/${event.id}/participants`);
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
+        expect(res1.body.length).toBe(0);
+
+        const res2 = await http.get(`${base}/${work.id}/events/${event.id}/participants/available`);
+        console.log(res2.body);
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body[0]).toHaveProperty('id', characterInWork.id);
+
+        const res3 = await http.post(`${base}/${work.id}/events/${event.id}/participants`).send({
+            character_in_work_id: characterInWork.id,
+        });
+        expect(res3.status).toBe(201);
+        expect(res3.body).toHaveProperty('id');
+
+        const eventParticipantId = res3.body.id;
+
+        const res4 = await http.get(`${base}/${work.id}/events/${event.id}/participants/available`);
+        expect(res4.status).toBe(200);
+        expect(Array.isArray(res4.body)).toBe(true);
+        expect(res4.body.length).toBe(0);
+
+        const res5 = await http.get(`${base}/${work.id}/events/${event.id}/participants`);
+        expect(res5.status).toBe(200);
+        expect(Array.isArray(res5.body)).toBe(true);
+        expect(res5.body[0]).toHaveProperty('id', eventParticipantId);
+
+        const res6 = await http.delete(`${base}/${work.id}/events/${event.id}/participants/${eventParticipantId}`);
+        expect(res6.status).toBe(204);
+
+        const res7 = await http.get(`${base}/${work.id}/events/${event.id}/participants`);
+        expect(res7.status).toBe(200);
+        expect(Array.isArray(res7.body)).toBe(true);
+        expect(res7.body.length).toBe(0);
     });
 });

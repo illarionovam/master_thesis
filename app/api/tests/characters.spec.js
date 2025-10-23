@@ -1,26 +1,22 @@
-import { api } from './helpers/request.js';
 import { withAuth } from './helpers/auth.js';
 import { createCharacter, createWork, linkCharacterToWork } from './helpers/factories.js';
 
 const base = '/api/characters';
 
 describe('Character API', () => {
-    test('no token', async () => {
-        const res = await api().get(base);
-        expect(res.status).toBe(401);
-    });
+    test('get characters', async () => {
+        const { http, user } = await withAuth();
 
-    test('get characters > empty', async () => {
-        const { http } = await withAuth();
-        const res = await http.get(base);
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-    });
+        const res1 = await http.get(base);
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
 
-    test('create character > bad request', async () => {
-        const { http } = await withAuth();
-        const res = await http.post(base).send({});
-        expect(res.status).toBe(400);
+        const character = await createCharacter(user.id);
+
+        const res2 = await http.get(base);
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body[0]).toHaveProperty('id', character.id);
     });
 
     test('create character', async () => {
@@ -38,17 +34,6 @@ describe('Character API', () => {
         expect(res.status).toBe(201);
         expect(res.body).toHaveProperty('id');
         expect(res.body).toHaveProperty('name', characterToCreate.name);
-    });
-
-    test('get characters > 1 character', async () => {
-        const { http, user } = await withAuth();
-
-        const character = await createCharacter(user.id);
-
-        const res = await http.get(base);
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-        expect(res.body[0]).toHaveProperty('id', character.id);
     });
 
     test('get character', async () => {

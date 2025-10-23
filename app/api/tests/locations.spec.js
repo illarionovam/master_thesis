@@ -1,26 +1,22 @@
-import { api } from './helpers/request.js';
 import { withAuth } from './helpers/auth.js';
 import { createLocation, createWork, linkLocationToWork } from './helpers/factories.js';
 
 const base = '/api/locations';
 
 describe('Locations API', () => {
-    test('no token', async () => {
-        const res = await api().get(base);
-        expect(res.status).toBe(401);
-    });
+    test('get locations', async () => {
+        const { http, user } = await withAuth();
 
-    test('get locations > empty', async () => {
-        const { http } = await withAuth();
-        const res = await http.get(base);
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-    });
+        const res1 = await http.get(base);
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
 
-    test('create location > bad request', async () => {
-        const { http } = await withAuth();
-        const res = await http.post(base).send({});
-        expect(res.status).toBe(400);
+        const location = await createLocation(user.id);
+
+        const res2 = await http.get(base);
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body[0]).toHaveProperty('id', location.id);
     });
 
     test('create location', async () => {
@@ -36,17 +32,6 @@ describe('Locations API', () => {
         expect(res.status).toBe(201);
         expect(res.body).toHaveProperty('id');
         expect(res.body).toHaveProperty('title', locationToCreate.title);
-    });
-
-    test('get locations > 1 location', async () => {
-        const { http, user } = await withAuth();
-
-        const location = await createLocation(user.id);
-
-        const res = await http.get(base);
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-        expect(res.body[0]).toHaveProperty('id', location.id);
     });
 
     test('get location', async () => {

@@ -46,7 +46,7 @@ const getCharactersInWorkNotLinkedToEvent = async (event, { transaction } = {}) 
             '$participations.id$': null,
         },
         include: [
-            baseInclude,
+            ...baseInclude,
             {
                 model: EventParticipant,
                 as: 'participations',
