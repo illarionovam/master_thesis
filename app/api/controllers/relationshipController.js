@@ -20,9 +20,6 @@ const createRelationship = async (req, res) => {
 
     const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
 
-    console.log(characterInWork.work_id);
-    console.log(req.work.id);
-
     if (characterInWork == null || characterInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
     }

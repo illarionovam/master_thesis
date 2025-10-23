@@ -1,116 +1,300 @@
 import { api } from './helpers/request.js';
-import { createUser, createWork } from './helpers/factories.js';
-import { makeBearer } from './helpers/auth.js';
+import { withAuth } from './helpers/auth.js';
+import {
+    createCharacter,
+    createLocation,
+    createWork,
+    linkLocationToWork,
+    linkCharacterToWork,
+    linkCharacterToCharacter,
+    createEvent,
+} from './helpers/factories.js';
 
-describe('Works', () => {
-    /*
-    test('create/list/get/update/delete work (owner only)', async () => {
-        const { user } = await createUser();
-        const auth = makeBearer(user);
+const base = '/api/works';
 
-        const created = await api()
-            .post('/api/works')
-            .set('Authorization', auth)
-            .send({ title: 'Alpha', annotation: '', synopsis: '' });
-        expect(created.status).toBe(201);
-        const workId = created.body.id || created.body?.work?.id;
+describe('Works API', () => {
+    test('no token', async () => {
+        const res = await api().get(base);
+        expect(res.status).toBe(401);
+    });
 
-        const list = await api().get('/api/works').set('Authorization', auth);
-        expect(list.status).toBe(200);
-        expect(Array.isArray(list.body)).toBe(true);
+    test('get works > empty', async () => {
+        const { http } = await withAuth();
+        const res = await http.get(base);
+        expect(res.status).toBe(200);
+        expect(Array.isArray(res.body)).toBe(true);
+    });
 
-        const get = await api().get(`/api/works/${workId}`).set('Authorization', auth);
-        expect(get.status).toBe(200);
-        expect(get.body.title).toBe('Alpha');
+    test('create work > bad request', async () => {
+        const { http } = await withAuth();
+        const res = await http.post(base).send({});
+        expect(res.status).toBe(400);
+    });
 
-        const upd = await api().patch(`/api/works/${workId}`).set('Authorization', auth).send({ title: 'Alpha 2' });
-        expect(upd.status).toBe(200);
+    test('create work', async () => {
+        const { http } = await withAuth();
 
-        const del = await api().delete(`/api/works/${workId}`).set('Authorization', auth);
+        const workToCreate = {
+            title: 'My Work',
+        };
+
+        const res = await http.post(base).send(workToCreate);
+
+        expect(res.status).toBe(201);
+        expect(res.body).toHaveProperty('id');
+        expect(res.body).toHaveProperty('title', workToCreate.title);
+    });
+
+    test('get works > 1 work', async () => {
+        const { http, user } = await withAuth();
+
+        const work = await createWork(user.id);
+
+        const res = await http.get(base);
+        expect(res.status).toBe(200);
+        expect(Array.isArray(res.body)).toBe(true);
+        expect(res.body[0]).toHaveProperty('id', work.id);
+    });
+
+    test('get work', async () => {
+        const { http, user } = await withAuth();
+
+        const work = await createWork(user.id);
+
+        const res = await http.get(`${base}/${work.id}`);
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('id', work.id);
+    });
+
+    test('update work', async () => {
+        const { http, user } = await withAuth();
+
+        const work = await createWork(user.id);
+        const newAnnotation = 'test';
+
+        const res = await http.patch(`${base}/${work.id}`).send({ annotation: newAnnotation });
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('id', work.id);
+        expect(res.body).toHaveProperty('annotation', newAnnotation);
+    });
+
+    test('get work cast + available cast', async () => {
+        const { http, user } = await withAuth();
+
+        const character = await createCharacter(user.id);
+        const work = await createWork(user.id);
+
+        const res1 = await http.get(`${base}/${work.id}/cast`);
+
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
+        expect(res1.body.length === 0);
+
+        const res2 = await http.get(`${base}/${work.id}/cast/available`);
+
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body.length === 1);
+        expect(res2.body[0].id === character.id);
+
+        const characterInWork = await linkCharacterToWork(character.id, work.id);
+
+        const res3 = await http.get(`${base}/${work.id}/cast`);
+
+        expect(res3.status).toBe(200);
+        expect(Array.isArray(res3.body)).toBe(true);
+        expect(res3.body.length === 1);
+        expect(res3.body[0].id === characterInWork.id);
+
+        const res4 = await http.get(`${base}/${work.id}/cast/available`);
+
+        expect(res4.status).toBe(200);
+        expect(Array.isArray(res4.body)).toBe(true);
+        expect(res4.body.length === 0);
+    });
+
+    test('create / get / update / delete character in work', async () => {
+        const { http, user } = await withAuth();
+
+        const character = await createCharacter(user.id);
+        const work = await createWork(user.id);
+
+        const characterInWorkToCreate = {
+            work_id: work.id,
+            character_id: character.id,
+        };
+
+        const resCreate = await http.post(`${base}/${work.id}/cast`).send(characterInWorkToCreate);
+
+        expect(resCreate.status).toBe(201);
+        expect(resCreate.body).toHaveProperty('id');
+
+        const characterInWorkId = resCreate.body.id;
+
+        const resGet = await http.get(`${base}/${work.id}/cast/${characterInWorkId}`);
+
+        expect(resGet.status).toBe(200);
+        expect(resGet.body).toHaveProperty('id', characterInWorkId);
+
+        const newAttributes = { lost: ['arm', 'core'] };
+
+        const resUpdate = await http
+            .patch(`${base}/${work.id}/cast/${characterInWorkId}`)
+            .send({ attributes: newAttributes });
+
+        expect(resUpdate.status).toBe(200);
+        expect(resUpdate.body).toHaveProperty('id', characterInWorkId);
+        expect(resUpdate.body).toHaveProperty('attributes', newAttributes);
+
+        const resDelete = await http.delete(`${base}/${work.id}/cast/${characterInWorkId}`);
+
+        expect(resDelete.status).toBe(204);
+
+        const resGet2 = await http.get(`${base}/${work.id}/cast/${characterInWorkId}`);
+
+        expect(resGet2.status).toBe(403);
+    });
+
+    test('get character in work relationships + available relationships', async () => {
+        const { http, user } = await withAuth();
+
+        const characterA = await createCharacter(user.id);
+        const characterB = await createCharacter(user.id, {
+            name: 'Feiser',
+            appearance: 'Lean, strong',
+            personality: 'Sarcastic tactician',
+            bio: 'Lone ektrikhos',
+        });
+        const work = await createWork(user.id);
+        const characterInWorkA = await linkCharacterToWork(characterA.id, work.id);
+        const characterInWorkB = await linkCharacterToWork(characterB.id, work.id);
+
+        const res1 = await http.get(`${base}/${work.id}/cast/${characterInWorkA.id}/relationships`);
+
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
+        expect(res1.body.length === 0);
+
+        const res2 = await http.get(`${base}/${work.id}/cast/${characterInWorkA.id}/relationships/available`);
+
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body.length === 1);
+        expect(res2.body[0].id === characterInWorkB.id);
+
+        const relationship = await linkCharacterToCharacter(characterInWorkA.id, characterInWorkB.id, {
+            type: 'friend, partner',
+        });
+
+        const res3 = await http.get(`${base}/${work.id}/cast/${characterInWorkA.id}/relationships`);
+
+        expect(res3.status).toBe(200);
+        expect(Array.isArray(res3.body)).toBe(true);
+        expect(res3.body.length === 1);
+        expect(res3.body[0].id === relationship.id);
+
+        const res4 = await http.get(`${base}/${work.id}/cast/${characterInWorkA.id}/relationships/available`);
+
+        expect(res4.status).toBe(200);
+        expect(Array.isArray(res4.body)).toBe(true);
+        expect(res4.body.length === 0);
+    });
+
+    test('create / get / update / delete relationship', async () => {
+        const { http, user } = await withAuth();
+
+        const characterA = await createCharacter(user.id);
+        const characterB = await createCharacter(user.id, {
+            name: 'Feiser',
+            appearance: 'Lean, strong',
+            personality: 'Sarcastic tactician',
+            bio: 'Lone ektrikhos',
+        });
+        const work = await createWork(user.id);
+        const characterInWorkA = await linkCharacterToWork(characterA.id, work.id);
+        const characterInWorkB = await linkCharacterToWork(characterB.id, work.id);
+
+        const resCreate = await http
+            .post(`${base}/${work.id}/cast/${characterInWorkA.id}/relationships`)
+            .send({ to_character_in_work_id: characterInWorkB.id, type: 'friend, partner' });
+
+        expect(resCreate.status).toBe(201);
+        expect(resCreate.body).toHaveProperty('id');
+
+        const relationshipId = resCreate.body.id;
+
+        const resGet = await http.get(`${base}/${work.id}/cast/${characterInWorkA.id}/relationships/${relationshipId}`);
+
+        expect(resGet.status).toBe(200);
+        expect(resGet.body).toHaveProperty('id', relationshipId);
+
+        const newNotes = 'Saved Feiser from the jail.';
+
+        const resUpdate = await http
+            .patch(`${base}/${work.id}/cast/${characterInWorkA.id}/relationships/${relationshipId}`)
+            .send({ notes: newNotes });
+
+        expect(resUpdate.status).toBe(200);
+        expect(resUpdate.body).toHaveProperty('id', relationshipId);
+        expect(resUpdate.body).toHaveProperty('notes', newNotes);
+
+        const resDelete = await http.delete(
+            `${base}/${work.id}/cast/${characterInWorkA.id}/relationships/${relationshipId}`
+        );
+
+        expect(resDelete.status).toBe(204);
+
+        const resGet2 = await http.get(
+            `${base}/${work.id}/cast/${characterInWorkA.id}/relationships/${relationshipId}`
+        );
+
+        expect(resGet2.status).toBe(403);
+    });
+
+    test('get work location links + available location links', async () => {
+        const { http, user } = await withAuth();
+
+        const location = await createLocation(user.id);
+        const work = await createWork(user.id);
+
+        const res1 = await http.get(`${base}/${work.id}/location-links`);
+
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
+        expect(res1.body.length === 0);
+
+        const res2 = await http.get(`${base}/${work.id}/location-links/available`);
+
+        expect(res2.status).toBe(200);
+        expect(Array.isArray(res2.body)).toBe(true);
+        expect(res2.body.length === 1);
+        expect(res2.body[0].id === location.id);
+
+        const locationInWork = await linkLocationToWork(location.id, work.id);
+
+        const res3 = await http.get(`${base}/${work.id}/location-links`);
+
+        expect(res3.status).toBe(200);
+        expect(Array.isArray(res3.body)).toBe(true);
+        expect(res3.body.length === 1);
+        expect(res3.body[0].id === locationInWork.id);
+
+        const res4 = await http.get(`${base}/${work.id}/location-links/available`);
+
+        expect(res4.status).toBe(200);
+        expect(Array.isArray(res4.body)).toBe(true);
+        expect(res4.body.length === 0);
+    });
+
+    test('delete work', async () => {
+        const { http, user } = await withAuth();
+
+        const work = await createWork(user.id);
+
+        const del = await http.delete(`${base}/${work.id}`);
         expect(del.status).toBe(204);
+
+        const getAfter = await http.get(`${base}/${work.id}`);
+        expect(getAfter.status).toBe(403);
     });
-
-    test('owner isolation: cannot access others work', async () => {
-        const { user: a } = await createUser();
-        const { user: b } = await createUser();
-        const work = await createWork(a.id, { title: 'Secret' });
-
-        const res = await api().get(`/api/works/${work.id}`).set('Authorization', makeBearer(b));
-        expect([403]).toContain(res.status);
-    });
-    */
-    /*
-    test('create event with location_in_work and add participant', async () => {
-        const { user } = await createUser();
-        const auth = makeBearer(user);
-        const work = await createWork(user.id);
-        const loc = await createLocation(user.id);
-        const liw = await linkLocationToWork(loc.id, work.id);
-        const event = await createEvent(work.id, { location_in_work_id: liw.id });
-
-        const ch = await createCharacter(user.id);
-        const ciw = await linkCharacterToWork(ch.id, work.id);
-
-        const res = await api()
-            .post(`/api/works/${work.id}/events/${event.id}/participants`)
-            .set('Authorization', auth)
-            .send({ character_in_work_id: ciw.id });
-        expect(res.status).toBe(201);
-    });
-
-    test('reject participant if event.work_id != ciw.work_id', async () => {
-        const { user } = await createUser();
-        const auth = makeBearer(user);
-        const w1 = await createWork(user.id);
-        const w2 = await createWork(user.id);
-
-        const event = await createEvent(w1.id);
-        const ch = await createCharacter(user.id);
-        const ciw = await linkCharacterToWork(ch.id, w2.id);
-
-        const res = await api()
-            .post(`/api/works/${work.id}/events/${event.id}/participants`)
-            .set('Authorization', auth)
-            .send({ event_id: event.id, character_in_work_id: ciw.id });
-        expect([403]).toContain(res.status);
-    });*/
-    /*
-    test('create relationship between two CIW in same work', async () => {
-        const { user } = await createUser();
-        const auth = makeBearer(user);
-        const work = await createWork(user.id);
-
-        const chA = await createCharacter(user.id, { name: 'Tyrel' });
-        const chB = await createCharacter(user.id, { name: 'Fayzer' });
-        const ciwA = await linkCharacterToWork(chA.id, work.id);
-        const ciwB = await linkCharacterToWork(chB.id, work.id);
-
-        const res = await api()
-            .post(`api/works/${work.id}/cast/${ciwA.id}/relationships`)
-            .set('Authorization', auth)
-            .send({
-                to_character_in_work_id: ciwB.id,
-                type: 'ally',
-                notes: 'since chapter 6',
-            });
-        expect(res.status).toBe(201);
-    });
-
-    test('reject relationship if characters belong to different works', async () => {
-        const { user } = await createUser();
-        const auth = makeBearer(user);
-        const w1 = await createWork(user.id);
-        const w2 = await createWork(user.id);
-
-        const chA = await createCharacter(user.id, { name: 'A' });
-        const chB = await createCharacter(user.id, { name: 'B' });
-        const ciwA = await linkCharacterToWork(chA.id, w1.id);
-        const ciwB = await linkCharacterToWork(chB.id, w2.id);
-
-        const res = await api()
-            .post(`/api/works/${w1.id}/cast/${ciwA.id}/relationships`)
-            .set('Authorization', auth)
-            .send({ to_character_in_work_id: ciwB.id, type: 'ally' });
-        expect([403]).toContain(res.status);
-    });*/
 });

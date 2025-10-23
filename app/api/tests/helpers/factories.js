@@ -6,6 +6,7 @@ import { CharacterInWork } from '../../models/characterInWork.js';
 import { Location } from '../../models/location.js';
 import { LocationInWork } from '../../models/locationInWork.js';
 import { Event } from '../../models/event.js';
+import { Relationship } from '../../models/relationship.js';
 
 export const createUser = async (attrs = {}) => {
     const password = attrs.password ?? 'P@ssw0rd1';
@@ -47,6 +48,15 @@ export const linkCharacterToWork = async (character_id, work_id, attrs = {}) => 
         work_id,
         image_url: attrs.image_url ?? null,
         attributes: attrs.attributes ?? {},
+    });
+};
+
+export const linkCharacterToCharacter = async (from_character_in_work_id, to_character_in_work_id, attr = {}) => {
+    return Relationship.create({
+        from_character_in_work_id,
+        to_character_in_work_id,
+        type: attr.type ?? 'friend',
+        notes: attr.notes ?? null,
     });
 };
 

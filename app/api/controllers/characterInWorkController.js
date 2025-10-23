@@ -3,6 +3,7 @@ import relationshipService from '../services/relationshipService.js';
 import characterController from './characterController.js';
 import relationshipController from './relationshipController.js';
 import workController from './workController.js';
+import createHttpError from 'http-errors';
 
 const stripBulkCharacterInWorkResponse = characterInWork => {
     return {

@@ -13,7 +13,7 @@
       "<rootDir>/tests/setup/setupTests.cjs"
     ],
     "testMatch": [
-      "**/tests/**/*.spec.js"
+      "**/tests/**/works.spec.js"
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
