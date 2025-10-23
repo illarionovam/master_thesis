@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
 import appUserService from '../services/appUserService.js';
 import tokenService from '../services/tokenService.js';
+import { mailer } from '../mailer/mailer.js';
 
 const stripAppUserResponse = appUser => {
     return {
@@ -33,6 +34,12 @@ const signUpAppUser = async (req, res) => {
                 expiresIn: '15m',
             });
             await tokenService.createToken({ owner_id: appUser.id, token, scope: 'email_verify' }, { transaction: t });
+            // await mailer.sendMail({
+            //     to: appUser.email,
+            //     from: process.env.EMAIL_USER,
+            //     subject: 'Verify email',
+            //     html: `<a target='_blank' href='${process.env.SERVER_URL}:${process.env.SERVER_PORT}/confirm-email#${token}'>Verify email</a>`,
+            // });
         });
     } catch (err) {
         if (!(err instanceof Sequelize.UniqueConstraintError)) {
@@ -91,6 +98,12 @@ const resetAppUserPassword = async (req, res) => {
             expiresIn: '15m',
         });
         await tokenService.createToken({ owner_id: appUser.id, token, scope: 'password_reset' });
+        // await mailer.sendMail({
+        //     to: appUser.email,
+        //     from: process.env.EMAIL_USER,
+        //     subject: 'Change password',
+        //     html: `<a target='_blank' href='${process.env.SERVER_URL}:${process.env.SERVER_PORT}/confirm-password#${token}'>Change password</a>`,
+        // });
     }
 
     res.sendStatus(200);
@@ -118,6 +131,12 @@ const updateAppUserEmail = async (req, res) => {
             expiresIn: '15m',
         });
         await tokenService.createToken({ owner_id: req.appUser.id, token, scope: 'email_verify' }, { transaction: t });
+        // await mailer.sendMail({
+        //     to: appUser.email,
+        //     from: process.env.EMAIL_USER,
+        //     subject: 'Verify email',
+        //     html: `<a target='_blank' href='${process.env.SERVER_URL}:${process.env.SERVER_PORT}/confirm-email#${token}'>Verify email</a>`,
+        // });
     });
 
     res.sendStatus(200);
