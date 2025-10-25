@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { signUpAppUser, signInAppUser } from '../../api/auth.js';
+import { signUpAppUser, signInAppUser, confirmAppUserEmail, confirmAppUserPassword } from '../../api/auth.js';
 import wrapper from '../wrapper.js';
 
 export const signUp = createAsyncThunk('auth/signUp', async (payload, { rejectWithValue }) => {
@@ -9,3 +9,13 @@ export const signUp = createAsyncThunk('auth/signUp', async (payload, { rejectWi
 export const signIn = createAsyncThunk('auth/signIn', async (payload, { rejectWithValue }) => {
     return wrapper(signInAppUser, rejectWithValue)(payload);
 });
+
+export const confirmEmail = createAsyncThunk('auth/confirmEmail', async (token, { rejectWithValue }) =>
+    wrapper(confirmAppUserEmail, rejectWithValue)(token)
+);
+
+export const confirmPassword = createAsyncThunk(
+    'auth/confirmPassword',
+    async ({ token, new_password }, { rejectWithValue }) =>
+        wrapper(args => confirmAppUserPassword(args.token, args.new_password), rejectWithValue)({ token, new_password })
+);

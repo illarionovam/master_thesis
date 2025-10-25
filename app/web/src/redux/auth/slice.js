@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { signIn, signUp } from './operations';
+import { signIn, signUp, confirmEmail, confirmPassword } from './operations';
 
 const initialState = {
     token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
@@ -14,6 +14,8 @@ const initialState = {
         error: null,
         result: null,
     },
+    confirmEmail: { loading: false, error: null, success: false },
+    confirmPassword: { loading: false, error: null, success: false },
 };
 
 const authSlice = createSlice({
@@ -73,6 +75,32 @@ const authSlice = createSlice({
 
                 state.token = null;
                 state.user = null;
+            })
+            .addCase(confirmEmail.pending, state => {
+                state.confirmEmail.loading = true;
+                state.confirmEmail.error = null;
+                state.confirmEmail.success = false;
+            })
+            .addCase(confirmEmail.fulfilled, state => {
+                state.confirmEmail.loading = false;
+                state.confirmEmail.success = true;
+            })
+            .addCase(confirmEmail.rejected, (state, action) => {
+                state.confirmEmail.loading = false;
+                state.confirmEmail.error = action.payload;
+            })
+            .addCase(confirmPassword.pending, state => {
+                state.confirmPassword.loading = true;
+                state.confirmPassword.error = null;
+                state.confirmPassword.success = false;
+            })
+            .addCase(confirmPassword.fulfilled, state => {
+                state.confirmPassword.loading = false;
+                state.confirmPassword.success = true;
+            })
+            .addCase(confirmPassword.rejected, (state, action) => {
+                state.confirmPassword.loading = false;
+                state.confirmPassword.error = action.payload;
             });
     },
 });

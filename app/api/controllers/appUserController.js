@@ -157,7 +157,7 @@ const confirmAppUserEmail = async (req, res) => {
         await tokenService.destroyToken(req.token, { transaction: t });
     });
 
-    res.json(stripAppUserResponse(req.appUser));
+    res.sendStatus(200);
 };
 
 const updateAppUserNormalFields = async (req, res) => {

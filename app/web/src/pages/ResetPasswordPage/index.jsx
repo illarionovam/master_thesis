@@ -1,58 +1,34 @@
 import { useEffect, useId, useState } from 'react';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { confirmPassword } from '../../redux/auth/operations';
+import {
+    selectConfirmPasswordLoading,
+    selectConfirmPasswordError,
+    selectConfirmPasswordSuccess,
+} from '../../redux/auth/selectors';
 
 export default function ResetPasswordPage() {
     const titleId = useId();
-    const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
-    const [error, setError] = useState('');
+    const dispatch = useDispatch();
+
+    const loading = useSelector(selectConfirmPasswordLoading);
+    const error = useSelector(selectConfirmPasswordError);
+    const success = useSelector(selectConfirmPasswordSuccess);
+
     const [token, setToken] = useState('');
 
     useEffect(() => {
-        let token = window.location.hash ? window.location.hash.slice(1) : '';
-
-        if (!token) {
-            setStatus('error');
-            setError('Missing token in URL hash.');
-        } else {
-            setToken(token);
-        }
+        let t = window.location.hash ? window.location.hash.slice(1) : '';
+        setToken(t);
     }, []);
 
-    const handleSubmit = async e => {
+    const handleSubmit = e => {
         e.preventDefault();
-        if (!token) return;
-
         const fd = new FormData(e.currentTarget);
         const new_password = (fd.get('new_password') || '').toString();
-
-        if (!new_password) {
-            setStatus('error');
-            setError('New password is required.');
-            return;
-        }
-
-        setStatus('loading');
-        setError('');
-
-        try {
-            // Використовуємо "axios" напряму, аби інтерсептор не підмінив Authorization
-            await axios.post(
-                '/api/auth/confirm-password',
-                { new_password },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            setStatus('success');
-            e.currentTarget.reset();
-        } catch (err) {
-            const msg =
-                err?.response?.data?.message ||
-                (typeof err?.response?.data === 'string' ? err.response.data : null) ||
-                err?.message ||
-                'Unknown error';
-            setError(msg);
-            setStatus('error');
-        }
+        if (!new_password || !token) return;
+        dispatch(confirmPassword({ token, new_password }));
+        e.currentTarget.reset();
     };
 
     return (
@@ -68,19 +44,19 @@ export default function ResetPasswordPage() {
                         type="password"
                         autoComplete="new-password"
                         required
-                        disabled={status === 'loading' || !token}
+                        disabled={loading || !token}
                     />
                 </div>
 
                 <div>
-                    <button type="submit" disabled={status === 'loading' || !token}>
-                        {status === 'loading' ? 'Submitting...' : 'Set New Password'}
+                    <button type="submit" disabled={loading || !token}>
+                        {loading ? 'Submitting...' : 'Set New Password'}
                     </button>
                 </div>
             </form>
 
-            {status === 'success' && <p aria-live="polite">Password changed.</p>}
-            {status === 'error' && error && <p role="alert">{error}</p>}
+            {success && <p aria-live="polite">Password changed.</p>}
+            {error && <p role="alert">{error}</p>}
         </main>
     );
 }
