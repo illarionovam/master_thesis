@@ -31,7 +31,8 @@ export default function SignInPage() {
 
         if (signIn.fulfilled.match(action)) {
             form.reset();
-            navigate('/', { replace: true });
+            const backTo = location.state?.from?.pathname || '/';
+            navigate(backTo, { replace: true });
         }
     };
 
