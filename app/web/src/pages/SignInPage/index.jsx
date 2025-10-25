@@ -1,5 +1,6 @@
-import { useId } from 'react';
+import { useEffect, useId } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { signIn } from '../../redux/auth/operations';
 import { selectSignInLoading, selectSignInError, selectToken, selectUser } from '../../redux/auth/selectors';
 import { resetSignIn } from '../../redux/auth/slice';
@@ -7,11 +8,16 @@ import { resetSignIn } from '../../redux/auth/slice';
 export default function SignInPage() {
     const titleId = useId();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const loading = useSelector(selectSignInLoading);
     const error = useSelector(selectSignInError);
     const token = useSelector(selectToken);
     const user = useSelector(selectUser);
+
+    useEffect(() => {
+        if (token) navigate('/', { replace: true });
+    }, [token, navigate]);
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -25,8 +31,7 @@ export default function SignInPage() {
 
         if (signIn.fulfilled.match(action)) {
             form.reset();
-            // should be navigated to home page later, when I have home page
-            // navigate('/dashboard');
+            navigate('/', { replace: true });
         }
     };
 

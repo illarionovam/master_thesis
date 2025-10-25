@@ -10,7 +10,6 @@ export const selectSignInResult = state => state.auth.signIn.result;
 
 export const selectToken = state => state.auth.token;
 export const selectUser = state => state.auth.user;
-export const selectIsAuthenticated = state => Boolean(state.auth.token);
 
 export const selectConfirmEmailLoading = state => state.auth.confirmEmail.loading;
 export const selectConfirmEmailError = state => state.auth.confirmEmail.error;
