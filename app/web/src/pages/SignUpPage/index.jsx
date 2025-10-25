@@ -79,7 +79,7 @@ export default function SignUpPage() {
                         {loading ? 'Loading' : 'Sign Up'}
                     </button>
                     <button type="button" onClick={() => dispatch(resetSignUp())} disabled={loading}>
-                        Скинути стан
+                        Reset
                     </button>
                 </div>
             </form>
