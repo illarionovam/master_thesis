@@ -132,7 +132,7 @@ const updateAppUserEmail = async (req, res) => {
         });
         await tokenService.createToken({ owner_id: req.appUser.id, token, scope: 'email_verify' }, { transaction: t });
         await mailer.sendMail({
-            to: appUser.email,
+            to: req.appUser.email,
             from: process.env.EMAIL_USER,
             subject: 'Verify email',
             html: `<a target='_blank' href='${process.env.SERVER_URL}:${process.env.VITE_SERVER_PORT}/confirm-email#${token}'>Verify email</a>`,

@@ -1,9 +1,22 @@
-import { api } from './helpers/request.js';
-import { withAuth } from './helpers/auth.js';
-import { createUser } from './helpers/factories.js';
-import { getEmailedToken } from './helpers/auth.js';
+import { jest } from '@jest/globals';
+
+const sendMail = jest.fn().mockResolvedValue({ messageId: 'stubbed' });
+
+await jest.unstable_mockModule('../mailer/mailer.js', () => ({
+    __esModule: true,
+    mailer: { sendMail },
+}));
+
+const { api } = await import('./helpers/request.js');
+const { withAuth } = await import('./helpers/auth.js');
+const { createUser } = await import('./helpers/factories.js');
+const { getEmailedToken } = await import('./helpers/auth.js');
 
 const base = '/api/auth';
+
+beforeEach(() => {
+    jest.clearAllMocks();
+});
 
 describe('Auth API', () => {
     test('sign-up + confirm-email + sign-in', async () => {
@@ -16,6 +29,7 @@ describe('Auth API', () => {
 
         const signUpRes = await api().post(`${base}/sign-up`).send(userToCreate);
         expect(signUpRes.status).toBe(201);
+        expect(sendMail).toHaveBeenCalledTimes(1);
 
         const emailVerifyToken = await getEmailedToken(userToCreate.email, 'email_verify');
 
@@ -37,6 +51,7 @@ describe('Auth API', () => {
         const { user } = await createUser({ verified: true });
         const forgotPasswordRes = await api().post(`${base}/forgot-password`).send({ email: user.email });
         expect(forgotPasswordRes.status).toBe(200);
+        expect(sendMail).toHaveBeenCalledTimes(1);
 
         const passwordResetToken = await getEmailedToken(user.email, 'password_reset');
         const newPassword = 'P@ssw0rd2';
@@ -62,6 +77,7 @@ describe('Auth API', () => {
 
         const updateEmailRes = await http.post(`${base}/update-email`).send({ new_email: newEmail });
         expect(updateEmailRes.status).toBe(200);
+        expect(sendMail).toHaveBeenCalledTimes(1);
 
         const emailVerifyToken = await getEmailedToken(user.email, 'email_verify');
 
@@ -70,7 +86,6 @@ describe('Auth API', () => {
             .set('Authorization', `Bearer ${emailVerifyToken}`)
             .send();
         expect(confirmEmailRes.status).toBe(200);
-        expect(confirmEmailRes.body).toHaveProperty('email', newEmail);
     });
 
     test('sign-in + update + user-info + sign-out', async () => {

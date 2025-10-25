@@ -352,7 +352,6 @@ describe('Works API', () => {
         expect(res1.body.length).toBe(0);
 
         const res2 = await http.get(`${base}/${work.id}/events/${event.id}/participants/available`);
-        console.log(res2.body);
         expect(res2.status).toBe(200);
         expect(Array.isArray(res2.body)).toBe(true);
         expect(res2.body[0]).toHaveProperty('id', characterInWork.id);
