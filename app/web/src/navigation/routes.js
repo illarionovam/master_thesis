@@ -5,6 +5,8 @@ export const ROUTES = {
     CONFIRM_EMAIL_PAGE: '/confirm-email',
     RESET_PASSWORD_PAGE: '/reset-password',
     CHARACTERS_PAGE: '/characters',
+    LOCATIONS_PAGE: '/locations',
+    WORKS_PAGE: '/works',
     NOT_FOUND: '*',
 };
 

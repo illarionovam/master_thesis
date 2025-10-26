@@ -9,6 +9,8 @@ const SignInPage = lazy(() => import('../pages/SignInPage'));
 const ConfirmEmailPage = lazy(() => import('../pages/ConfirmEmailPage'));
 const ResetPasswordPage = lazy(() => import('../pages/ResetPasswordPage'));
 const CharactersPage = lazy(() => import('../pages/CharactersPage'));
+const LocationsPage = lazy(() => import('../pages/LocationsPage'));
+const WorksPage = lazy(() => import('../pages/WorksPage'));
 
 const Navigation = () => {
     return (
@@ -24,6 +26,22 @@ const Navigation = () => {
                     element={
                         <RequireAuth>
                             <CharactersPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path={ROUTES.LOCATIONS_PAGE}
+                    element={
+                        <RequireAuth>
+                            <LocationsPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path={ROUTES.WORKS_PAGE}
+                    element={
+                        <RequireAuth>
+                            <WorksPage />
                         </RequireAuth>
                     }
                 />

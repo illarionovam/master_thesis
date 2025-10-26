@@ -1,3 +1,3 @@
-export default function ListItem({ id, content }) {
+export default function ListItem({ content }) {
     return <>{content}</>;
 }

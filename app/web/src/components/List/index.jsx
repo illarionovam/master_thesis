@@ -7,7 +7,7 @@ export default function List({ items = [] }) {
             {items.map(({ id, content }) => (
                 <li key={id}>
                     <ListItemLink id={id}>
-                        <ListItem id={id} content={content} />
+                        <ListItem content={content} />
                     </ListItemLink>
                 </li>
             ))}

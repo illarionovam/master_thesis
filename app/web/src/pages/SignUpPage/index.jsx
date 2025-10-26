@@ -27,7 +27,7 @@ export default function SignUpPage() {
         const passwordConfirm = fd.get('passwordConfirm') || '';
 
         if (password !== passwordConfirm) {
-            setMismatch('Passwords do note match.');
+            setMismatch('Passwords do not match.');
             return;
         }
 

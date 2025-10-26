@@ -2,28 +2,24 @@ import { useEffect, useId } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import List from '../../components/List';
 
-import { getCharacters } from '../../redux/characters/operations';
-import {
-    selectCharacters,
-    selectGetCharactersLoading,
-    selectGetCharactersError,
-} from '../../redux/characters/selectors';
+import { getWorks } from '../../redux/works/operations';
+import { selectWorks, selectGetWorksLoading, selectGetWorksError } from '../../redux/works/selectors';
 
 export default function CharactersPage() {
     const titleId = useId();
     const dispatch = useDispatch();
 
-    const items = useSelector(selectCharacters);
-    const loading = useSelector(selectGetCharactersLoading);
-    const error = useSelector(selectGetCharactersError);
+    const items = useSelector(selectWorks);
+    const loading = useSelector(selectGetWorksLoading);
+    const error = useSelector(selectGetWorksError);
 
     useEffect(() => {
-        dispatch(getCharacters());
+        dispatch(getWorks());
     }, [dispatch]);
 
     return (
         <main aria-labelledby={titleId}>
-            <h1 id={titleId}>Characters</h1>
+            <h1 id={titleId}>Works</h1>
 
             {loading && <p aria-live="polite">Loading...</p>}
             {error && <p role="alert">{error}</p>}

@@ -9,3 +9,5 @@ export const confirmAppUserEmail = async token =>
 
 export const confirmAppUserPassword = async (token, new_password) =>
     await axiosInstanceWithSpecialScope(token).post('/auth/confirm-password', { new_password });
+
+export const signOutAppUser = async payload => await axiosInstance.post('/auth/sign-out', payload);

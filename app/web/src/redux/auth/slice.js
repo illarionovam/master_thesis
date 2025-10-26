@@ -4,16 +4,9 @@ import { signIn, signUp, confirmEmail, confirmPassword } from './operations';
 const initialState = {
     token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
     user: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null,
-    signUp: {
-        loading: false,
-        error: null,
-        result: null,
-    },
-    signIn: {
-        loading: false,
-        error: null,
-        result: null,
-    },
+
+    signUp: { loading: false, error: null, result: null },
+    signIn: { loading: false, error: null, result: null },
     confirmEmail: { loading: false, error: null, success: false },
     confirmPassword: { loading: false, error: null, success: false },
 };
@@ -31,6 +24,16 @@ const authSlice = createSlice({
             state.signIn.loading = false;
             state.signIn.error = null;
             state.signIn.result = null;
+        },
+        signOutLocal(state) {
+            state.token = null;
+            state.user = null;
+            state.signIn.result = null;
+
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
         },
     },
     extraReducers: builder => {
@@ -68,13 +71,12 @@ const authSlice = createSlice({
                 state.signIn.loading = false;
                 state.signIn.error = action.payload;
 
+                state.token = null;
+                state.user = null;
                 if (typeof window !== 'undefined') {
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                 }
-
-                state.token = null;
-                state.user = null;
             })
             .addCase(confirmEmail.pending, state => {
                 state.confirmEmail.loading = true;
@@ -105,5 +107,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { resetSignUp, resetSignIn, signOut } = authSlice.actions;
+export const { resetSignUp, resetSignIn, signOutLocal } = authSlice.actions;
 export default authSlice.reducer;
