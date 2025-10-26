@@ -38,7 +38,7 @@ const signUpAppUser = async (req, res) => {
                 to: appUser.email,
                 from: process.env.EMAIL_USER,
                 subject: 'Verify email',
-                html: `<a target='_blank' href='${SERVER_URL}/confirm-email#${token}'>Verify email</a>`,
+                html: `<a target='_blank' href='${process.env.SERVER_URL}/confirm-email#${token}'>Verify email</a>`,
             });
         });
     } catch (err) {
