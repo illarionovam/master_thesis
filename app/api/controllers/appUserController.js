@@ -38,7 +38,7 @@ const signUpAppUser = async (req, res) => {
                 to: appUser.email,
                 from: process.env.EMAIL_USER,
                 subject: 'Verify email',
-                html: `<a target='_blank' href='${process.env.SERVER_URL}:${process.env.VITE_SERVER_PORT}/confirm-email#${token}'>Verify email</a>`,
+                html: `<a target='_blank' href='${SERVER_URL}/confirm-email#${token}'>Verify email</a>`,
             });
         });
     } catch (err) {
@@ -102,7 +102,7 @@ const resetAppUserPassword = async (req, res) => {
             to: appUser.email,
             from: process.env.EMAIL_USER,
             subject: 'Change password',
-            html: `<a target='_blank' href='${process.env.SERVER_URL}:${process.env.VITE_SERVER_PORT}/reset-password#${token}'>Change password</a>`,
+            html: `<a target='_blank' href='${process.env.SERVER_URL}/reset-password#${token}'>Change password</a>`,
         });
     }
 
@@ -135,7 +135,7 @@ const updateAppUserEmail = async (req, res) => {
             to: req.appUser.email,
             from: process.env.EMAIL_USER,
             subject: 'Verify email',
-            html: `<a target='_blank' href='${process.env.SERVER_URL}:${process.env.VITE_SERVER_PORT}/confirm-email#${token}'>Verify email</a>`,
+            html: `<a target='_blank' href='${process.env.SERVER_URL}/confirm-email#${token}'>Verify email</a>`,
         });
     });
 
