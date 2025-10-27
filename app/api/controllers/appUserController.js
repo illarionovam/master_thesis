@@ -168,7 +168,7 @@ const updateAppUserNormalFields = async (req, res) => {
         const passwordIsCorrect = await bcrypt.compare(password, req.appUser.hash_password);
 
         if (!passwordIsCorrect) {
-            throw createHttpError(401, 'Incorrect credentials');
+            throw createHttpError(422, 'Current password is incorrect/');
         }
 
         req.body.hash_password = await bcrypt.hash(new_password, 10);

@@ -3,9 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Title from '../../components/Title';
 import ConfirmSignOutModal from '../../components/ConfirmSignOutModal';
+import ChangePasswordModal from '../../components/ChangePasswordModal';
 
-import { getUserInfo, signOut } from '../../redux/auth/operations';
-import { selectUser, selectGetUserInfoLoading, selectGetUserInfoError } from '../../redux/auth/selectors';
+import { getUserInfo, signOut, updateUser } from '../../redux/auth/operations';
+import {
+    selectUser,
+    selectGetUserInfoLoading,
+    selectUpdateUserLoading,
+    selectGetUserInfoError,
+    selectUpdateUserError,
+} from '../../redux/auth/selectors';
 
 export default function UserDetailPage() {
     const dispatch = useDispatch();
@@ -14,38 +21,52 @@ export default function UserDetailPage() {
     const loading = useSelector(selectGetUserInfoLoading);
     const error = useSelector(selectGetUserInfoError);
 
+    const updateLoading = useSelector(selectUpdateUserLoading);
+    const updateError = useSelector(selectUpdateUserError);
+
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [changePassOpen, setChangePassOpen] = useState(false);
 
     useEffect(() => {
         dispatch(getUserInfo());
     }, [dispatch]);
 
     const handleSignOut = () => setConfirmOpen(true);
-
     const handleSignOutCurrent = () => {
         setConfirmOpen(false);
         dispatch(signOut());
     };
-
     const handleSignOutAll = () => {
         setConfirmOpen(false);
         dispatch(signOut({ terminate_all_sessions: true }));
     };
-
     const handleClose = () => setConfirmOpen(false);
 
+    const handleOpenChangePassword = () => setChangePassOpen(true);
+    const handleCloseChangePassword = () => setChangePassOpen(false);
+    const handleSubmitChangePassword = async ({ current_password, new_password }) => {
+        try {
+            await dispatch(updateUser({ password: current_password, new_password })).unwrap();
+            setChangePassOpen(false);
+        } catch (err) {
+            //
+        }
+    };
     return (
         <main aria-labelledby="user-title" style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
             <Title id="user-title">User</Title>
 
-            <div style={{ margin: '12px 0 24px' }}>
+            <div style={{ display: 'flex', gap: 8, margin: '12px 0 24px' }}>
                 <button type="button" onClick={handleSignOut}>
                     Sign Out
+                </button>
+                <button type="button" onClick={handleOpenChangePassword}>
+                    Change Password
                 </button>
             </div>
 
             {loading && <p aria-live="polite">Loading...</p>}
-            {error && <p role="alert">{error}</p>}
+            {error && <p role="alert">{error.message ?? String(error)}</p>}
 
             {!loading && !error && user && (
                 <section aria-label="User info">
@@ -83,6 +104,14 @@ export default function UserDetailPage() {
                 onClose={handleClose}
                 onCurrent={handleSignOutCurrent}
                 onAll={handleSignOutAll}
+            />
+
+            <ChangePasswordModal
+                open={changePassOpen}
+                onClose={handleCloseChangePassword}
+                onSubmit={handleSubmitChangePassword}
+                loading={updateLoading}
+                apiError={updateError}
             />
         </main>
     );
