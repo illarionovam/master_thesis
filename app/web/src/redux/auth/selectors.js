@@ -18,3 +18,6 @@ export const selectConfirmEmailSuccess = state => state.auth.confirmEmail.succes
 export const selectConfirmPasswordLoading = state => state.auth.confirmPassword.loading;
 export const selectConfirmPasswordError = state => state.auth.confirmPassword.error;
 export const selectConfirmPasswordSuccess = state => state.auth.confirmPassword.success;
+
+export const selectGetUserInfoLoading = state => state.auth.getUserInfo.loading;
+export const selectGetUserInfoError = state => state.auth.getUserInfo.error;

@@ -1,6 +1,6 @@
 import { useEffect, useId } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { signIn } from '../../redux/auth/operations';
 import { selectSignInLoading, selectSignInError, selectToken, selectUser } from '../../redux/auth/selectors';
 import { resetSignIn } from '../../redux/auth/slice';
@@ -9,6 +9,7 @@ export default function SignInPage() {
     const titleId = useId();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const loading = useSelector(selectSignInLoading);
     const error = useSelector(selectSignInError);
@@ -16,8 +17,10 @@ export default function SignInPage() {
     const user = useSelector(selectUser);
 
     useEffect(() => {
-        if (token) navigate('/', { replace: true });
-    }, [token, navigate]);
+        if (!token) return;
+        const backTo = location.state?.from?.pathname || '/';
+        navigate(backTo, { replace: true });
+    }, [token, navigate, location]);
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -27,13 +30,7 @@ export default function SignInPage() {
         const email = fd.get('email')?.trim();
         const password = fd.get('password') || '';
 
-        const action = await dispatch(signIn({ email, password }));
-
-        if (signIn.fulfilled.match(action)) {
-            form.reset();
-            const backTo = location.state?.from?.pathname || '/';
-            navigate(backTo, { replace: true });
-        }
+        dispatch(signIn({ email, password }));
     };
 
     return (
@@ -61,7 +58,7 @@ export default function SignInPage() {
                 </div>
             </form>
 
-            {error && <p role="alert">{error}</p>}
+            {error && <p role="alert">{error.message}</p>}
             {token && user && (
                 <p aria-live="polite">
                     Signed in as <strong>{user.name ?? user.username ?? user.email}</strong>.

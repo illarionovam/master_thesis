@@ -7,7 +7,8 @@ export const ROUTES = {
     CHARACTERS_PAGE: '/characters',
     LOCATIONS_PAGE: '/locations',
     WORKS_PAGE: '/works',
-    NOT_FOUND: '*',
+    USER_DETAIL_PAGE: '/user',
+    NOT_FOUND_PAGE: '*',
 };
 
 export default ROUTES;

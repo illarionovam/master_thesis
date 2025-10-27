@@ -25,7 +25,7 @@ export default function ConfirmEmailPage() {
             <h1 id={titleId}>Confirm Email</h1>
             {loading && <p aria-live="polite">Confirming...</p>}
             {success && <p aria-live="polite">Email verified.</p>}
-            {error && <p role="alert">{error}</p>}
+            {error && <p role="alert">{error.message}</p>}
         </main>
     );
 }

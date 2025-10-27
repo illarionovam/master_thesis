@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { signIn, signUp, confirmEmail, confirmPassword } from './operations';
+import { signIn, signUp, confirmEmail, confirmPassword, getUserInfo } from './operations';
 
 const initialState = {
     token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
@@ -9,6 +9,7 @@ const initialState = {
     signIn: { loading: false, error: null, result: null },
     confirmEmail: { loading: false, error: null, success: false },
     confirmPassword: { loading: false, error: null, success: false },
+    getUserInfo: { loading: false, error: null },
 };
 
 const authSlice = createSlice({
@@ -103,6 +104,22 @@ const authSlice = createSlice({
             .addCase(confirmPassword.rejected, (state, action) => {
                 state.confirmPassword.loading = false;
                 state.confirmPassword.error = action.payload;
+            })
+            .addCase(getUserInfo.pending, state => {
+                state.getUserInfo.loading = true;
+                state.getUserInfo.error = null;
+            })
+            .addCase(getUserInfo.fulfilled, (state, action) => {
+                state.getUserInfo.loading = false;
+                state.user = action.payload;
+
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('user', JSON.stringify(action.payload));
+                }
+            })
+            .addCase(getUserInfo.rejected, (state, action) => {
+                state.getUserInfo.loading = false;
+                state.getUserInfo.error = action.payload;
             });
     },
 });

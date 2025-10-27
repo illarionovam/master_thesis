@@ -11,6 +11,8 @@ const ResetPasswordPage = lazy(() => import('../pages/ResetPasswordPage'));
 const CharactersPage = lazy(() => import('../pages/CharactersPage'));
 const LocationsPage = lazy(() => import('../pages/LocationsPage'));
 const WorksPage = lazy(() => import('../pages/WorksPage'));
+const UserDetailsPage = lazy(() => import('../pages/UserDetailsPage/index.jsx'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 const Navigation = () => {
     return (
@@ -45,6 +47,15 @@ const Navigation = () => {
                         </RequireAuth>
                     }
                 />
+                <Route
+                    path={ROUTES.USER_DETAIL_PAGE}
+                    element={
+                        <RequireAuth>
+                            <UserDetailsPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route path={ROUTES.NOT_FOUND_PAGE} element={<NotFoundPage />} />
             </Routes>
         </Suspense>
     );

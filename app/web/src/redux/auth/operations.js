@@ -5,6 +5,7 @@ import {
     confirmAppUserEmail,
     confirmAppUserPassword,
     signOutAppUser,
+    getAppUserInfo,
 } from '../../api/auth.js';
 import wrapper from '../wrapper.js';
 import { signOutLocal } from './slice.js';
@@ -35,3 +36,7 @@ export const signOut = createAsyncThunk('auth/signOut', async (payload, { dispat
         dispatch(signOutLocal());
     })
 );
+
+export const getUserInfo = createAsyncThunk('auth/getUserInfo', async (_, { rejectWithValue }) => {
+    return wrapper(getAppUserInfo, rejectWithValue)();
+});

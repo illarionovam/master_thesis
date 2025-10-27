@@ -22,11 +22,6 @@ export default function HomePage() {
                     <h1 id={titleId} style={{ margin: 0 }}>
                         HOME
                     </h1>
-                    {token && (
-                        <button type="button" onClick={handleSignOut}>
-                            Sign Out
-                        </button>
-                    )}
                 </header>
             </main>
         </div>

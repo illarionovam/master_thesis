@@ -85,7 +85,7 @@ export default function SignUpPage() {
             </form>
 
             {mismatch && <p role="alert">{mismatch}</p>}
-            {error && <p role="alert">{error}</p>}
+            {error && <p role="alert">{error.message}</p>}
             {result && <p aria-live="polite">Verify email before signing in.</p>}
         </main>
     );
