@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
             </form>
 
             {success && <p aria-live="polite">Password changed.</p>}
-            {error && <p role="alert">{error.message}</p>}
+            {error && <p role="alert">{error}</p>}
         </main>
     );
 }

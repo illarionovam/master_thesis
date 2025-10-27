@@ -2,6 +2,9 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
     signUpAppUser,
     signInAppUser,
+    resetAppUserPassword,
+    updateAppUser,
+    updateAppUserEmail,
     confirmAppUserEmail,
     confirmAppUserPassword,
     signOutAppUser,
@@ -10,25 +13,23 @@ import {
 import wrapper from '../wrapper.js';
 import { signOutLocal } from './slice.js';
 
-export const signUp = createAsyncThunk('auth/signUp', async (payload, { rejectWithValue }) => {
-    return wrapper(signUpAppUser, rejectWithValue)(payload);
-});
-
-export const signIn = createAsyncThunk('auth/signIn', async (payload, { rejectWithValue }) => {
-    return wrapper(signInAppUser, rejectWithValue)(payload);
-});
-
-export const confirmEmail = createAsyncThunk('auth/confirmEmail', async (token, { rejectWithValue }) =>
-    wrapper(confirmAppUserEmail, rejectWithValue)(token)
+export const signUp = createAsyncThunk('auth/signUp', (payload, { rejectWithValue }) =>
+    wrapper(signUpAppUser, rejectWithValue)(payload)
 );
 
-export const confirmPassword = createAsyncThunk(
-    'auth/confirmPassword',
-    async ({ token, new_password }, { rejectWithValue }) =>
-        wrapper(args => confirmAppUserPassword(args.token, args.new_password), rejectWithValue)({ token, new_password })
+export const signIn = createAsyncThunk('auth/signIn', (payload, { rejectWithValue }) =>
+    wrapper(signInAppUser, rejectWithValue)(payload)
 );
 
-export const signOut = createAsyncThunk('auth/signOut', async (payload, { dispatch, rejectWithValue }) =>
+export const resetPassword = createAsyncThunk('auth/resetPassword', (payload, { rejectWithValue }) =>
+    wrapper(resetAppUserPassword, rejectWithValue)(payload)
+);
+
+export const getUserInfo = createAsyncThunk('auth/getUserInfo', (_, { rejectWithValue }) =>
+    wrapper(getAppUserInfo, rejectWithValue)()
+);
+
+export const signOut = createAsyncThunk('auth/signOut', (payload, { dispatch, rejectWithValue }) =>
     wrapper(
         signOutAppUser,
         rejectWithValue
@@ -37,6 +38,20 @@ export const signOut = createAsyncThunk('auth/signOut', async (payload, { dispat
     })
 );
 
-export const getUserInfo = createAsyncThunk('auth/getUserInfo', async (_, { rejectWithValue }) => {
-    return wrapper(getAppUserInfo, rejectWithValue)();
-});
+export const updateUser = createAsyncThunk('auth/updateUser', (payload, { rejectWithValue }) =>
+    wrapper(updateAppUser, rejectWithValue)(payload)
+);
+
+export const updateUserEmail = createAsyncThunk('auth/updateUserEmail', (payload, { rejectWithValue }) =>
+    wrapper(updateAppUserEmail, rejectWithValue)(payload)
+);
+
+export const confirmEmail = createAsyncThunk('auth/confirmEmail', (token, { rejectWithValue }) =>
+    wrapper(confirmAppUserEmail, rejectWithValue)(token)
+);
+
+export const confirmPassword = createAsyncThunk(
+    'auth/confirmPassword',
+    ({ token, new_password }, { rejectWithValue }) =>
+        wrapper(confirmAppUserPassword, rejectWithValue)(token, new_password)
+);

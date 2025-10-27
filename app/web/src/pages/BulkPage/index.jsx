@@ -19,7 +19,7 @@ export default function DataPage({ title, fetchAction, selectData, selectLoading
             <Title id={titleId}>{title}</Title>
 
             {loading && <p aria-live="polite">Loading...</p>}
-            {error && <p role="alert">{error.message}</p>}
+            {error && <p role="alert">{error}</p>}
             {!loading && !error && render?.(data)}
         </main>
     );

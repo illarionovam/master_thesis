@@ -1,5 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { signIn, signUp, confirmEmail, confirmPassword, getUserInfo } from './operations';
+import {
+    signIn,
+    signUp,
+    resetPassword,
+    getUserInfo,
+    updateUser,
+    updateUserEmail,
+    confirmEmail,
+    confirmPassword,
+} from './operations';
 
 const initialState = {
     token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
@@ -7,9 +16,12 @@ const initialState = {
 
     signUp: { loading: false, error: null, result: null },
     signIn: { loading: false, error: null, result: null },
+    resetPassword: { loading: false, error: null, success: false },
+    getUserInfo: { loading: false, error: null },
+    updateUser: { loading: false, error: null },
+    updateUserEmail: { loading: false, error: null, success: false },
     confirmEmail: { loading: false, error: null, success: false },
     confirmPassword: { loading: false, error: null, success: false },
-    getUserInfo: { loading: false, error: null },
 };
 
 const authSlice = createSlice({
@@ -79,6 +91,64 @@ const authSlice = createSlice({
                     localStorage.removeItem('user');
                 }
             })
+            .addCase(resetPassword.pending, state => {
+                state.resetPassword.loading = true;
+                state.resetPassword.error = null;
+                state.resetPassword.success = false;
+            })
+            .addCase(resetPassword.fulfilled, state => {
+                state.resetPassword.loading = false;
+                state.resetPassword.success = true;
+            })
+            .addCase(resetPassword.rejected, (state, action) => {
+                state.resetPassword.loading = false;
+                state.resetPassword.error = action.payload;
+            })
+            .addCase(getUserInfo.pending, state => {
+                state.getUserInfo.loading = true;
+                state.getUserInfo.error = null;
+            })
+            .addCase(getUserInfo.fulfilled, (state, action) => {
+                state.getUserInfo.loading = false;
+                state.user = action.payload;
+
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('user', JSON.stringify(action.payload));
+                }
+            })
+            .addCase(getUserInfo.rejected, (state, action) => {
+                state.getUserInfo.loading = false;
+                state.getUserInfo.error = action.payload;
+            })
+            .addCase(updateUser.pending, state => {
+                state.updateUser.loading = true;
+                state.updateUser.error = null;
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                state.updateUser.loading = false;
+                state.user = action.payload;
+
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('user', JSON.stringify(state.user));
+                }
+            })
+            .addCase(updateUser.rejected, (state, action) => {
+                state.updateUser.loading = false;
+                state.updateUser.error = action.payload;
+            })
+            .addCase(updateUserEmail.pending, state => {
+                state.updateUserEmail.loading = true;
+                state.updateUserEmail.error = null;
+                state.updateUserEmail.success = false;
+            })
+            .addCase(updateUserEmail.fulfilled, state => {
+                state.updateUserEmail.loading = false;
+                state.updateUserEmail.success = true;
+            })
+            .addCase(updateUserEmail.rejected, (state, action) => {
+                state.updateUserEmail.loading = false;
+                state.updateUserEmail.error = action.payload;
+            })
             .addCase(confirmEmail.pending, state => {
                 state.confirmEmail.loading = true;
                 state.confirmEmail.error = null;
@@ -104,22 +174,6 @@ const authSlice = createSlice({
             .addCase(confirmPassword.rejected, (state, action) => {
                 state.confirmPassword.loading = false;
                 state.confirmPassword.error = action.payload;
-            })
-            .addCase(getUserInfo.pending, state => {
-                state.getUserInfo.loading = true;
-                state.getUserInfo.error = null;
-            })
-            .addCase(getUserInfo.fulfilled, (state, action) => {
-                state.getUserInfo.loading = false;
-                state.user = action.payload;
-
-                if (typeof window !== 'undefined') {
-                    localStorage.setItem('user', JSON.stringify(action.payload));
-                }
-            })
-            .addCase(getUserInfo.rejected, (state, action) => {
-                state.getUserInfo.loading = false;
-                state.getUserInfo.error = action.payload;
             });
     },
 });

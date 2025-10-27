@@ -58,7 +58,7 @@ export default function SignInPage() {
                 </div>
             </form>
 
-            {error && <p role="alert">{error.message}</p>}
+            {error && <p role="alert">{error}</p>}
             {token && user && (
                 <p aria-live="polite">
                     Signed in as <strong>{user.name ?? user.username ?? user.email}</strong>.
