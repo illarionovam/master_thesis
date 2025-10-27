@@ -38,6 +38,10 @@ const authSlice = createSlice({
             state.signIn.error = null;
             state.signIn.result = null;
         },
+        resetChangePassword(state) {
+            state.updateUser.loading = false;
+            state.updateUser.error = null;
+        },
         signOutLocal(state) {
             state.token = null;
             state.user = null;
@@ -178,5 +182,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { resetSignUp, resetSignIn, signOutLocal } = authSlice.actions;
+export const { resetSignUp, resetSignIn, resetChangePassword, signOutLocal } = authSlice.actions;
 export default authSlice.reducer;

@@ -13,6 +13,7 @@ import {
     selectGetUserInfoError,
     selectUpdateUserError,
 } from '../../redux/auth/selectors';
+import { resetChangePassword } from '../../redux/auth/slice';
 
 export default function UserDetailPage() {
     const dispatch = useDispatch();
@@ -42,14 +43,16 @@ export default function UserDetailPage() {
     };
     const handleClose = () => setConfirmOpen(false);
 
-    const handleOpenChangePassword = () => setChangePassOpen(true);
+    const handleOpenChangePassword = () => {
+        dispatch(resetChangePassword());
+        setChangePassOpen(true);
+    };
     const handleCloseChangePassword = () => setChangePassOpen(false);
     const handleSubmitChangePassword = async ({ current_password, new_password }) => {
-        try {
-            await dispatch(updateUser({ password: current_password, new_password })).unwrap();
+        const action = await dispatch(updateUser({ password: current_password, new_password }));
+
+        if (updateUser.fulfilled.match(action)) {
             setChangePassOpen(false);
-        } catch (err) {
-            //
         }
     };
     return (

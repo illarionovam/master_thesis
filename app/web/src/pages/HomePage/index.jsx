@@ -1,17 +1,11 @@
 import { useId } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { selectToken } from '../../redux/auth/selectors';
-import { signOut } from '../../redux/auth/operations';
 import LeftSidebar from '../../components/LeftSidebar';
 
 export default function HomePage() {
     const titleId = useId();
     const token = useSelector(selectToken);
-    const dispatch = useDispatch();
-
-    const handleSignOut = () => {
-        dispatch(signOut());
-    };
 
     return (
         <div style={{ display: 'flex', minHeight: '100vh' }}>
