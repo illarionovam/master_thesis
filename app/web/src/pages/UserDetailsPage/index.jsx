@@ -5,14 +5,17 @@ import Title from '../../components/Title';
 import ConfirmSignOutModal from '../../components/ConfirmSignOutModal';
 import ChangePasswordModal from '../../components/ChangePasswordModal';
 import EditUserDetailsModal from '../../components/EditUserDetailsModal';
+import ChangeEmailModal from '../../components/ChangeEmailModal';
 
-import { getUserInfo, signOut, updateUser } from '../../redux/auth/operations';
+import { getUserInfo, signOut, updateUser, updateUserEmail } from '../../redux/auth/operations';
 import {
     selectUser,
     selectGetUserInfoLoading,
     selectUpdateUserLoading,
+    selectUpdateUserEmailLoading,
     selectGetUserInfoError,
     selectUpdateUserError,
+    selectUpdateUserEmailError,
 } from '../../redux/auth/selectors';
 import { resetChangePassword } from '../../redux/auth/slice';
 
@@ -26,9 +29,13 @@ export default function UserDetailPage() {
     const updateLoading = useSelector(selectUpdateUserLoading);
     const updateError = useSelector(selectUpdateUserError);
 
+    const emailLoading = useSelector(selectUpdateUserEmailLoading);
+    const emailError = useSelector(selectUpdateUserEmailError);
+
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [changePassOpen, setChangePassOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
+    const [emailOpen, setEmailOpen] = useState(false);
 
     useEffect(() => {
         dispatch(getUserInfo());
@@ -63,9 +70,17 @@ export default function UserDetailPage() {
     const handleSubmitEdit = async ({ username, name }) => {
         const action = await dispatch(updateUser({ username, name }));
         if (updateUser.fulfilled.match(action)) {
-            setEditOpen(false); // закриваємо лише на успіх
+            setEditOpen(false);
         }
-        // помилка відобразиться в модалці через apiError = updateError
+    };
+    const handleOpenChangeEmail = () => setEmailOpen(true);
+    const handleCloseChangeEmail = () => setEmailOpen(false);
+
+    const handleSubmitChangeEmail = async ({ email }) => {
+        const action = await dispatch(updateUserEmail({ new_email: email }));
+        if (updateUserEmail.fulfilled.match(action)) {
+            setEmailOpen(false);
+        }
     };
     return (
         <main aria-labelledby="user-title" style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
@@ -80,6 +95,9 @@ export default function UserDetailPage() {
                 </button>
                 <button type="button" onClick={handleOpenEdit}>
                     Edit Details
+                </button>
+                <button type="button" onClick={handleOpenChangeEmail}>
+                    Change Email
                 </button>
             </div>
 
@@ -139,6 +157,15 @@ export default function UserDetailPage() {
                 loading={updateLoading}
                 apiError={updateError}
                 initial={{ username: user?.username ?? '', name: user?.name ?? '' }}
+            />
+
+            <ChangeEmailModal
+                open={emailOpen}
+                onClose={handleCloseChangeEmail}
+                onSubmit={handleSubmitChangeEmail}
+                loading={emailLoading}
+                apiError={emailError}
+                initial={user?.email ?? ''}
             />
         </main>
     );

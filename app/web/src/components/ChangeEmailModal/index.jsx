@@ -1,56 +1,48 @@
 import { useEffect, useRef, useState } from 'react';
 
-export default function EditDetailsModal({ open, onClose, onSubmit, loading, apiError, initial }) {
+export default function ChangeEmailModal({ open, onClose, onSubmit, loading, apiError, initial }) {
     const dialogRef = useRef(null);
-    const [username, setUsername] = useState(initial?.username ?? '');
-    const [name, setName] = useState(initial?.name ?? '');
+    const [email, setEmail] = useState(initial ?? '');
     const [formError, setFormError] = useState(null);
 
     useEffect(() => {
         if (open) {
             dialogRef.current?.showModal?.();
-            setUsername(initial?.username ?? '');
-            setName(initial?.name ?? '');
+            setEmail(initial ?? '');
             setFormError(null);
         } else {
             dialogRef.current?.close?.();
         }
-    }, [open, initial?.username, initial?.name]);
+    }, [open, initial]);
 
     const handleSubmit = e => {
         e.preventDefault();
+        const trimmed = email.trim();
+        if (!trimmed) return setFormError('Email is required');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+            return setFormError('Enter a valid email');
+        }
         setFormError(null);
-        onSubmit?.({ username, name: (name ?? '').trim() || null });
+        onSubmit?.({ email: trimmed });
     };
 
     return (
-        <dialog ref={dialogRef} aria-labelledby="ed-title" onClose={onClose}>
+        <dialog ref={dialogRef} aria-labelledby="ce-title" onClose={onClose}>
             <form method="dialog" onSubmit={handleSubmit} style={{ minWidth: 360 }}>
-                <h2 id="ed-title" style={{ marginTop: 0 }}>
-                    Edit Details
+                <h2 id="ce-title" style={{ marginTop: 0 }}>
+                    Change Email
                 </h2>
 
                 <div style={{ display: 'grid', gap: 10 }}>
                     <label>
-                        <span>Username</span>
+                        <span>New email</span>
                         <input
-                            type="text"
-                            name="username"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
+                            type="email"
+                            name="email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
                             required
-                            autoComplete="username"
-                        />
-                    </label>
-
-                    <label>
-                        <span>Name</span>
-                        <input
-                            type="text"
-                            name="name"
-                            value={name}
-                            onChange={e => setName(e.target.value)}
-                            autoComplete="name"
+                            autoComplete="email"
                         />
                     </label>
 
