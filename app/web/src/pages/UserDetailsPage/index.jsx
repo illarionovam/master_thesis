@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Title from '../../components/Title';
 import ConfirmSignOutModal from '../../components/ConfirmSignOutModal';
 import ChangePasswordModal from '../../components/ChangePasswordModal';
+import EditUserDetailsModal from '../../components/EditUserDetailsModal';
 
 import { getUserInfo, signOut, updateUser } from '../../redux/auth/operations';
 import {
@@ -27,6 +28,7 @@ export default function UserDetailPage() {
 
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [changePassOpen, setChangePassOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
 
     useEffect(() => {
         dispatch(getUserInfo());
@@ -55,6 +57,16 @@ export default function UserDetailPage() {
             setChangePassOpen(false);
         }
     };
+    const handleOpenEdit = () => setEditOpen(true);
+    const handleCloseEdit = () => setEditOpen(false);
+
+    const handleSubmitEdit = async ({ username, name }) => {
+        const action = await dispatch(updateUser({ username, name }));
+        if (updateUser.fulfilled.match(action)) {
+            setEditOpen(false); // закриваємо лише на успіх
+        }
+        // помилка відобразиться в модалці через apiError = updateError
+    };
     return (
         <main aria-labelledby="user-title" style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
             <Title id="user-title">User</Title>
@@ -65,6 +77,9 @@ export default function UserDetailPage() {
                 </button>
                 <button type="button" onClick={handleOpenChangePassword}>
                     Change Password
+                </button>
+                <button type="button" onClick={handleOpenEdit}>
+                    Edit Details
                 </button>
             </div>
 
@@ -115,6 +130,15 @@ export default function UserDetailPage() {
                 onSubmit={handleSubmitChangePassword}
                 loading={updateLoading}
                 apiError={updateError}
+            />
+
+            <EditUserDetailsModal
+                open={editOpen}
+                onClose={handleCloseEdit}
+                onSubmit={handleSubmitEdit}
+                loading={updateLoading}
+                apiError={updateError}
+                initial={{ username: user?.username ?? '', name: user?.name ?? '' }}
             />
         </main>
     );

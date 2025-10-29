@@ -1,4 +1,3 @@
-// src/api/works.js
 import axiosInstance from './defaults';
 
 export const getAppUserWorks = async () => await axiosInstance.get('/works');

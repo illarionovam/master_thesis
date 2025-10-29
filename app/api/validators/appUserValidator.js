@@ -95,17 +95,11 @@ const updateAppUserNormalFieldsValidator = Joi.alternatives()
             new_password: Joi.forbidden(),
         }),
         Joi.object({
-            name: Joi.string().trim().min(1).max(255).required().messages({
-                'string.max': 'name must contain no more than 255 characters',
+            name: Joi.alternatives().try(Joi.string().trim().min(1).max(255), Joi.valid(null)).messages({
                 'string.min': 'name is required',
-                'any.required': 'name is required',
+                'string.max': 'name must contain no more than 255 characters',
+                'any.only': 'name must be null or a non-empty string',
             }),
-            username: Joi.forbidden(),
-            avatar_url: Joi.forbidden(),
-            password: Joi.forbidden(),
-            new_password: Joi.forbidden(),
-        }),
-        Joi.object({
             username: Joi.string().trim().min(3).max(60).required().messages({
                 'string.base': 'username must be a string',
                 'string.empty': 'username is required',
@@ -113,7 +107,6 @@ const updateAppUserNormalFieldsValidator = Joi.alternatives()
                 'string.max': 'username must contain no more than 60 characters',
                 'any.required': 'username is required',
             }),
-            name: Joi.forbidden(),
             avatar_url: Joi.forbidden(),
             password: Joi.forbidden(),
             new_password: Joi.forbidden(),

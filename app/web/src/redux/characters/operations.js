@@ -2,6 +2,6 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getAppUserCharacters } from '../../api/characters.js';
 import wrapper from '../wrapper.js';
 
-export const getCharacters = createAsyncThunk('characters/getCharacters', (_, { rejectWithValue }) => {
-    wrapper(getAppUserCharacters, rejectWithValue)();
-});
+export const getCharacters = createAsyncThunk('characters/getCharacters', async (_, { rejectWithValue }) =>
+    wrapper(getAppUserCharacters, rejectWithValue)()
+);
