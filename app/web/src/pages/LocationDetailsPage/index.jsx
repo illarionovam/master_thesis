@@ -45,24 +45,11 @@ export default function LocationDetailsPage() {
     };
 
     return (
-        <main aria-labelledby={titleId} style={{ display: 'grid', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <main aria-labelledby={titleId}>
+            <div>
                 <Title id={titleId}>Location details</Title>
                 {!loading && !error && location && (
-                    <button
-                        type="button"
-                        onClick={handleOpenEdit}
-                        aria-label="Edit location"
-                        title="Edit"
-                        style={{
-                            padding: '6px 10px',
-                            borderRadius: 8,
-                            border: '1px solid #ccc',
-                            cursor: 'pointer',
-                            fontSize: 14,
-                            background: '#fff',
-                        }}
-                    >
+                    <button type="button" onClick={handleOpenEdit} aria-label="Edit location" title="Edit">
                         Edit
                     </button>
                 )}
@@ -72,7 +59,7 @@ export default function LocationDetailsPage() {
             {error && <p role="alert">{error}</p>}
 
             {!loading && !error && location && (
-                <div style={{ display: 'grid', gap: 8 }}>
+                <div>
                     <div>
                         <strong>Title:</strong> {location.title ?? '—'}
                     </div>

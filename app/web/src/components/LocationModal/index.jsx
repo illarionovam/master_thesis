@@ -67,16 +67,13 @@ export default function LocationModal({
     };
 
     return (
-        <div role="dialog" aria-modal="true" style={overlay} onClick={handleCancel}>
-            <div style={modal} onClick={e => e.stopPropagation()}>
-                <h2 style={{ marginTop: 0, marginBottom: 16 }}>
-                    {mode === 'update' ? 'Update Location' : 'Create Location'}
-                </h2>
+        <div role="dialog" aria-modal="true" onClick={handleCancel}>
+            <div onClick={e => e.stopPropagation()}>
+                <h2>{mode === 'update' ? 'Update Location' : 'Create Location'}</h2>
 
                 <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'grid', gap: 12 }}>
-                        {/* Title */}
-                        <label style={{ display: 'grid', gap: 6 }}>
+                    <div>
+                        <label>
                             <span>Title *</span>
                             <input
                                 type="text"
@@ -84,17 +81,15 @@ export default function LocationModal({
                                 onChange={e => setTitle(e.target.value)}
                                 required
                                 placeholder="e.g., Northern Outpost"
-                                style={input}
                             />
                         </label>
 
-                        <label style={{ display: 'grid', gap: 6 }}>
+                        <label>
                             <span>Parent Location</span>
                             <select
                                 key={selfId ? `parent-${selfId}` : `parent-${mode}`}
                                 value={parentId}
                                 onChange={e => setParentId(e.target.value)}
-                                style={input}
                             >
                                 <option value="">— None —</option>
                                 {filteredParentOptions.map(opt => (
@@ -105,26 +100,25 @@ export default function LocationModal({
                             </select>
                         </label>
 
-                        <label style={{ display: 'grid', gap: 6 }}>
+                        <label>
                             <span>Description *</span>
                             <textarea
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
                                 required
                                 rows={4}
-                                placeholder="Short description…"
-                                style={{ ...input, resize: 'vertical' }}
+                                placeholder="Short description..."
                             />
                         </label>
 
-                        {(localError || error) && <p style={{ color: '#b00020', margin: 0 }}>{localError || error}</p>}
+                        {(localError || error) && <p>{localError || error}</p>}
 
-                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-                            <button type="button" onClick={handleCancel} style={btnGhost} disabled={submitting}>
+                        <div>
+                            <button type="button" onClick={handleCancel} disabled={submitting}>
                                 Cancel
                             </button>
-                            <button type="submit" style={btnPrimary} disabled={!isValid || submitting}>
-                                {submitting ? 'Submitting…' : mode === 'update' ? 'Save' : 'Create'}
+                            <button type="submit" disabled={!isValid || submitting}>
+                                {submitting ? 'Submitting...' : mode === 'update' ? 'Save' : 'Create'}
                             </button>
                         </div>
                     </div>

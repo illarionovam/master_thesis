@@ -13,13 +13,11 @@ export default function ConfirmSignOutModal({ open, onClose, onCurrent, onAll })
 
     return (
         <dialog ref={dialogRef} aria-labelledby="signout-title" onClose={onClose}>
-            <form method="dialog" className="modal-body" style={{ minWidth: 320 }}>
-                <h2 id="signout-title" style={{ marginTop: 0 }}>
-                    Terminate all sessions?
-                </h2>
+            <form method="dialog" className="modal-body">
+                <h2 id="signout-title">Terminate all sessions?</h2>
                 <p>Choose what to sign out:</p>
 
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16 }}>
+                <div>
                     <button type="button" onClick={onCurrent}>
                         Only current
                     </button>

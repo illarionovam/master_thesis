@@ -55,11 +55,9 @@ export default function BulkPage({
     };
 
     return (
-        <main aria-labelledby={titleId} style={{ display: 'grid', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Title id={titleId} style={{ margin: 0 }}>
-                    {title}
-                </Title>
+        <main aria-labelledby={titleId}>
+            <div>
+                <Title id={titleId}>{title}</Title>
 
                 {CreateModal && createAction && (
                     <button
@@ -67,15 +65,6 @@ export default function BulkPage({
                         onClick={handleOpenCreate}
                         aria-label={`Create ${title}`}
                         title={`Create ${title}`}
-                        style={{
-                            padding: '6px 10px',
-                            borderRadius: 8,
-                            border: '1px solid #ccc',
-                            cursor: 'pointer',
-                            fontSize: 18,
-                            lineHeight: 1,
-                            background: '#fff',
-                        }}
                     >
                         +
                     </button>

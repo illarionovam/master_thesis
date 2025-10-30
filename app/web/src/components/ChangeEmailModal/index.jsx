@@ -28,12 +28,10 @@ export default function ChangeEmailModal({ open, onClose, onSubmit, loading, api
 
     return (
         <dialog ref={dialogRef} aria-labelledby="ce-title" onClose={onClose}>
-            <form method="dialog" onSubmit={handleSubmit} style={{ minWidth: 360 }}>
-                <h2 id="ce-title" style={{ marginTop: 0 }}>
-                    Change Email
-                </h2>
+            <form method="dialog" onSubmit={handleSubmit}>
+                <h2 id="ce-title">Change Email</h2>
 
-                <div style={{ display: 'grid', gap: 10 }}>
+                <div>
                     <label>
                         <span>New email</span>
                         <input
@@ -50,7 +48,7 @@ export default function ChangeEmailModal({ open, onClose, onSubmit, loading, api
                     {apiError && <p role="alert">{apiError.message ?? String(apiError)}</p>}
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16 }}>
+                <div>
                     <button type="submit" disabled={loading}>
                         Submit
                     </button>

@@ -83,10 +83,10 @@ export default function UserDetailPage() {
         }
     };
     return (
-        <main aria-labelledby="user-title" style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
+        <main aria-labelledby="user-title">
             <Title id="user-title">User</Title>
 
-            <div style={{ display: 'flex', gap: 8, margin: '12px 0 24px' }}>
+            <div>
                 <button type="button" onClick={handleSignOut}>
                     Sign Out
                 </button>
@@ -106,7 +106,7 @@ export default function UserDetailPage() {
 
             {!loading && !error && user && (
                 <section aria-label="User info">
-                    <dl style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: '8px 16px' }}>
+                    <dl>
                         {user.id !== undefined && (
                             <>
                                 <dt>ID</dt>

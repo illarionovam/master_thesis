@@ -31,12 +31,10 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
 
     return (
         <dialog ref={dialogRef} aria-labelledby="cp-title" onClose={onClose}>
-            <form method="dialog" onSubmit={handleSubmit} style={{ minWidth: 360 }}>
-                <h2 id="cp-title" style={{ marginTop: 0 }}>
-                    Change Password
-                </h2>
+            <form method="dialog" onSubmit={handleSubmit}>
+                <h2 id="cp-title">Change Password</h2>
 
-                <div style={{ display: 'grid', gap: 10 }}>
+                <div>
                     <label>
                         <span>Current password</span>
                         <input
@@ -64,7 +62,7 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
                     {apiError && <p role="alert">{apiError}</p>}
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16 }}>
+                <div>
                     <button type="submit" disabled={loading}>
                         Submit
                     </button>
