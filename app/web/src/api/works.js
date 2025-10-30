@@ -61,7 +61,7 @@ export const updateAppUserLocationInWork = async (workId, locationInWorkId, payl
 export const destroyAppUserLocationInWork = async (workId, locationInWorkId) =>
     await axiosInstance.delete(`/works/${workId}/location-links/${locationInWorkId}`);
 
-export const getAppUserEventsByWorkId = async workId => await axiosInstance.get(`/works/${workId}/events`);
+export const getAppUserEvents = async workId => await axiosInstance.get(`/works/${workId}/events`);
 
 export const createAppUserEvent = async (workId, payload) =>
     await axiosInstance.post(`/works/${workId}/events`, payload);

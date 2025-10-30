@@ -10,8 +10,7 @@ export const updateAppUserLocation = async (id, payload) => await axiosInstance.
 
 export const destroyAppUserLocation = async id => await axiosInstance.delete(`/locations/${id}`);
 
-export const getAppUserLocationPlacements = async (id, params) =>
-    await axiosInstance.get(`/locations/${id}/placements`, { params });
+export const getAppUserLocationPlacements = async id => await axiosInstance.get(`/locations/${id}/placements`);
 
-export const getAppUserLocationPossiblePlacements = async (id, params) =>
-    await axiosInstance.get(`/locations/${id}/placements/available`, { params });
+export const getAppUserLocationPossiblePlacements = async id =>
+    await axiosInstance.get(`/locations/${id}/placements/available`);

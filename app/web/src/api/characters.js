@@ -10,8 +10,7 @@ export const updateAppUserCharacter = async (id, payload) => await axiosInstance
 
 export const destroyAppUserCharacter = async id => await axiosInstance.delete(`/characters/${id}`);
 
-export const getAppUserCharacterAppearances = async (id, params) =>
-    await axiosInstance.get(`/characters/${id}/appearances`, { params });
+export const getAppUserCharacterAppearances = async id => await axiosInstance.get(`/characters/${id}/appearances`);
 
-export const getAppUserCharacterPossibleAppearances = async (id, params) =>
-    await axiosInstance.get(`/characters/${id}/appearances/available`, { params });
+export const getAppUserCharacterPossibleAppearances = async id =>
+    await axiosInstance.get(`/characters/${id}/appearances/available`);

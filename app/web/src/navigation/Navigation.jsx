@@ -12,7 +12,9 @@ const CharactersPage = lazy(() => import('../pages/CharactersPage'));
 const LocationsPage = lazy(() => import('../pages/LocationsPage'));
 const WorksPage = lazy(() => import('../pages/WorksPage'));
 const UserDetailsPage = lazy(() => import('../pages/UserDetailsPage'));
+const CharacterDetailsPage = lazy(() => import('../pages/CharacterDetailsPage'));
 const LocationDetailsPage = lazy(() => import('../pages/LocationDetailsPage'));
+const WorkDetailsPage = lazy(() => import('../pages/WorkDetailsPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 const Navigation = () => {
@@ -33,10 +35,26 @@ const Navigation = () => {
                     }
                 />
                 <Route
+                    path={ROUTES.CHARACTER_DETAILS_PAGE}
+                    element={
+                        <RequireAuth>
+                            <CharacterDetailsPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
                     path={ROUTES.LOCATIONS_PAGE}
                     element={
                         <RequireAuth>
                             <LocationsPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path={ROUTES.LOCATION_DETAILS_PAGE}
+                    element={
+                        <RequireAuth>
+                            <LocationDetailsPage />
                         </RequireAuth>
                     }
                 />
@@ -49,18 +67,18 @@ const Navigation = () => {
                     }
                 />
                 <Route
-                    path={ROUTES.USER_DETAIL_PAGE}
+                    path={ROUTES.WORK_DETAILS_PAGE}
                     element={
                         <RequireAuth>
-                            <UserDetailsPage />
+                            <WorkDetailsPage />
                         </RequireAuth>
                     }
                 />
                 <Route
-                    path={ROUTES.LOCATION_DETAILS_PAGE}
+                    path={ROUTES.USER_DETAIL_PAGE}
                     element={
                         <RequireAuth>
-                            <LocationDetailsPage />
+                            <UserDetailsPage />
                         </RequireAuth>
                     }
                 />
