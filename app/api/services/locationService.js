@@ -12,7 +12,6 @@ const getLocation = async (id, ownerId, { transaction } = {}) => {
             {
                 model: Location,
                 as: 'parent',
-                attributes: ['id', 'title', 'description', 'parent_location_id'],
                 required: false,
             },
         ],
