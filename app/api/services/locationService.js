@@ -8,6 +8,14 @@ const createLocation = async (payload, { transaction } = {}) => {
 const getLocation = async (id, ownerId, { transaction } = {}) => {
     return Location.findOne({
         where: { id, owner_id: ownerId },
+        include: [
+            {
+                model: Location,
+                as: 'parent',
+                attributes: ['id', 'title', 'description', 'parent_location_id'],
+                required: false,
+            },
+        ],
         transaction,
     });
 };
