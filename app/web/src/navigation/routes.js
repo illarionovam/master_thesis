@@ -8,6 +8,7 @@ export const ROUTES = {
     LOCATIONS_PAGE: '/locations',
     WORKS_PAGE: '/works',
     USER_DETAIL_PAGE: '/user',
+    LOCATION_DETAILS_PAGE: '/locations/:id',
     NOT_FOUND_PAGE: '*',
 };
 

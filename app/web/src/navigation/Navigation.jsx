@@ -11,7 +11,8 @@ const ResetPasswordPage = lazy(() => import('../pages/ResetPasswordPage'));
 const CharactersPage = lazy(() => import('../pages/CharactersPage'));
 const LocationsPage = lazy(() => import('../pages/LocationsPage'));
 const WorksPage = lazy(() => import('../pages/WorksPage'));
-const UserDetailsPage = lazy(() => import('../pages/UserDetailsPage/index.jsx'));
+const UserDetailsPage = lazy(() => import('../pages/UserDetailsPage'));
+const LocationDetailsPage = lazy(() => import('../pages/LocationDetailsPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 const Navigation = () => {
@@ -52,6 +53,14 @@ const Navigation = () => {
                     element={
                         <RequireAuth>
                             <UserDetailsPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path={ROUTES.LOCATION_DETAILS_PAGE}
+                    element={
+                        <RequireAuth>
+                            <LocationDetailsPage />
                         </RequireAuth>
                     }
                 />

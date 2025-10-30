@@ -10,18 +10,20 @@ import {
     confirmPassword,
 } from './operations';
 
+const op = { loading: false, error: null };
+
 const initialState = {
     token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
     user: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null,
 
-    signUp: { loading: false, error: null, result: null },
-    signIn: { loading: false, error: null, result: null },
-    resetPassword: { loading: false, error: null, success: false },
-    getUserInfo: { loading: false, error: null },
-    updateUser: { loading: false, error: null },
-    updateUserEmail: { loading: false, error: null, success: false },
-    confirmEmail: { loading: false, error: null, success: false },
-    confirmPassword: { loading: false, error: null, success: false },
+    signUp: { ...op, success: false },
+    signIn: { ...op, result: null },
+    resetPassword: { ...op, success: false },
+    getUserInfo: { ...op },
+    updateUser: { ...op },
+    updateUserEmail: { ...op, success: false },
+    confirmEmail: { ...op, success: false },
+    confirmPassword: { ...op, success: false },
 };
 
 const authSlice = createSlice({
@@ -31,7 +33,7 @@ const authSlice = createSlice({
         resetSignUp(state) {
             state.signUp.loading = false;
             state.signUp.error = null;
-            state.signUp.result = null;
+            state.signUp.success = false;
         },
         resetSignIn(state) {
             state.signIn.loading = false;
@@ -59,14 +61,15 @@ const authSlice = createSlice({
                 state.signUp.loading = true;
                 state.signUp.error = null;
             })
-            .addCase(signUp.fulfilled, (state, action) => {
+            .addCase(signUp.fulfilled, state => {
                 state.signUp.loading = false;
-                state.signUp.result = action.payload;
+                state.signUp.success = true;
             })
             .addCase(signUp.rejected, (state, action) => {
                 state.signUp.loading = false;
                 state.signUp.error = action.payload;
-            })
+            });
+        builder
             .addCase(signIn.pending, state => {
                 state.signIn.loading = true;
                 state.signIn.error = null;
@@ -94,7 +97,8 @@ const authSlice = createSlice({
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                 }
-            })
+            });
+        builder
             .addCase(resetPassword.pending, state => {
                 state.resetPassword.loading = true;
                 state.resetPassword.error = null;
@@ -107,7 +111,8 @@ const authSlice = createSlice({
             .addCase(resetPassword.rejected, (state, action) => {
                 state.resetPassword.loading = false;
                 state.resetPassword.error = action.payload;
-            })
+            });
+        builder
             .addCase(getUserInfo.pending, state => {
                 state.getUserInfo.loading = true;
                 state.getUserInfo.error = null;
@@ -123,7 +128,8 @@ const authSlice = createSlice({
             .addCase(getUserInfo.rejected, (state, action) => {
                 state.getUserInfo.loading = false;
                 state.getUserInfo.error = action.payload;
-            })
+            });
+        builder
             .addCase(updateUser.pending, state => {
                 state.updateUser.loading = true;
                 state.updateUser.error = null;
@@ -139,7 +145,8 @@ const authSlice = createSlice({
             .addCase(updateUser.rejected, (state, action) => {
                 state.updateUser.loading = false;
                 state.updateUser.error = action.payload;
-            })
+            });
+        builder
             .addCase(updateUserEmail.pending, state => {
                 state.updateUserEmail.loading = true;
                 state.updateUserEmail.error = null;
@@ -152,7 +159,8 @@ const authSlice = createSlice({
             .addCase(updateUserEmail.rejected, (state, action) => {
                 state.updateUserEmail.loading = false;
                 state.updateUserEmail.error = action.payload;
-            })
+            });
+        builder
             .addCase(confirmEmail.pending, state => {
                 state.confirmEmail.loading = true;
                 state.confirmEmail.error = null;
@@ -165,7 +173,8 @@ const authSlice = createSlice({
             .addCase(confirmEmail.rejected, (state, action) => {
                 state.confirmEmail.loading = false;
                 state.confirmEmail.error = action.payload;
-            })
+            });
+        builder
             .addCase(confirmPassword.pending, state => {
                 state.confirmPassword.loading = true;
                 state.confirmPassword.error = null;

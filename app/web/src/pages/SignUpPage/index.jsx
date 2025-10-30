@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { signUp } from '../../redux/auth/operations';
-import { selectSignUpLoading, selectSignUpError, selectSignUpResult } from '../../redux/auth/selectors';
+import { selectSignUpLoading, selectSignUpError, selectSignUpSuccess } from '../../redux/auth/selectors';
 import { resetSignUp } from '../../redux/auth/slice';
 
 export default function SignUpPage() {
@@ -10,7 +10,7 @@ export default function SignUpPage() {
 
     const loading = useSelector(selectSignUpLoading);
     const error = useSelector(selectSignUpError);
-    const result = useSelector(selectSignUpResult);
+    const success = useSelector(selectSignUpSuccess);
 
     const [mismatch, setMismatch] = useState('');
 
@@ -86,7 +86,7 @@ export default function SignUpPage() {
 
             {mismatch && <p role="alert">{mismatch}</p>}
             {error && <p role="alert">{error}</p>}
-            {result && <p aria-live="polite">Verify email before signing in.</p>}
+            {success && <p aria-live="polite">Verify email before signing in.</p>}
         </main>
     );
 }

@@ -1,11 +1,9 @@
-export const selectAuth = state => state.auth;
-
 export const selectToken = state => state.auth.token;
 export const selectUser = state => state.auth.user;
 
 export const selectSignUpLoading = state => state.auth.signUp.loading;
 export const selectSignUpError = state => state.auth.signUp.error;
-export const selectSignUpResult = state => state.auth.signUp.result;
+export const selectSignUpSuccess = state => state.auth.signUp.success;
 
 export const selectSignInLoading = state => state.auth.signIn.loading;
 export const selectSignInError = state => state.auth.signIn.error;
