@@ -88,12 +88,13 @@ export default function BulkPage({
 
             {CreateModal && openCreate && (
                 <CreateModal
+                    {...createModalProps}
                     open={openCreate}
+                    mode="create"
                     onClose={handleCloseCreate}
                     onSubmit={handleSubmitCreate}
                     submitting={creating}
                     error={createError}
-                    {...createModalProps}
                 />
             )}
         </main>

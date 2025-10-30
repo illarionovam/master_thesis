@@ -5,7 +5,7 @@ import BulkPage from '../BulkPage';
 
 import { getLocations, createLocation } from '../../redux/locations/operations';
 import { selectLocations, selectGetLocationsLoading, selectGetLocationsError } from '../../redux/locations/selectors';
-import CreateLocationModal from '../../components/CreateLocationModal';
+import LocationModal from '../../components/LocationModal';
 
 export default function LocationsPage() {
     const locations = useSelector(selectLocations);
@@ -19,7 +19,7 @@ export default function LocationsPage() {
             selectLoading={selectGetLocationsLoading}
             selectError={selectGetLocationsError}
             render={items => <List items={items} />}
-            CreateModal={CreateLocationModal}
+            CreateModal={LocationModal}
             createAction={createLocation}
             createModalProps={{ parentOptions: locations }}
             onCreated={created => {
