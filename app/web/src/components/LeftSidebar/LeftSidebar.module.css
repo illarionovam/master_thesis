@@ -4,9 +4,9 @@
     bottom: 0;
     left: 0;
     width: 260px;
-    background: #fff;
-    border-right: 1px solid #e5e7eb;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    border-right: 1px solid var(--shadow-color);
+    box-shadow: 0 4px 24px var(--shadow-color);
     z-index: 10;
 
     transform: translateX(-100%);
@@ -36,13 +36,13 @@
     padding: 8px 10px;
     border-radius: 8px;
     text-decoration: none;
-    color: #111827;
+    color: var(--link-base-color);
     margin-bottom: 6px;
     text-transform: uppercase;
 }
 
 .active {
-    background: #e5e7eb;
+    background: var(--shadow-color);
     font-weight: 600;
 }
 
@@ -54,8 +54,8 @@
     width: 40px;
     height: 40px;
     border-radius: 40px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--shadow-color);
+    box-shadow: 0 4px 24px var(--shadow-color);
     cursor: pointer;
     display: grid;
     place-items: center;
