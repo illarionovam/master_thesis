@@ -21,7 +21,7 @@ export default function LeftSidebar({ defaultCollapsed = true }) {
                 aria-expanded={!collapsed}
             >
                 <svg className={styles.icon} aria-hidden="true" focusable="false">
-                    <use href={collapsed ? '/icons.svg#rightArrow' : '/icons.svg#leftArrow'} />
+                    <use href={`/icons.svg#${collapsed ? 'rightArrow' : 'leftArrow'}`} />
                 </svg>
             </button>
 
