@@ -2,7 +2,7 @@ import { useEffect, useId, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Title from '../../components/Title';
 
-export default function BulkPage({
+export default function BulkPageLayout({
     title,
     fetchAction,
     selectData,

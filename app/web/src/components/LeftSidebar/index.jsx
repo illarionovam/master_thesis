@@ -6,15 +6,23 @@ export default function LeftSidebar({ defaultCollapsed = true }) {
     const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
     return (
-        <aside className={`${styles.aside} ${collapsed ? styles.collapsed : ''}`} aria-label="Left navigation">
+        <aside
+            className={`${styles.aside} ${collapsed ? styles.collapsed : styles.expanded}`}
+            role="complementary"
+            aria-label="Sidebar"
+            aria-hidden={collapsed ? 'true' : 'false'}
+        >
             <button
                 type="button"
                 className={styles.toggleBtn}
                 onClick={() => setCollapsed(v => !v)}
                 aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                 title={collapsed ? 'Expand' : 'Collapse'}
+                aria-expanded={!collapsed}
             >
-                {collapsed ? '>' : '<'}
+                <svg className={styles.icon} aria-hidden="true" focusable="false">
+                    <use href={collapsed ? '/icons.svg#rightArrow' : '/icons.svg#leftArrow'} />
+                </svg>
             </button>
 
             {!collapsed && <div className={styles.title}>Navigation</div>}

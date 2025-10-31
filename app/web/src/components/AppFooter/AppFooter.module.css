@@ -1,0 +1,13 @@
+.footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    margin-top: auto;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: center;
+}
