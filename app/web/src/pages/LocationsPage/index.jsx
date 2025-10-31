@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import List from '../../components/List';
-import BulkPage from '../BulkPage';
+import BulkPageLayout from '../../layouts/BulkPageLayout';
 
 import { getLocations, createLocation } from '../../redux/locations/operations';
 import { selectLocations, selectGetLocationsLoading, selectGetLocationsError } from '../../redux/locations/selectors';
@@ -12,7 +12,7 @@ export default function LocationsPage() {
     const navigate = useNavigate();
 
     return (
-        <BulkPage
+        <BulkPageLayout
             title="Locations"
             fetchAction={getLocations}
             selectData={selectLocations}

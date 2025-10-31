@@ -1,5 +1,5 @@
 import List from '../../components/List';
-import BulkPage from '../BulkPage';
+import BulkPageLayout from '../../layouts/BulkPageLayout';
 
 import { getCharacters } from '../../redux/characters/operations';
 import {
@@ -10,7 +10,7 @@ import {
 
 export default function CharactersPage() {
     return (
-        <BulkPage
+        <BulkPageLayout
             title="Characters"
             fetchAction={getCharacters}
             selectData={selectCharacters}

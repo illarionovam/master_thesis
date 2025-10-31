@@ -25,8 +25,6 @@ export default function LeftSidebar({ defaultCollapsed = true }) {
                 </svg>
             </button>
 
-            {!collapsed && <div className={styles.title}>Navigation</div>}
-
             <ul className={styles.list}>
                 <li>
                     <NavLink

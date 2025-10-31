@@ -1,12 +1,12 @@
 import List from '../../components/List';
-import BulkPage from '../BulkPage';
+import BulkPageLayout from '../../layouts/BulkPageLayout';
 
 import { getWorks } from '../../redux/works/operations';
 import { selectWorks, selectGetWorksLoading, selectGetWorksError } from '../../redux/works/selectors';
 
 export default function WorksPage() {
     return (
-        <BulkPage
+        <BulkPageLayout
             title="Works"
             fetchAction={getWorks}
             selectData={selectWorks}
