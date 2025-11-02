@@ -204,3 +204,21 @@
     gap: 8px;
     justify-content: flex-end;
 }
+
+.dangerBtn {
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid #b91c1c;
+    background: #dc2626;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.dangerBtn:hover {
+    filter: brightness(0.95);
+}
+.dangerBtn:disabled {
+    opacity: 0.7;
+    cursor: progress;
+}

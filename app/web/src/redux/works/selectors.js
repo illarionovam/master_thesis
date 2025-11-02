@@ -31,7 +31,12 @@ export const selectGetWorkCastLoading = state => state.works.getWorkCast.loading
 export const selectGetWorkCastError = state => state.works.getWorkCast.error;
 export const selectWorkCastRaw = state => state.works.getWorkCast.cast ?? [];
 export const selectWorkCast = createSelector(selectWorkCastRaw, list =>
-    list.map(({ id, works_id, character }) => ({ id, content: character.name, to: `/works/${works_id}/cast/${id}` }))
+    list.map(({ id, works_id, character_id, character }) => ({
+        id,
+        content: character.name,
+        character_id,
+        to: `/works/${works_id}/cast/${id}`,
+    }))
 );
 
 export const selectGetWorkPossibleCastLoading = state => state.works.getWorkPossibleCast.loading;
@@ -97,9 +102,10 @@ export const selectGetWorkLocationLinksLoading = state => state.works.getWorkLoc
 export const selectGetWorkLocationLinksError = state => state.works.getWorkLocationLinks.error;
 export const selectWorkLocationLinksRaw = state => state.works.getWorkLocationLinks.locationLinks ?? [];
 export const selectWorkLocationLinks = createSelector(selectWorkLocationLinksRaw, list =>
-    list.map(({ id, work_id, location }) => ({
+    list.map(({ id, work_id, location_id, location }) => ({
         id,
         content: location.title,
+        location_id,
         to: `/works/${work_id}/location-links/${id}`,
     }))
 );

@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 
 import Title from '../../components/Title';
 import List from '../../components/List';
@@ -10,8 +10,9 @@ import {
     updateLocation,
     getLocationPlacements,
     getLocationPossiblePlacements,
+    deleteLocation,
 } from '../../redux/locations/operations';
-import { linkWorkLocation } from '../../redux/works/operations';
+import { linkWorkLocation, deleteLocationInWork } from '../../redux/works/operations';
 
 import {
     selectLocation,
@@ -26,6 +27,9 @@ import {
     selectLocationPossiblePlacements,
     selectGetLocationPossiblePlacementsLoading,
     selectGetLocationPossiblePlacementsError,
+    selectDeleteLocationLoading,
+    selectDeleteLocationError,
+    selectDeleteLocationSuccess,
 } from '../../redux/locations/selectors';
 
 import styles from './LocationDetailsPage.module.css';
@@ -34,6 +38,7 @@ export default function LocationDetailsPage() {
     const { id } = useParams();
     const titleId = useId();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const location = useSelector(selectLocation);
     const loading = useSelector(selectGetLocationLoading);
@@ -50,6 +55,10 @@ export default function LocationDetailsPage() {
     const possibleWorks = useSelector(selectLocationPossiblePlacements) || [];
     const possibleLoading = useSelector(selectGetLocationPossiblePlacementsLoading);
     const possibleError = useSelector(selectGetLocationPossiblePlacementsError);
+
+    const deleteLoading = useSelector(selectDeleteLocationLoading);
+    const deleteError = useSelector(selectDeleteLocationError);
+    const deleteSuccess = useSelector(selectDeleteLocationSuccess);
 
     const [addOpen, setAddOpen] = useState(false);
     const [selectedWorkId, setSelectedWorkId] = useState('');
@@ -71,7 +80,7 @@ export default function LocationDetailsPage() {
         dispatch(getLocationPossiblePlacements(id));
     }, [addOpen, dispatch, id]);
 
-    const disableAll = loading || updateLoading;
+    const disableAll = loading || updateLoading || deleteLoading;
 
     const parentOptions = useMemo(() => {
         if (!id) return allLocations;
@@ -103,6 +112,16 @@ export default function LocationDetailsPage() {
         if (updateLocation.fulfilled.match(action)) setEditMode(false);
     };
 
+    const handleDelete = async () => {
+        if (!id) return;
+        const ok = window.confirm('Delete this location? This action cannot be undone.');
+        if (!ok) return;
+        const action = await dispatch(deleteLocation(id));
+        if (deleteLocation.fulfilled.match(action)) {
+            navigate('/locations', { replace: true });
+        }
+    };
+
     const openAddModal = () => {
         setSelectedWorkId('');
         setAddOpen(true);
@@ -117,17 +136,28 @@ export default function LocationDetailsPage() {
         try {
             setAdding(true);
             const action = await dispatch(linkWorkLocation({ workId: selectedWorkId, data: { location_id: id } }));
-            if (
-                linkWorkLocation.fulfilled?.match
-                    ? linkWorkLocation.fulfilled.match(action)
-                    : action?.meta?.requestStatus === 'fulfilled'
-            ) {
+            if (linkWorkLocation.fulfilled.match(action)) {
                 setAddOpen(false);
                 setSelectedWorkId('');
                 dispatch(getLocationPlacements(id));
             }
         } finally {
             setAdding(false);
+        }
+    };
+
+    const [removingId, setRemovingId] = useState(null);
+
+    const handleRemovePlacement = async (workId, locationInWorkId) => {
+        if (!id) return;
+        try {
+            setRemovingId(workId);
+            const action = await dispatch(deleteLocationInWork({ workId, locationInWorkId }));
+            if (deleteLocationInWork.fulfilled.match(action)) {
+                dispatch(getLocationPlacements(id));
+            }
+        } finally {
+            setRemovingId(null);
         }
     };
 
@@ -223,16 +253,32 @@ export default function LocationDetailsPage() {
                                 </p>
                             )}
 
+                            {deleteError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(deleteError)}
+                                </p>
+                            )}
+
                             <div className={styles.actions}>
                                 {!editMode ? (
-                                    <button
-                                        type="button"
-                                        className={styles.primaryBtn}
-                                        onClick={handleEdit}
-                                        disabled={disableAll}
-                                    >
-                                        Edit
-                                    </button>
+                                    <>
+                                        <button
+                                            type="button"
+                                            className={styles.primaryBtn}
+                                            onClick={handleEdit}
+                                            disabled={disableAll}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={styles.dangerBtn}
+                                            onClick={handleDelete}
+                                            disabled={disableAll}
+                                        >
+                                            {deleteLoading ? 'Deleting…' : 'Delete'}
+                                        </button>
+                                    </>
                                 ) : (
                                     <>
                                         <button
@@ -287,7 +333,13 @@ export default function LocationDetailsPage() {
                         {!placementsLoading && !placementsError && (
                             <>
                                 {placements.length > 0 ? (
-                                    <List items={placements} />
+                                    <List
+                                        items={placements}
+                                        onRemove={({ id: locationInWorkId, work_id: workId }) => {
+                                            if (removingId) return;
+                                            handleRemovePlacement(workId, locationInWorkId);
+                                        }}
+                                    />
                                 ) : (
                                     <p className={styles.muted}>No placements yet.</p>
                                 )}

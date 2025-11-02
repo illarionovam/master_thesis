@@ -28,7 +28,12 @@ export const selectGetLocationPlacementsError = state => state.locations.getLoca
 export const selectLocationPlacementsRaw = state => state.locations.getLocationPlacements.placements ?? [];
 
 export const selectLocationPlacements = createSelector(selectLocationPlacementsRaw, list =>
-    list.map(({ id, work_id, work }) => ({ id, content: work.title, to: `/works/${work_id}/location-links/${id}` }))
+    list.map(({ id, work_id, work }) => ({
+        id,
+        content: work.title,
+        work_id,
+        to: `/works/${work_id}/location-links/${id}`,
+    }))
 );
 
 export const selectGetLocationPossiblePlacementsLoading = state =>

@@ -29,7 +29,7 @@ export const selectGetCharacterAppearancesError = state => state.characters.getC
 export const selectCharacterAppearancesRaw = state => state.characters.getCharacterAppearances.appearances ?? [];
 
 export const selectCharacterAppearances = createSelector(selectCharacterAppearancesRaw, list =>
-    list.map(({ id, work_id, work }) => ({ id, content: work.title, to: `/works/${work_id}/cast/${id}` }))
+    list.map(({ id, work_id, work }) => ({ id, content: work.title, work_id, to: `/works/${work_id}/cast/${id}` }))
 );
 
 export const selectGetCharacterPossibleAppearancesLoading = state =>
