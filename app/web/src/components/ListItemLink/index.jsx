@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
 
-export default function ListItemLink({ id, children }) {
-    return <Link to={String(id)}>{children}</Link>;
+export default function ListItemLink({ to, children }) {
+    return <Link to={to}>{children}</Link>;
 }

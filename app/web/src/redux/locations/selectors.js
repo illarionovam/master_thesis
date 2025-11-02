@@ -5,7 +5,7 @@ export const selectGetLocationsError = state => state.locations.getLocations.err
 
 export const selectLocationsRaw = state => state.locations.locations ?? [];
 export const selectLocations = createSelector(selectLocationsRaw, list =>
-    list.map(({ id, title }) => ({ id, content: title }))
+    list.map(({ id, title }) => ({ id, content: title, to: `/locations/${id}` }))
 );
 
 export const selectLocation = state => state.locations.location;
@@ -28,7 +28,7 @@ export const selectGetLocationPlacementsError = state => state.locations.getLoca
 export const selectLocationPlacementsRaw = state => state.locations.getLocationPlacements.placements ?? [];
 
 export const selectLocationPlacements = createSelector(selectLocationPlacementsRaw, list =>
-    list.map(({ id, work }) => ({ id, content: work.title }))
+    list.map(({ id, work_id, work }) => ({ id, content: work.title, to: `/works/${work_id}/location-links/${id}` }))
 );
 
 export const selectGetLocationPossiblePlacementsLoading = state =>
@@ -38,5 +38,5 @@ export const selectLocationPossiblePlacementsRaw = state =>
     state.locations.getLocationPossiblePlacements.possiblePlacements ?? [];
 
 export const selectLocationPossiblePlacements = createSelector(selectLocationPossiblePlacementsRaw, list =>
-    list.map(({ id, title }) => ({ id, content: title }))
+    list.map(({ id, title }) => ({ id, content: title, to: `/works/${id}` }))
 );
