@@ -1,0 +1,72 @@
+.dialog {
+    padding: 0;
+    border: none;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+}
+
+.dialog::backdrop {
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(1px);
+}
+
+.body {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+.text {
+    margin: 0 0 14px;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.primaryBtn {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #111827;
+    background: #111827;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ghostBtn {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #111827;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dangerBtn {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #dc2626;
+    background: #dc2626;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}

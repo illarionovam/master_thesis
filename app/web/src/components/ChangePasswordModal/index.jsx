@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import styles from './ChangePasswordModal.module.css';
 
 export default function ChangePasswordModal({ open, onClose, onSubmit, loading, apiError }) {
     const dialogRef = useRef(null);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [formError, setFormError] = useState(null);
 
     useEffect(() => {
         if (open) {
@@ -16,27 +18,25 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
         }
     }, [open]);
 
-    const [formError, setFormError] = useState(null);
-
     const handleSubmit = e => {
         e.preventDefault();
-
         if (!currentPassword || !newPassword) return setFormError('Both fields are required');
         if (newPassword.length < 8) return setFormError('Min 8 characters');
         if (newPassword === currentPassword) return setFormError('Must differ from current');
-
         setFormError(null);
         onSubmit({ current_password: currentPassword, new_password: newPassword });
     };
 
     return (
-        <dialog ref={dialogRef} aria-labelledby="cp-title" onClose={onClose}>
-            <form method="dialog" onSubmit={handleSubmit}>
-                <h2 id="cp-title">Change Password</h2>
+        <dialog ref={dialogRef} aria-labelledby="cp-title" onClose={onClose} className={styles.dialog}>
+            <form method="dialog" onSubmit={handleSubmit} className={styles.body} noValidate>
+                <h2 id="cp-title" className={styles.title}>
+                    Change Password
+                </h2>
 
-                <div>
-                    <label>
-                        <span>Current password</span>
+                <div className={styles.fields}>
+                    <label className={styles.field}>
+                        <span className={styles.label}>Current password</span>
                         <input
                             type="password"
                             name="current_password"
@@ -44,10 +44,13 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
                             onChange={e => setCurrentPassword(e.target.value)}
                             autoComplete="current-password"
                             required
+                            className={styles.input}
+                            disabled={loading}
                         />
                     </label>
-                    <label>
-                        <span>New password</span>
+
+                    <label className={styles.field}>
+                        <span className={styles.label}>New password</span>
                         <input
                             type="password"
                             name="new_password"
@@ -56,17 +59,23 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
                             autoComplete="new-password"
                             required
                             minLength={8}
+                            className={styles.input}
+                            disabled={loading}
                         />
                     </label>
-                    {formError && <p role="alert">{formError}</p>}
-                    {apiError && <p role="alert">{apiError}</p>}
+
+                    {(formError || apiError) && (
+                        <p role="alert" className={styles.error}>
+                            {formError || apiError}
+                        </p>
+                    )}
                 </div>
 
-                <div>
-                    <button type="submit" disabled={loading}>
-                        Submit
+                <div className={styles.actions}>
+                    <button type="submit" disabled={loading} className={styles.primaryBtn}>
+                        {loading ? 'Saving…' : 'Save'}
                     </button>
-                    <button type="button" onClick={onClose} disabled={loading}>
+                    <button type="button" onClick={onClose} disabled={loading} className={styles.ghostBtn}>
                         Cancel
                     </button>
                 </div>

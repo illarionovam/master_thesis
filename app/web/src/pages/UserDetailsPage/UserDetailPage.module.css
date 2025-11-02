@@ -1,0 +1,137 @@
+.page {
+    min-height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 24px 16px;
+}
+
+.card {
+    width: 100%;
+    max-width: 720px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    padding: 24px;
+}
+
+.title {
+    margin: 0 0 12px;
+    font-size: 22px;
+    line-height: 1.25;
+}
+
+.muted {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.form {
+    display: grid;
+    gap: 14px;
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+}
+
+.fieldRow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: end;
+}
+
+.label {
+    font-size: 14px;
+    color: #374151;
+}
+
+.input {
+    height: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 16px;
+    background: #fff;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.15);
+}
+
+.input:disabled {
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+.error {
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: #b91c1c;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    padding: 8px 10px;
+    border-radius: 8px;
+}
+
+.actions,
+.rowActions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.primaryBtn {
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid #111827;
+    background: #111827;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primaryBtn:disabled {
+    opacity: 0.7;
+    cursor: progress;
+}
+
+.ghostBtn {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #111827;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ghostBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.dangerBtn {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #dc2626;
+    background: #dc2626;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.dangerBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

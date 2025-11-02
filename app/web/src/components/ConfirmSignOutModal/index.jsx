@@ -1,30 +1,30 @@
 import { useEffect, useRef } from 'react';
+import styles from './ConfirmSignOutModal.module.css';
 
 export default function ConfirmSignOutModal({ open, onClose, onCurrent, onAll }) {
     const dialogRef = useRef(null);
 
     useEffect(() => {
-        if (open) {
-            dialogRef.current?.showModal?.();
-        } else {
-            dialogRef.current?.close?.();
-        }
+        if (open) dialogRef.current?.showModal?.();
+        else dialogRef.current?.close?.();
     }, [open]);
 
     return (
-        <dialog ref={dialogRef} aria-labelledby="signout-title" onClose={onClose}>
-            <form method="dialog" className="modal-body">
-                <h2 id="signout-title">Terminate all sessions?</h2>
-                <p>Choose what to sign out:</p>
+        <dialog ref={dialogRef} aria-labelledby="signout-title" onClose={onClose} className={styles.dialog}>
+            <form method="dialog" className={styles.body}>
+                <h2 id="signout-title" className={styles.title}>
+                    Terminate all sessions?
+                </h2>
+                <p className={styles.text}>Choose what to sign out:</p>
 
-                <div>
-                    <button type="button" onClick={onCurrent}>
+                <div className={styles.actions}>
+                    <button type="button" onClick={onCurrent} className={styles.primaryBtn}>
                         Only current
                     </button>
-                    <button type="button" onClick={onAll}>
+                    <button type="button" onClick={onAll} className={styles.dangerBtn}>
                         All
                     </button>
-                    <button type="button" onClick={onClose}>
+                    <button type="button" onClick={onClose} className={styles.ghostBtn}>
                         Cancel
                     </button>
                 </div>
