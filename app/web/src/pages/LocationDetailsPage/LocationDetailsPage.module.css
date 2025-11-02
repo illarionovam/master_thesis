@@ -151,3 +151,56 @@
     font-weight: 600;
     cursor: pointer;
 }
+
+.subHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.dialog {
+    border: none;
+    border-radius: 12px;
+    padding: 0;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.dialog::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+}
+
+.modalBody {
+    padding: 20px;
+    display: grid;
+    gap: 14px;
+}
+
+.modalTitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.radioList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.radioRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.modalActions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}

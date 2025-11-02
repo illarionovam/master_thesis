@@ -4,7 +4,14 @@ import { useParams, Link } from 'react-router-dom';
 
 import Title from '../../components/Title';
 import List from '../../components/List';
-import { getLocation, getLocations, updateLocation, getLocationPlacements } from '../../redux/locations/operations';
+import {
+    getLocation,
+    getLocations,
+    updateLocation,
+    getLocationPlacements,
+    getLocationPossiblePlacements,
+} from '../../redux/locations/operations';
+import { linkWorkLocation } from '../../redux/works/operations';
 
 import {
     selectLocation,
@@ -16,6 +23,9 @@ import {
     selectLocationPlacements,
     selectGetLocationPlacementsLoading,
     selectGetLocationPlacementsError,
+    selectLocationPossiblePlacements,
+    selectGetLocationPossiblePlacementsLoading,
+    selectGetLocationPossiblePlacementsError,
 } from '../../redux/locations/selectors';
 
 import styles from './LocationDetailsPage.module.css';
@@ -37,6 +47,14 @@ export default function LocationDetailsPage() {
     const placementsLoading = useSelector(selectGetLocationPlacementsLoading);
     const placementsError = useSelector(selectGetLocationPlacementsError);
 
+    const possibleWorks = useSelector(selectLocationPossiblePlacements) || [];
+    const possibleLoading = useSelector(selectGetLocationPossiblePlacementsLoading);
+    const possibleError = useSelector(selectGetLocationPossiblePlacementsError);
+
+    const [addOpen, setAddOpen] = useState(false);
+    const [selectedWorkId, setSelectedWorkId] = useState('');
+    const [adding, setAdding] = useState(false);
+
     const [editMode, setEditMode] = useState(false);
     const formRef = useRef(null);
 
@@ -47,6 +65,11 @@ export default function LocationDetailsPage() {
         }
         dispatch(getLocations());
     }, [dispatch, id]);
+
+    useEffect(() => {
+        if (!addOpen || !id) return;
+        dispatch(getLocationPossiblePlacements(id));
+    }, [addOpen, dispatch, id]);
 
     const disableAll = loading || updateLoading;
 
@@ -78,6 +101,34 @@ export default function LocationDetailsPage() {
 
         const action = await dispatch(updateLocation({ id, data: { title, description, parent_location_id } }));
         if (updateLocation.fulfilled.match(action)) setEditMode(false);
+    };
+
+    const openAddModal = () => {
+        setSelectedWorkId('');
+        setAddOpen(true);
+    };
+    const closeAddModal = () => {
+        if (adding) return;
+        setAddOpen(false);
+        setSelectedWorkId('');
+    };
+    const handleAddToWork = async () => {
+        if (!id || !selectedWorkId) return;
+        try {
+            setAdding(true);
+            const action = await dispatch(linkWorkLocation({ workId: selectedWorkId, data: { location_id: id } }));
+            if (
+                linkWorkLocation.fulfilled?.match
+                    ? linkWorkLocation.fulfilled.match(action)
+                    : action?.meta?.requestStatus === 'fulfilled'
+            ) {
+                setAddOpen(false);
+                setSelectedWorkId('');
+                dispatch(getLocationPlacements(id));
+            }
+        } finally {
+            setAdding(false);
+        }
     };
 
     return (
@@ -207,7 +258,19 @@ export default function LocationDetailsPage() {
                     </section>
 
                     <section className={styles.card} aria-label="Location placements">
-                        <h2 className={styles.subTitle}>Placements</h2>
+                        <div className={styles.subHeader}>
+                            <h2 className={styles.subTitle}>Placements</h2>
+                            <button
+                                type="button"
+                                className={styles.primaryBtn}
+                                onClick={openAddModal}
+                                disabled={placementsLoading}
+                                aria-label="Add to work"
+                                title="Add to work"
+                            >
+                                Add to work
+                            </button>
+                        </div>
 
                         {placementsLoading && (
                             <p aria-live="polite" className={styles.muted}>
@@ -231,6 +294,71 @@ export default function LocationDetailsPage() {
                             </>
                         )}
                     </section>
+
+                    {addOpen && (
+                        <dialog open className={styles.dialog} aria-labelledby="add-work-title" onClose={closeAddModal}>
+                            <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                                <h3 id="add-work-title" className={styles.modalTitle}>
+                                    Add to work
+                                </h3>
+
+                                {possibleLoading && (
+                                    <p className={styles.muted} aria-live="polite">
+                                        Loading works…
+                                    </p>
+                                )}
+                                {!possibleLoading && possibleError && (
+                                    <p className={styles.error} role="alert">
+                                        {String(possibleError)}
+                                    </p>
+                                )}
+
+                                {!possibleLoading && !possibleError && (
+                                    <>
+                                        {possibleWorks.length === 0 ? (
+                                            <p className={styles.muted}>No available works to add.</p>
+                                        ) : (
+                                            <ul className={styles.radioList}>
+                                                {possibleWorks.map(w => (
+                                                    <li key={w.id}>
+                                                        <label className={styles.radioRow}>
+                                                            <input
+                                                                type="radio"
+                                                                name="work"
+                                                                value={w.id}
+                                                                checked={String(selectedWorkId) === String(w.id)}
+                                                                onChange={e => setSelectedWorkId(e.target.value)}
+                                                            />
+                                                            <span>{w.content}</span>
+                                                        </label>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </>
+                                )}
+
+                                <div className={styles.modalActions}>
+                                    <button
+                                        type="button"
+                                        className={styles.primaryBtn}
+                                        onClick={handleAddToWork}
+                                        disabled={adding || possibleLoading || !selectedWorkId}
+                                    >
+                                        {adding ? 'Adding...' : 'Add'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={styles.ghostBtn}
+                                        onClick={closeAddModal}
+                                        disabled={adding}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </dialog>
+                    )}
                 </>
             )}
         </main>
