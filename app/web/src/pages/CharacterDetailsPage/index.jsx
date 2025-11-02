@@ -12,7 +12,6 @@ import {
     getCharacterPossibleAppearances,
     deleteCharacter,
 } from '../../redux/characters/operations';
-
 import { linkWorkCharacter, deleteCharacterInWork } from '../../redux/works/operations';
 
 import {
@@ -58,9 +57,15 @@ export default function CharacterDetailsPage() {
     const possibleError = useSelector(selectGetCharacterPossibleAppearancesError);
 
     const [editMode, setEditMode] = useState(false);
-    const [addOpen, setAddOpen] = useState(false);
+
+    const [attrs, setAttrs] = useState({});
+
+    const [addTagOpen, setAddTagOpen] = useState(false);
+    const [addWorkOpen, setAddWorkOpen] = useState(false);
+
     const [selectedWorkId, setSelectedWorkId] = useState('');
     const [adding, setAdding] = useState(false);
+
     const [removingId, setRemovingId] = useState(null);
 
     const formRef = useRef(null);
@@ -72,9 +77,15 @@ export default function CharacterDetailsPage() {
     }, [dispatch, id]);
 
     useEffect(() => {
-        if (!addOpen || !id) return;
+        if (character) {
+            setAttrs(character.attributes && typeof character.attributes === 'object' ? character.attributes : {});
+        }
+    }, [character]);
+
+    useEffect(() => {
+        if (!addWorkOpen || !id) return;
         dispatch(getCharacterPossibleAppearances(id));
-    }, [addOpen, dispatch, id]);
+    }, [addWorkOpen, dispatch, id]);
 
     const disableAll = loading || updateLoading || deleteLoading;
 
@@ -87,19 +98,22 @@ export default function CharacterDetailsPage() {
         formRef.current.appearance.value = character.appearance ?? '';
         formRef.current.personality.value = character.personality ?? '';
         formRef.current.bio.value = character.bio ?? '';
+        setAttrs(character.attributes && typeof character.attributes === 'object' ? character.attributes : {});
     };
 
     const handleSave = async () => {
         if (!formRef.current) return;
         const fd = new FormData(formRef.current);
-        const name = (fd.get('name') || '').toString().trim();
-        const appearance = (fd.get('appearance') || '').toString().trim();
-        const personality = (fd.get('personality') || '').toString().trim();
-        const bio = (fd.get('bio') || '').toString().trim();
 
-        if (!name || !appearance || !personality || !bio) return;
+        const data = {
+            name: (fd.get('name') || '').toString().trim(),
+            appearance: (fd.get('appearance') || '').toString().trim(),
+            personality: (fd.get('personality') || '').toString().trim(),
+            bio: (fd.get('bio') || '').toString().trim(),
+            attributes: attrs,
+        };
+        if (!data.name || !data.appearance || !data.personality || !data.bio) return;
 
-        const data = { name, appearance, personality, bio };
         const action = await dispatch(updateCharacter({ id, data }));
         if (updateCharacter.fulfilled.match(action)) setEditMode(false);
     };
@@ -114,13 +128,21 @@ export default function CharacterDetailsPage() {
         }
     };
 
-    const openAddModal = () => {
-        setSelectedWorkId('');
-        setAddOpen(true);
+    const removeAttr = k => {
+        setAttrs(prev => {
+            const next = { ...prev };
+            delete next[k];
+            return next;
+        });
     };
-    const closeAddModal = () => {
+
+    const openAddWorkModal = () => {
+        setSelectedWorkId('');
+        setAddWorkOpen(true);
+    };
+    const closeAddWorkModal = () => {
         if (adding) return;
-        setAddOpen(false);
+        setAddWorkOpen(false);
         setSelectedWorkId('');
     };
     const handleAddToWork = async () => {
@@ -129,7 +151,7 @@ export default function CharacterDetailsPage() {
             setAdding(true);
             const action = await dispatch(linkWorkCharacter({ workId: selectedWorkId, data: { character_id: id } }));
             if (linkWorkCharacter.fulfilled.match(action)) {
-                setAddOpen(false);
+                setAddWorkOpen(false);
                 setSelectedWorkId('');
                 dispatch(getCharacterAppearances(id));
             }
@@ -168,7 +190,6 @@ export default function CharacterDetailsPage() {
                         </li>
                     </ol>
                 </nav>
-
                 <Title id={titleId}>{character?.name ?? '—'}</Title>
             </div>
 
@@ -244,6 +265,47 @@ export default function CharacterDetailsPage() {
                                 />
                             </div>
 
+                            <div className={styles.field}>
+                                <span className={styles.label}>Tags</span>
+                                <div className={styles.chips}>
+                                    {Object.keys(attrs).length === 0 && (
+                                        <span className={styles.muted}>No tags yet.</span>
+                                    )}
+
+                                    {Object.entries(attrs).map(([k, v]) => (
+                                        <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
+                                            <strong className={styles.chipKey}>{k}</strong>
+                                            <span className={styles.chipSep}>:</span>
+                                            <span className={styles.chipVal}>{String(v)}</span>
+
+                                            {editMode && (
+                                                <button
+                                                    type="button"
+                                                    className={styles.chipRemove}
+                                                    onClick={() => removeAttr(k)}
+                                                    aria-label={`Remove tag ${k}`}
+                                                    title="Remove"
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </span>
+                                    ))}
+
+                                    {editMode && (
+                                        <button
+                                            type="button"
+                                            className={styles.addChipBtn}
+                                            onClick={() => setAddTagOpen(true)}
+                                            aria-label="Add tag"
+                                            title="Add tag"
+                                        >
+                                            +
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
                             {updateError && (
                                 <p role="alert" className={styles.error}>
                                     {String(updateError)}
@@ -305,7 +367,7 @@ export default function CharacterDetailsPage() {
                             <button
                                 type="button"
                                 className={styles.primaryBtn}
-                                onClick={openAddModal}
+                                onClick={openAddWorkModal}
                                 disabled={appearancesLoading}
                                 aria-label="Add to work"
                                 title="Add to work"
@@ -319,32 +381,57 @@ export default function CharacterDetailsPage() {
                                 Loading...
                             </p>
                         )}
-
                         {!appearancesLoading && appearancesError && (
                             <p role="alert" className={styles.error}>
                                 {String(appearancesError)}
                             </p>
                         )}
 
-                        {!appearancesLoading && !appearancesError && (
-                            <>
-                                {appearances.length > 0 ? (
-                                    <List
-                                        items={appearances}
-                                        onRemove={({ id: characterInWorkId, work_id: workId }) => {
-                                            if (removingId) return;
-                                            handleRemoveAppearance(workId, characterInWorkId);
-                                        }}
-                                    />
-                                ) : (
-                                    <p className={styles.muted}>No appearances yet.</p>
-                                )}
-                            </>
-                        )}
+                        {!appearancesLoading &&
+                            !appearancesError &&
+                            (appearances.length > 0 ? (
+                                <List
+                                    items={appearances}
+                                    onRemove={({ id: characterInWorkId, work_id: workId }) => {
+                                        if (removingId) return;
+                                        handleRemoveAppearance(workId, characterInWorkId);
+                                    }}
+                                />
+                            ) : (
+                                <p className={styles.muted}>No appearances yet.</p>
+                            ))}
                     </section>
 
-                    {addOpen && (
-                        <dialog open className={styles.dialog} aria-labelledby="add-work-title" onClose={closeAddModal}>
+                    {addTagOpen && (
+                        <dialog
+                            open
+                            className={styles.dialog}
+                            aria-labelledby="add-tag-title"
+                            onClose={() => setAddTagOpen(false)}
+                        >
+                            <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                                <h3 id="add-tag-title" className={styles.modalTitle}>
+                                    Add tag
+                                </h3>
+                                <AddTagFields
+                                    onAdd={(k, v) => {
+                                        if (!k) return;
+                                        setAttrs(prev => ({ ...prev, [k]: v }));
+                                        setAddTagOpen(false);
+                                    }}
+                                    onCancel={() => setAddTagOpen(false)}
+                                />
+                            </form>
+                        </dialog>
+                    )}
+
+                    {addWorkOpen && (
+                        <dialog
+                            open
+                            className={styles.dialog}
+                            aria-labelledby="add-work-title"
+                            onClose={closeAddWorkModal}
+                        >
                             <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
                                 <h3 id="add-work-title" className={styles.modalTitle}>
                                     Add to work
@@ -361,30 +448,28 @@ export default function CharacterDetailsPage() {
                                     </p>
                                 )}
 
-                                {!possibleLoading && !possibleError && (
-                                    <>
-                                        {possibleWorks.length === 0 ? (
-                                            <p className={styles.muted}>No available works to add.</p>
-                                        ) : (
-                                            <ul className={styles.radioList}>
-                                                {possibleWorks.map(w => (
-                                                    <li key={w.id}>
-                                                        <label className={styles.radioRow}>
-                                                            <input
-                                                                type="radio"
-                                                                name="work"
-                                                                value={w.id}
-                                                                checked={String(selectedWorkId) === String(w.id)}
-                                                                onChange={e => setSelectedWorkId(e.target.value)}
-                                                            />
-                                                            <span>{w.content}</span>
-                                                        </label>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </>
-                                )}
+                                {!possibleLoading &&
+                                    !possibleError &&
+                                    (possibleWorks.length === 0 ? (
+                                        <p className={styles.muted}>No available works to add.</p>
+                                    ) : (
+                                        <ul className={styles.radioList}>
+                                            {possibleWorks.map(w => (
+                                                <li key={w.id}>
+                                                    <label className={styles.radioRow}>
+                                                        <input
+                                                            type="radio"
+                                                            name="work"
+                                                            value={w.id}
+                                                            checked={String(selectedWorkId) === String(w.id)}
+                                                            onChange={e => setSelectedWorkId(e.target.value)}
+                                                        />
+                                                        <span>{w.content}</span>
+                                                    </label>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ))}
 
                                 <div className={styles.modalActions}>
                                     <button
@@ -398,7 +483,7 @@ export default function CharacterDetailsPage() {
                                     <button
                                         type="button"
                                         className={styles.ghostBtn}
-                                        onClick={closeAddModal}
+                                        onClick={closeAddWorkModal}
                                         disabled={adding}
                                     >
                                         Cancel
@@ -410,5 +495,63 @@ export default function CharacterDetailsPage() {
                 </>
             )}
         </main>
+    );
+}
+
+function AddTagFields({ onAdd, onCancel }) {
+    const [keyStr, setKeyStr] = useState('');
+    const [valStr, setValStr] = useState('');
+    const [err, setErr] = useState('');
+
+    const save = () => {
+        const k = keyStr.trim();
+        if (!k) return setErr('Key is required');
+        setErr('');
+        onAdd?.(k, valStr.trim());
+    };
+
+    return (
+        <>
+            <div className={styles.field}>
+                <label className={styles.label}>
+                    Key
+                    <input
+                        className={styles.input}
+                        type="text"
+                        value={keyStr}
+                        onChange={e => setKeyStr(e.target.value)}
+                        placeholder="e.g. species"
+                        required
+                    />
+                </label>
+            </div>
+            <div className={styles.field}>
+                <label className={styles.label}>
+                    Value
+                    <input
+                        className={styles.input}
+                        type="text"
+                        value={valStr}
+                        onChange={e => setValStr(e.target.value)}
+                        placeholder="e.g. ektirhos"
+                    />
+                </label>
+            </div>
+
+            {err && (
+                <p className={styles.error} role="alert">
+                    {err}
+                </p>
+            )}
+
+            <div className={styles.modalActions}>
+                <button type="button" className={styles.primaryBtn} onClick={save}>
+                    Save
+                </button>
+                <button type="button" className={styles.ghostBtn} onClick={onCancel}>
+                    Cancel
+                </button>
+            </div>
+        </>
     );
 }
