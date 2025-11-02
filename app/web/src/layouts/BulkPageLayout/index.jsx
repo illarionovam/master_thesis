@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Title from '../../components/Title';
+import styles from './BulkPageLayout.module.css';
 
 export default function BulkPageLayout({
     title,
@@ -55,36 +56,41 @@ export default function BulkPageLayout({
     };
 
     return (
-        <main aria-labelledby={titleId}>
-            <div>
+        <main aria-labelledby={titleId} className={styles.page}>
+            <div className={styles.header}>
                 <Title id={titleId}>{title}</Title>
-
-                {CreateModal && createAction && (
-                    <button
-                        type="button"
-                        onClick={handleOpenCreate}
-                        aria-label={`Create ${title}`}
-                        title={`Create ${title}`}
-                    >
-                        +
-                    </button>
-                )}
             </div>
 
             {loading && <p aria-live="polite">Loading...</p>}
             {error && <p role="alert">{error}</p>}
             {!loading && !error && render?.(data)}
 
-            {CreateModal && openCreate && (
-                <CreateModal
-                    {...createModalProps}
-                    open={openCreate}
-                    mode="create"
-                    onClose={handleCloseCreate}
-                    onSubmit={handleSubmitCreate}
-                    submitting={creating}
-                    error={createError}
-                />
+            {CreateModal && createAction && (
+                <>
+                    <button
+                        type="button"
+                        className={styles.fab}
+                        onClick={handleOpenCreate}
+                        aria-label={`Create ${title}`}
+                        title={`Create ${title}`}
+                    >
+                        <svg className={styles.icon} aria-hidden="true" focusable="false">
+                            <use href="/icons.svg#plus" />
+                        </svg>
+                    </button>
+
+                    {openCreate && (
+                        <CreateModal
+                            {...createModalProps}
+                            open={openCreate}
+                            mode="create"
+                            onClose={handleCloseCreate}
+                            onSubmit={handleSubmitCreate}
+                            submitting={creating}
+                            error={createError}
+                        />
+                    )}
+                </>
             )}
         </main>
     );

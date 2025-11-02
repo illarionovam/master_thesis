@@ -1,13 +1,13 @@
 import { useId } from 'react';
+import Title from '../../components/Title';
+import styles from './HomePage.module.css';
 
 export default function HomePage() {
     const titleId = useId();
 
     return (
-        <section aria-labelledby={titleId}>
-            <header>
-                <h1 id={titleId}>HOME</h1>
-            </header>
-        </section>
+        <main aria-labelledby={titleId} className={styles.page}>
+            <Title id={titleId}>HOME</Title>
+        </main>
     );
 }

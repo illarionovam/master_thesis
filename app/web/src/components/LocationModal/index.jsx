@@ -1,173 +1,126 @@
-import { useMemo, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import styles from './CreateLocationModal.module.css';
 
-export default function LocationModal({
+export default function CreateLocationModal({
     open,
-    mode = 'create',
-    initialValues = null,
     onClose,
     onSubmit,
-    submitting,
-    error,
+    submitting = false,
+    error = null,
     parentOptions = [],
-    currentId,
 }) {
-    if (!open) return null;
+    const dialogRef = useRef(null);
 
-    const navigate = useNavigate();
-
-    const [title, setTitle] = useState(() => initialValues?.title ?? '');
-    const [parentId, setParentId] = useState(() =>
-        initialValues?.parent_location_id ? String(initialValues.parent_location_id) : ''
-    );
-    const [description, setDescription] = useState(() => initialValues?.description ?? '');
-    const [localError, setLocalError] = useState(null);
+    const [title, setTitle] = useState('');
+    const [parentId, setParentId] = useState('');
+    const [description, setDescription] = useState('');
+    const [formError, setFormError] = useState(null);
 
     useEffect(() => {
         if (open) {
-            setTitle(initialValues?.title ?? '');
-            setParentId(initialValues?.parent_location_id ?? '');
-            setDescription(initialValues?.description ?? '');
-            setLocalError(null);
+            dialogRef.current?.showModal?.();
+            setTitle('');
+            setParentId('');
+            setDescription('');
+            setFormError(null);
+        } else {
+            dialogRef.current?.close?.();
         }
-    }, [open, initialValues]);
+    }, [open]);
 
     const isValid = useMemo(() => title.trim().length > 0 && description.trim().length > 0, [title, description]);
-
-    const selfId = initialValues?.id ?? currentId ?? null;
-
-    const filteredParentOptions = useMemo(() => {
-        const sid = selfId ? String(selfId) : null;
-        return sid ? parentOptions.filter(opt => String(opt.id) !== sid) : parentOptions;
-    }, [parentOptions, selfId]);
 
     const handleSubmit = e => {
         e.preventDefault();
         if (!isValid) {
-            setLocalError('Title and Description are required.');
+            setFormError('Title and Description are required.');
             return;
         }
-        setLocalError(null);
+        setFormError(null);
 
         const payload = {
             title: title.trim(),
             description: description.trim(),
-            ...(parentId ? { parent_location_id: parentId } : { parent_location_id: null }),
+            parent_location_id: parentId ? String(parentId) : null,
         };
 
         onSubmit?.(payload);
     };
 
-    const handleCancel = () => {
-        if (mode === 'update' && selfId) {
-            navigate(`/locations/${selfId}`);
-            return;
-        }
-        onClose?.();
-    };
-
     return (
-        <div role="dialog" aria-modal="true" onClick={handleCancel}>
-            <div onClick={e => e.stopPropagation()}>
-                <h2>{mode === 'update' ? 'Update Location' : 'Create Location'}</h2>
+        <dialog ref={dialogRef} className={styles.dialog} aria-labelledby="create-location-title" onClose={onClose}>
+            <form onSubmit={handleSubmit} className={styles.form}>
+                <h2 id="create-location-title" className={styles.title}>
+                    Create Location
+                </h2>
 
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>
-                            <span>Title *</span>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                                required
-                                placeholder="e.g., Northern Outpost"
-                            />
-                        </label>
+                <div className={styles.field}>
+                    <label htmlFor="loc-title" className={styles.label}>
+                        Title *
+                    </label>
+                    <input
+                        id="loc-title"
+                        type="text"
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        required
+                        placeholder="e.g., Northern Outpost"
+                        className={styles.input}
+                        disabled={submitting}
+                    />
+                </div>
 
-                        <label>
-                            <span>Parent Location</span>
-                            <select
-                                key={selfId ? `parent-${selfId}` : `parent-${mode}`}
-                                value={parentId}
-                                onChange={e => setParentId(e.target.value)}
-                            >
-                                <option value="">— None —</option>
-                                {filteredParentOptions.map(opt => (
-                                    <option key={String(opt.id)} value={String(opt.id)}>
-                                        {opt.content}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
+                <div className={styles.field}>
+                    <label htmlFor="loc-parent" className={styles.label}>
+                        Parent Location
+                    </label>
+                    <select
+                        id="loc-parent"
+                        value={parentId}
+                        onChange={e => setParentId(e.target.value)}
+                        className={styles.input}
+                        disabled={submitting}
+                    >
+                        <option value="">— None —</option>
+                        {parentOptions.map(opt => (
+                            <option key={String(opt.id)} value={String(opt.id)}>
+                                {opt.content}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-                        <label>
-                            <span>Description *</span>
-                            <textarea
-                                value={description}
-                                onChange={e => setDescription(e.target.value)}
-                                required
-                                rows={4}
-                                placeholder="Short description..."
-                            />
-                        </label>
+                <div className={styles.field}>
+                    <label htmlFor="loc-desc" className={styles.label}>
+                        Description *
+                    </label>
+                    <textarea
+                        id="loc-desc"
+                        rows={5}
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
+                        required
+                        placeholder="Short description..."
+                        className={`${styles.input} ${styles.textarea}`}
+                        disabled={submitting}
+                    />
+                </div>
 
-                        {(localError || error) && <p>{localError || error}</p>}
+                {(formError || error) && (
+                    <p role="alert" className={styles.error}>
+                        {formError || error}
+                    </p>
+                )}
 
-                        <div>
-                            <button type="button" onClick={handleCancel} disabled={submitting}>
-                                Cancel
-                            </button>
-                            <button type="submit" disabled={!isValid || submitting}>
-                                {submitting ? 'Submitting...' : mode === 'update' ? 'Save' : 'Create'}
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <div className={styles.actions}>
+                    <button type="button" className={styles.ghostBtn} onClick={onClose} disabled={submitting}>
+                        Cancel
+                    </button>
+                    <button type="submit" className={styles.primaryBtn} disabled={!isValid || submitting}>
+                        {submitting ? 'Submitting...' : 'Create'}
+                    </button>
+                </div>
+            </form>
+        </dialog>
     );
 }
-
-const overlay = {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.35)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 999,
-    padding: 16,
-};
-
-const modal = {
-    background: '#fff',
-    borderRadius: 12,
-    width: 'min(520px, 100%)',
-    padding: 20,
-    boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-};
-
-const input = {
-    padding: '10px 12px',
-    borderRadius: 8,
-    border: '1px solid #ccc',
-    outline: 'none',
-};
-
-const btnPrimary = {
-    padding: '8px 14px',
-    borderRadius: 8,
-    border: '1px solid #333',
-    background: '#111',
-    color: '#fff',
-    cursor: 'pointer',
-};
-
-const btnGhost = {
-    padding: '8px 14px',
-    borderRadius: 8,
-    border: '1px solid #ccc',
-    background: '#fff',
-    color: '#333',
-    cursor: 'pointer',
-};

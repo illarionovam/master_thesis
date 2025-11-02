@@ -1,29 +1,27 @@
-.page {
-    min-height: 100%;
-    display: grid;
-    place-items: center;
-    padding: 24px 16px;
-}
-
-.card {
-    width: 100%;
-    max-width: 480px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
+.dialog {
+    border: none;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-    padding: 24px;
+    padding: 0;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-.title {
-    margin: 0 0 12px;
-    font-size: 22px;
-    line-height: 1.25;
+.dialog::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
 }
 
 .form {
+    padding: 24px;
     display: grid;
-    gap: 12px;
+    gap: 14px;
+}
+
+.title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .field {
@@ -43,7 +41,7 @@
     padding: 0 12px;
     font-size: 16px;
     background: #fff;
-    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .input:focus {
@@ -55,37 +53,34 @@
 .input:disabled {
     background: #f9fafb;
     cursor: not-allowed;
+    color: #6b7280;
+}
+
+.textarea {
+    min-height: 120px;
+    padding: 10px 12px;
+    height: auto;
 }
 
 .error {
-    margin: 4px 0 0;
     font-size: 14px;
     color: #b91c1c;
     background: #fee2e2;
     border: 1px solid #fecaca;
-    padding: 8px 10px;
     border-radius: 8px;
-}
-
-.success {
-    margin: 4px 0 0;
-    font-size: 14px;
-    color: #065f46;
-    background: #d1fae5;
-    border: 1px solid #a7f3d0;
     padding: 8px 10px;
-    border-radius: 8px;
 }
 
 .actions {
     display: flex;
     gap: 8px;
-    margin-top: 6px;
+    justify-content: flex-end;
+    margin-top: 2px;
 }
 
 .primaryBtn {
-    flex: 1;
     height: 40px;
+    padding: 0 16px;
     border: 1px solid #111827;
     background: #111827;
     color: #fff;
@@ -108,25 +103,4 @@
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-}
-
-.ghostBtn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.meta {
-    margin: 4px 0 0;
-    font-size: 14px;
-    color: #4b5563;
-    text-align: center;
-}
-
-.link {
-    color: #111827;
-    font-weight: 600;
-    text-decoration: none;
-}
-.link:hover {
-    text-decoration: underline;
 }

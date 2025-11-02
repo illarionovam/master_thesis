@@ -1,10 +1,11 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 import Title from '../../components/Title';
-import LocationModal from '../../components/LocationModal';
-import { getLocation, updateLocation, getLocations } from '../../redux/locations/operations';
+import List from '../../components/List';
+import { getLocation, getLocations, updateLocation, getLocationPlacements } from '../../redux/locations/operations';
+
 import {
     selectLocation,
     selectGetLocationLoading,
@@ -12,7 +13,12 @@ import {
     selectLocations,
     selectUpdateLocationLoading,
     selectUpdateLocationError,
+    selectLocationPlacements,
+    selectGetLocationPlacementsLoading,
+    selectGetLocationPlacementsError,
 } from '../../redux/locations/selectors';
+
+import styles from './LocationDetailsPage.module.css';
 
 export default function LocationDetailsPage() {
     const { id } = useParams();
@@ -23,70 +29,210 @@ export default function LocationDetailsPage() {
     const loading = useSelector(selectGetLocationLoading);
     const error = useSelector(selectGetLocationError);
 
-    const parentOptions = useSelector(selectLocations); // [{id, content}]
+    const allLocations = useSelector(selectLocations) || [];
     const updateLoading = useSelector(selectUpdateLocationLoading);
     const updateError = useSelector(selectUpdateLocationError);
 
-    const [openEdit, setOpenEdit] = useState(false);
+    const placements = useSelector(selectLocationPlacements) || [];
+    const placementsLoading = useSelector(selectGetLocationPlacementsLoading);
+    const placementsError = useSelector(selectGetLocationPlacementsError);
+
+    const [editMode, setEditMode] = useState(false);
+    const formRef = useRef(null);
 
     useEffect(() => {
-        if (id) dispatch(getLocation(id));
+        if (id) {
+            dispatch(getLocation(id));
+            dispatch(getLocationPlacements(id));
+        }
         dispatch(getLocations());
     }, [dispatch, id]);
 
-    const handleOpenEdit = () => setOpenEdit(true);
-    const handleCloseEdit = () => setOpenEdit(false);
+    const disableAll = loading || updateLoading;
 
-    const handleSubmitEdit = async data => {
-        const res = await dispatch(updateLocation({ id, data }));
-        if (updateLocation.fulfilled.match(res)) {
-            setOpenEdit(false);
+    const parentOptions = useMemo(() => {
+        if (!id) return allLocations;
+        return allLocations.filter(l => String(l.id) !== String(id));
+    }, [allLocations, id]);
+
+    const handleEdit = () => setEditMode(true);
+
+    const handleCancel = () => {
+        setEditMode(false);
+        if (!formRef.current || !location) return;
+        formRef.current.title.value = location.title ?? '';
+        formRef.current.description.value = location.description ?? '';
+        if (formRef.current.parent_location_id) {
+            formRef.current.parent_location_id.value = location.parent?.id ? String(location.parent.id) : '';
         }
     };
 
+    const handleSave = async () => {
+        if (!formRef.current) return;
+        const fd = new FormData(formRef.current);
+        const title = (fd.get('title') || '').toString().trim();
+        const description = (fd.get('description') || '').toString().trim();
+        const parentRaw = (fd.get('parent_location_id') || '').toString().trim();
+        const parent_location_id = parentRaw ? parentRaw : null;
+        if (!title || !description) return;
+
+        const action = await dispatch(updateLocation({ id, data: { title, description, parent_location_id } }));
+        if (updateLocation.fulfilled.match(action)) setEditMode(false);
+    };
+
     return (
-        <main aria-labelledby={titleId}>
-            <div>
-                <Title id={titleId}>Location details</Title>
-                {!loading && !error && location && (
-                    <button type="button" onClick={handleOpenEdit} aria-label="Edit location" title="Edit">
-                        Edit
-                    </button>
-                )}
+        <main aria-labelledby={titleId} className={styles.page}>
+            <div className={styles.header}>
+                <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+                    <ol>
+                        <li>
+                            <Link to="/locations" className={styles.crumbLink}>
+                                LOCATIONS
+                            </Link>
+                        </li>
+                        <li aria-current="page">
+                            <Link to={`/locations/${id}`} className={styles.crumbLink}>
+                                {location?.title ?? '—'}
+                            </Link>
+                        </li>
+                    </ol>
+                </nav>
+
+                <Title id={titleId}>{location?.title ?? '—'}</Title>
             </div>
 
-            {loading && <p aria-live="polite">Loading...</p>}
-            {error && <p role="alert">{error}</p>}
-
-            {!loading && !error && location && (
-                <div>
-                    <div>
-                        <strong>Title:</strong> {location.title ?? '—'}
-                    </div>
-                    <div>
-                        <strong>Description:</strong> {location.description ?? '—'}
-                    </div>
-                    <div>
-                        <strong>Parent Location:</strong> {location.parent?.title ?? '—'}
-                    </div>
-                </div>
+            {loading && (
+                <p aria-live="polite" className={styles.muted}>
+                    Loading...
+                </p>
+            )}
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {error}
+                </p>
             )}
 
-            <LocationModal
-                open={openEdit}
-                mode="update"
-                initialValues={{
-                    id: location?.id,
-                    title: location?.title ?? '',
-                    description: location?.description ?? '',
-                    parent_location_id: location?.parent_location_id ?? '',
-                }}
-                onClose={handleCloseEdit}
-                onSubmit={handleSubmitEdit}
-                submitting={updateLoading}
-                error={updateError}
-                parentOptions={parentOptions}
-            />
+            {!loading && !error && location && (
+                <>
+                    <section className={styles.card} aria-label="Location info">
+                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                            <div className={styles.field}>
+                                <label htmlFor="loc-title" className={styles.label}>
+                                    Title
+                                </label>
+                                <input
+                                    id="loc-title"
+                                    name="title"
+                                    type="text"
+                                    defaultValue={location.title ?? ''}
+                                    className={styles.input}
+                                    disabled={!editMode || disableAll}
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.field}>
+                                <label htmlFor="loc-desc" className={styles.label}>
+                                    Description
+                                </label>
+                                <textarea
+                                    id="loc-desc"
+                                    name="description"
+                                    rows={5}
+                                    defaultValue={location.description ?? ''}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    disabled={!editMode || disableAll}
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.field}>
+                                <label htmlFor="loc-parent" className={styles.label}>
+                                    Parent Location
+                                </label>
+                                <select
+                                    id="loc-parent"
+                                    name="parent_location_id"
+                                    defaultValue={location.parent?.id ? String(location.parent.id) : ''}
+                                    className={styles.input}
+                                    disabled={!editMode || disableAll}
+                                >
+                                    <option value="">— None —</option>
+                                    {parentOptions.map(opt => (
+                                        <option key={String(opt.id)} value={String(opt.id)}>
+                                            {opt.title ?? opt.content ?? `#${opt.id}`}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {updateError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(updateError)}
+                                </p>
+                            )}
+
+                            <div className={styles.actions}>
+                                {!editMode ? (
+                                    <button
+                                        type="button"
+                                        className={styles.primaryBtn}
+                                        onClick={handleEdit}
+                                        disabled={disableAll}
+                                    >
+                                        Edit
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className={styles.primaryBtn}
+                                            onClick={handleSave}
+                                            disabled={updateLoading}
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={styles.ghostBtn}
+                                            onClick={handleCancel}
+                                            disabled={updateLoading}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </form>
+                    </section>
+
+                    <section className={styles.card} aria-label="Location placements">
+                        <h2 className={styles.subTitle}>Placements</h2>
+
+                        {placementsLoading && (
+                            <p aria-live="polite" className={styles.muted}>
+                                Loading...
+                            </p>
+                        )}
+
+                        {!placementsLoading && placementsError && (
+                            <p role="alert" className={styles.error}>
+                                {String(placementsError)}
+                            </p>
+                        )}
+
+                        {!placementsLoading && !placementsError && (
+                            <>
+                                {placements.length > 0 ? (
+                                    <List items={placements} />
+                                ) : (
+                                    <p className={styles.muted}>No placements yet.</p>
+                                )}
+                            </>
+                        )}
+                    </section>
+                </>
+            )}
         </main>
     );
 }
