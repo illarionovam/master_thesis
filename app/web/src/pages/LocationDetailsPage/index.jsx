@@ -29,7 +29,6 @@ import {
     selectGetLocationPossiblePlacementsError,
     selectDeleteLocationLoading,
     selectDeleteLocationError,
-    selectDeleteLocationSuccess,
 } from '../../redux/locations/selectors';
 
 import styles from './LocationDetailsPage.module.css';
@@ -58,7 +57,6 @@ export default function LocationDetailsPage() {
 
     const deleteLoading = useSelector(selectDeleteLocationLoading);
     const deleteError = useSelector(selectDeleteLocationError);
-    const deleteSuccess = useSelector(selectDeleteLocationSuccess);
 
     const [addOpen, setAddOpen] = useState(false);
     const [selectedWorkId, setSelectedWorkId] = useState('');
@@ -356,7 +354,7 @@ export default function LocationDetailsPage() {
 
                                 {possibleLoading && (
                                     <p className={styles.muted} aria-live="polite">
-                                        Loading works…
+                                        Loading works...
                                     </p>
                                 )}
                                 {!possibleLoading && possibleError && (
