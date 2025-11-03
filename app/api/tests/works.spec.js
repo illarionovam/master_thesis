@@ -329,13 +329,19 @@ describe('Works API', () => {
         expect(resUpdate.body).toHaveProperty('id', eventId);
         expect(resUpdate.body).toHaveProperty('location_in_work_id', locationInWork.id);
 
+        const resGet2 = await http.get(`${base}/${work.id}/location-links/${locationInWork.id}/events`);
+
+        expect(resGet2.status).toBe(200);
+        expect(Array.isArray(resGet2.body)).toBe(true);
+        expect(resGet2.body[0]).toHaveProperty('id', eventId);
+
         const resDelete = await http.delete(`${base}/${work.id}/events/${eventId}`);
 
         expect(resDelete.status).toBe(204);
 
-        const resGet2 = await http.get(`${base}/${work.id}/events/${eventId}`);
+        const resGet3 = await http.get(`${base}/${work.id}/events/${eventId}`);
 
-        expect(resGet2.status).toBe(403);
+        expect(resGet3.status).toBe(403);
     });
 
     test('create / get / delete event participants', async () => {

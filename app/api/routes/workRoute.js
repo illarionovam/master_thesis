@@ -114,6 +114,11 @@ workRoute.get(
     controllerWrapper(validateWorkId()),
     controllerWrapper(locationInWorkController.getLocationInWork)
 );
+workRoute.get(
+    '/:id/location-links/:locationInWorkId/events',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(eventController.getEventsByWorkIdAndLocationInWorkId)
+);
 workRoute.patch(
     '/:id/location-links/:locationInWorkId',
     controllerWrapper(validateWorkId()),

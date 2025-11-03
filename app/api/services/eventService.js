@@ -45,6 +45,15 @@ const getEventsByWorkId = async (workId, { transaction } = {}) => {
     });
 };
 
+const getEventsByWorkIdAndLocationInWorkId = async (workId, locationInWorkId, { transaction } = {}) => {
+    return Event.findAll({
+        where: { work_id: workId, location_in_work_id: locationInWorkId },
+        include: baseInclude,
+        transaction,
+        subQuery: false,
+    });
+};
+
 const updateEvent = async (event, payload, { transaction } = {}) => {
     event.set(payload);
     return event.save({ transaction });
@@ -58,6 +67,7 @@ export default {
     createEvent,
     getEvent,
     getEventsByWorkId,
+    getEventsByWorkIdAndLocationInWorkId,
     updateEvent,
     destroyEvent,
 };
