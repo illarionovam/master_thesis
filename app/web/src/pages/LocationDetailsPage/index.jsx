@@ -274,7 +274,7 @@ export default function LocationDetailsPage() {
                                             onClick={handleDelete}
                                             disabled={disableAll}
                                         >
-                                            {deleteLoading ? 'Deleting…' : 'Delete'}
+                                            {deleteLoading ? 'Deleting...' : 'Delete'}
                                         </button>
                                     </>
                                 ) : (

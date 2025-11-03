@@ -137,7 +137,7 @@ export default function SignUpPage() {
 
                     <div className={styles.actions}>
                         <button type="submit" disabled={loading} className={styles.primaryBtn}>
-                            {loading ? 'Loading…' : 'Sign Up'}
+                            {loading ? 'Loading...' : 'Sign Up'}
                         </button>
                         <button
                             type="button"

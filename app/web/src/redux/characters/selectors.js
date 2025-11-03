@@ -29,7 +29,7 @@ export const selectGetCharacterAppearancesError = state => state.characters.getC
 export const selectCharacterAppearancesRaw = state => state.characters.getCharacterAppearances.appearances ?? [];
 
 export const selectCharacterAppearances = createSelector(selectCharacterAppearancesRaw, list =>
-    list.map(({ id, work_id, work }) => ({ id, content: work.title, work_id, to: `/works/${work_id}/cast/${id}` }))
+    list.map(item => ({ ...item, content: item.work.title, to: `/works/${item.work_id}/cast/${item.id}` }))
 );
 
 export const selectGetCharacterPossibleAppearancesLoading = state =>
@@ -41,5 +41,5 @@ export const selectCharacterPossibleAppearancesRaw = state =>
     state.characters.getCharacterPossibleAppearances.possibleAppearances ?? [];
 
 export const selectCharacterPossibleAppearances = createSelector(selectCharacterPossibleAppearancesRaw, list =>
-    list.map(({ id, title }) => ({ id, content: title, to: `/works/${id}` }))
+    list.map(item => ({ ...item, content: item.title, to: `/works/${item.id}` }))
 );

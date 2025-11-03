@@ -114,7 +114,7 @@ export default function UserDetailPage() {
 
                 {loading && (
                     <p className={styles.muted} aria-live="polite">
-                        Loading…
+                        Loading...
                     </p>
                 )}
                 {error && (

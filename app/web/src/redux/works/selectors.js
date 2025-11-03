@@ -5,7 +5,7 @@ export const selectGetWorksError = state => state.works.getWorks.error;
 
 export const selectWorksRaw = state => state.works.works ?? [];
 export const selectWorks = createSelector(selectWorksRaw, list =>
-    list.map(({ id, title }) => ({ id, content: title, to: `/works/${id}` }))
+    list.map(item => ({ ...item, content: item.title, to: `/works/${item.id}` }))
 );
 
 export const selectWork = state => state.works.work;
@@ -31,11 +31,10 @@ export const selectGetWorkCastLoading = state => state.works.getWorkCast.loading
 export const selectGetWorkCastError = state => state.works.getWorkCast.error;
 export const selectWorkCastRaw = state => state.works.getWorkCast.cast ?? [];
 export const selectWorkCast = createSelector(selectWorkCastRaw, list =>
-    list.map(({ id, works_id, character_id, character }) => ({
-        id,
-        content: character.name,
-        character_id,
-        to: `/works/${works_id}/cast/${id}`,
+    list.map(item => ({
+        ...item,
+        content: item.character.name,
+        to: `/works/${item.work_id}/cast/${item.id}`,
     }))
 );
 
@@ -43,7 +42,7 @@ export const selectGetWorkPossibleCastLoading = state => state.works.getWorkPoss
 export const selectGetWorkPossibleCastError = state => state.works.getWorkPossibleCast.error;
 export const selectWorkPossibleCastRaw = state => state.works.getWorkPossibleCast.possibleCast ?? [];
 export const selectWorkPossibleCast = createSelector(selectWorkPossibleCastRaw, list =>
-    list.map(({ id, name }) => ({ id, content: name, to: `/characters/${id}` }))
+    list.map(item => ({ ...item, content: item.name, to: `/characters/${item.id}` }))
 );
 
 export const selectGetCharacterInWorkLoading = state => state.works.getCharacterInWork.loading;
@@ -64,10 +63,10 @@ export const selectCharacterInWorkRelationshipsRaw = state =>
     state.works.getCharacterInWorkRelationships.relationships ?? [];
 
 export const selectCharacterInWorkRelationships = createSelector(selectCharacterInWorkRelationshipsRaw, list =>
-    list.map(({ id, work_id, from_character_in_work_id, to }) => ({
-        id,
-        content: to.name,
-        to: `/works/${work_id}/cast/${from_character_in_work_id}/relationships/${id}`,
+    list.map(item => ({
+        ...item,
+        content: item.to.name,
+        to: `/works/${item.work_id}/cast/${item.from_character_in_work_id}/relationships/${item.id}`,
     }))
 );
 
@@ -81,8 +80,7 @@ export const selectCharacterInWorkPossibleRelationshipsRaw = state =>
 
 export const selectCharacterInWorkPossibleRelationships = createSelector(
     selectCharacterInWorkPossibleRelationshipsRaw,
-    list =>
-        list.map(({ id, work_id, character }) => ({ id, content: character.name, to: `/works/${work_id}/cast/${id}` }))
+    list => list.map(item => ({ ...item, content: item.character.name, to: `/works/${item.work_id}/cast/${item.id}` }))
 );
 
 export const selectCreateRelationshipLoading = state => state.works.createRelationship.loading;
@@ -102,11 +100,10 @@ export const selectGetWorkLocationLinksLoading = state => state.works.getWorkLoc
 export const selectGetWorkLocationLinksError = state => state.works.getWorkLocationLinks.error;
 export const selectWorkLocationLinksRaw = state => state.works.getWorkLocationLinks.locationLinks ?? [];
 export const selectWorkLocationLinks = createSelector(selectWorkLocationLinksRaw, list =>
-    list.map(({ id, work_id, location_id, location }) => ({
-        id,
-        content: location.title,
-        location_id,
-        to: `/works/${work_id}/location-links/${id}`,
+    list.map(item => ({
+        ...item,
+        content: item.location.title,
+        to: `/works/${item.work_id}/location-links/${item.id}`,
     }))
 );
 
@@ -115,7 +112,7 @@ export const selectGetWorkPossibleLocationLinksError = state => state.works.getW
 export const selectWorkPossibleLocationLinksRaw = state =>
     state.works.getWorkPossibleLocationLinks.possibleLocationLinks ?? [];
 export const selectWorkPossibleLocationLinks = createSelector(selectWorkPossibleLocationLinksRaw, list =>
-    list.map(({ id, title }) => ({ id, content: title, to: `/locations/${id}` }))
+    list.map(item => ({ ...item, content: item.title, to: `/locations/${item.id}` }))
 );
 
 export const selectLinkWorkLocationLoading = state => state.works.linkWorkLocation.loading;
@@ -152,7 +149,7 @@ export const selectGetEventParticipantsLoading = state => state.works.getEventPa
 export const selectGetEventParticipantsError = state => state.works.getEventParticipants.error;
 export const selectEventParticipantsRaw = state => state.works.getEventParticipants.participants ?? [];
 export const selectEventParticipants = createSelector(selectEventParticipantsRaw, list =>
-    list.map(({ id, character }) => ({ id, content: character.name }))
+    list.map(item => ({ ...item, content: item.character.name }))
 );
 
 export const selectGetEventPossibleParticipantsLoading = state => state.works.getEventPossibleParticipants.loading;
@@ -160,7 +157,7 @@ export const selectGetEventPossibleParticipantsError = state => state.works.getE
 export const selectEventPossibleParticipantsRaw = state =>
     state.works.getEventPossibleParticipants.possibleParticipants ?? [];
 export const selectEventPossibleParticipants = createSelector(selectEventPossibleParticipantsRaw, list =>
-    list.map(({ id, character }) => ({ id, content: character.name }))
+    list.map(item => ({ ...item, content: item.character.name }))
 );
 
 export const selectLinkEventParticipantLoading = state => state.works.linkEventParticipant.loading;

@@ -77,7 +77,7 @@ export default function SignInPage() {
 
                     <div className={styles.actions}>
                         <button type="submit" disabled={loading} className={styles.primaryBtn}>
-                            {loading ? 'Loading…' : 'Sign In'}
+                            {loading ? 'Loading...' : 'Sign In'}
                         </button>
                         <button
                             type="button"
