@@ -286,7 +286,7 @@ export default function CharacterDetailsPage() {
                                                     aria-label={`Remove tag ${k}`}
                                                     title="Remove"
                                                 >
-                                                    ×
+                                                    x
                                                 </button>
                                             )}
                                         </span>

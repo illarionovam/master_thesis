@@ -28,7 +28,7 @@ const getLocationInWork = async (req, res) => {
 const updateLocationInWork = async (req, res) => {
     const { locationInWorkId } = req.params;
 
-    const locationInWork = await characterInWorkService.getCharacterInWork(locationInWorkId);
+    const locationInWork = await locationInWorkService.getLocationInWork(locationInWorkId);
 
     if (locationInWork == null || locationInWork.work_id !== req.work.id) {
         throw createHttpError(403, 'Forbidden');
