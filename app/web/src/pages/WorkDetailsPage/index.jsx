@@ -391,7 +391,6 @@ export default function WorkDetailsPage() {
                                         items={cast}
                                         onRemove={({ id: characterInWorkId, work_id: workId }) => {
                                             if (removingCastId) return;
-                                            console.log(characterInWorkId, workId);
                                             handleRemoveCast(workId, characterInWorkId);
                                         }}
                                     />

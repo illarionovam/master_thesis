@@ -361,7 +361,6 @@ const worksSlice = createSlice({
                 state.getLocationInWork.error = null;
             })
             .addCase(getLocationInWork.fulfilled, (state, action) => {
-                console.log(action.payload);
                 state.getLocationInWork.loading = false;
                 state.locationInWork = action.payload;
             })
