@@ -130,7 +130,17 @@ export const selectDeleteLocationInWorkSuccess = state => state.works.deleteLoca
 
 export const selectGetEventsLoading = state => state.works.getEvents.loading;
 export const selectGetEventsError = state => state.works.getEvents.error;
-export const selectEventsId = state => state.works.getEvents.events ?? [];
+export const selectEventsRaw = state => state.works.getEvents.events ?? [];
+export const selectEvents = createSelector(selectEventsRaw, list =>
+    list.map(item => ({ ...item, content: item.description }))
+);
+
+export const selectGetEventsByLocationInWorkIdLoading = state => state.works.getEventsByLocationInWorkId.loading;
+export const selectGetEventsByLocationInWorkIdError = state => state.works.getEventsByLocationInWorkId.error;
+export const selectGetEventsByLocationInWorkIdRaw = state => state.works.getEventsByLocationInWorkId.events ?? [];
+export const selectGetEventsByLocationInWorkId = createSelector(selectGetEventsByLocationInWorkIdRaw, list =>
+    list.map(item => ({ ...item, content: item.description }))
+);
 
 export const selectCreateEventLoading = state => state.works.createEvent.loading;
 export const selectCreateEventError = state => state.works.createEvent.error;

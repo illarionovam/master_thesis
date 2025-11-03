@@ -25,6 +25,7 @@ import {
     updateAppUserLocationInWork,
     destroyAppUserLocationInWork,
     getAppUserEvents,
+    getAppUserEventsByLocationInWorkId,
     createAppUserEvent,
     getAppUserEvent,
     updateAppUserEvent,
@@ -157,6 +158,12 @@ export const deleteLocationInWork = createAsyncThunk(
 
 export const getEvents = createAsyncThunk('works/getEvents', async (workId, { rejectWithValue }) =>
     wrapper(getAppUserEvents, rejectWithValue)(workId)
+);
+
+export const getEventsByLocationInWorkId = createAsyncThunk(
+    'works/getEventsByLocationInWorkId',
+    async ({ workId, locationInWorkId }, { rejectWithValue }) =>
+        wrapper(getAppUserEventsByLocationInWorkId, rejectWithValue)(workId, locationInWorkId)
 );
 
 export const createEvent = createAsyncThunk('works/createEvent', async ({ workId, data }, { rejectWithValue }) =>

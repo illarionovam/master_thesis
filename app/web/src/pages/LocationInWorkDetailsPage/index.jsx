@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
 
 import Title from '../../components/Title';
+import List from '../../components/List';
 import styles from './LocationInWorkDetailsPage.module.css';
 
-import { getLocationInWork, updateLocationInWork } from '../../redux/works/operations';
+import { getLocationInWork, updateLocationInWork, getEventsByLocationInWorkId } from '../../redux/works/operations';
 
 import {
     selectLocationInWork,
@@ -13,6 +14,9 @@ import {
     selectGetLocationInWorkError,
     selectUpdateLocationInWorkLoading,
     selectUpdateLocationInWorkError,
+    selectGetEventsByLocationInWorkIdLoading,
+    selectGetEventsByLocationInWorkIdError,
+    selectGetEventsByLocationInWorkId,
 } from '../../redux/works/selectors';
 
 export default function LocationInWorkDetailsPage() {
@@ -27,6 +31,10 @@ export default function LocationInWorkDetailsPage() {
     const updateLoading = useSelector(selectUpdateLocationInWorkLoading);
     const updateError = useSelector(selectUpdateLocationInWorkError);
 
+    const eventsLoading = useSelector(selectGetEventsByLocationInWorkIdLoading);
+    const eventsError = useSelector(selectGetEventsByLocationInWorkIdError);
+    const events = useSelector(selectGetEventsByLocationInWorkId) || [];
+
     const [editMode, setEditMode] = useState(false);
     const [attrs, setAttrs] = useState({});
     const [addTagOpen, setAddTagOpen] = useState(false);
@@ -36,6 +44,11 @@ export default function LocationInWorkDetailsPage() {
     useEffect(() => {
         if (!locationInWorkId) return;
         dispatch(getLocationInWork({ workId: id, locationInWorkId }));
+    }, [dispatch, id, locationInWorkId]);
+
+    useEffect(() => {
+        if (!locationInWorkId) return;
+        dispatch(getEventsByLocationInWorkId({ workId: id, locationInWorkId }));
     }, [dispatch, id, locationInWorkId]);
 
     useEffect(() => {
@@ -232,6 +245,29 @@ export default function LocationInWorkDetailsPage() {
                                 )}
                             </div>
                         </form>
+                    </section>
+
+                    <section className={styles.card} aria-label="Used in events">
+                        <h2 className={styles.subTitle}>Used in events</h2>
+
+                        {eventsLoading && (
+                            <p aria-live="polite" className={styles.muted}>
+                                Loading...
+                            </p>
+                        )}
+                        {!eventsLoading && eventsError && (
+                            <p role="alert" className={styles.error}>
+                                {String(eventsError)}
+                            </p>
+                        )}
+
+                        {!eventsLoading &&
+                            !eventsError &&
+                            (events.length > 0 ? (
+                                <List items={events} />
+                            ) : (
+                                <p className={styles.muted}>No events yet.</p>
+                            ))}
                     </section>
 
                     {addTagOpen && (
