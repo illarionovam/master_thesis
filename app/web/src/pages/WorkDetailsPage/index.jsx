@@ -7,7 +7,6 @@ import List from '../../components/List';
 
 import {
     getWork,
-    getWorks,
     updateWork,
     deleteWork,
     getWorkCast,
@@ -18,6 +17,8 @@ import {
     getWorkPossibleLocationLinks,
     linkWorkLocation,
     deleteLocationInWork,
+    getEvents,
+    createEvent,
 } from '../../redux/works/operations';
 
 import {
@@ -40,9 +41,14 @@ import {
     selectWorkPossibleLocationLinks,
     selectGetWorkPossibleLocationLinksLoading,
     selectGetWorkPossibleLocationLinksError,
+    selectGetEventsLoading,
+    selectGetEventsError,
+    selectEvents,
 } from '../../redux/works/selectors';
 
 import styles from './WorkDetailsPage.module.css';
+
+import CreateEventModal from '../../components/CreateEventModal';
 
 export default function WorkDetailsPage() {
     const { id } = useParams();
@@ -75,6 +81,10 @@ export default function WorkDetailsPage() {
     const possibleLocLinksLoading = useSelector(selectGetWorkPossibleLocationLinksLoading);
     const possibleLocLinksError = useSelector(selectGetWorkPossibleLocationLinksError);
 
+    const events = useSelector(selectEvents) || [];
+    const eventsLoading = useSelector(selectGetEventsLoading);
+    const eventsError = useSelector(selectGetEventsError);
+
     const [editMode, setEditMode] = useState(false);
     const formRef = useRef(null);
 
@@ -89,12 +99,15 @@ export default function WorkDetailsPage() {
     const [removingCastId, setRemovingCastId] = useState(null);
     const [removingLocId, setRemovingLocId] = useState(null);
 
+    const [eventModalOpen, setEventModalOpen] = useState(false);
+    const [creatingEvent, setCreatingEvent] = useState(false);
+
     useEffect(() => {
         if (!id) return;
         dispatch(getWork(id));
         dispatch(getWorkCast(id));
         dispatch(getWorkLocationLinks(id));
-        dispatch(getWorks());
+        dispatch(getEvents(id));
     }, [dispatch, id]);
 
     useEffect(() => {
@@ -221,6 +234,26 @@ export default function WorkDetailsPage() {
             }
         } finally {
             setRemovingLocId(null);
+        }
+    };
+
+    const openEventModal = () => setEventModalOpen(true);
+    const closeEventModal = () => {
+        if (creatingEvent) return;
+        setEventModalOpen(false);
+    };
+
+    const handleCreateEvent = async payload => {
+        if (!id) return;
+        try {
+            setCreatingEvent(true);
+            const action = await dispatch(createEvent({ workId: id, data: payload }));
+            if (createEvent.fulfilled.match(action)) {
+                setEventModalOpen(false);
+                dispatch(getEvents(id));
+            }
+        } finally {
+            setCreatingEvent(false);
         }
     };
 
@@ -572,6 +605,52 @@ export default function WorkDetailsPage() {
                                 </div>
                             </form>
                         </dialog>
+                    )}
+
+                    <section className={styles.card} aria-label="Events">
+                        <div className={styles.subHeader}>
+                            <h2 className={styles.subTitle}>Events</h2>
+                            <button
+                                type="button"
+                                className={styles.primaryBtn}
+                                onClick={openEventModal}
+                                disabled={eventsLoading}
+                                aria-label="Add event"
+                                title="Add event"
+                            >
+                                Add event
+                            </button>
+                        </div>
+
+                        {eventsLoading && (
+                            <p aria-live="polite" className={styles.muted}>
+                                Loading...
+                            </p>
+                        )}
+                        {!eventsLoading && eventsError && (
+                            <p role="alert" className={styles.error}>
+                                {String(eventsError)}
+                            </p>
+                        )}
+
+                        {!eventsLoading &&
+                            !eventsError &&
+                            (events.length > 0 ? (
+                                <List items={events} />
+                            ) : (
+                                <p className={styles.muted}>No events yet.</p>
+                            ))}
+                    </section>
+
+                    {eventModalOpen && (
+                        <CreateEventModal
+                            open={eventModalOpen}
+                            onClose={closeEventModal}
+                            onSubmit={handleCreateEvent}
+                            submitting={creatingEvent}
+                            error={null}
+                            locationOptions={locationLinks}
+                        />
                     )}
                 </>
             )}

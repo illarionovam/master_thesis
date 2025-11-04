@@ -79,6 +79,7 @@ export const linkLocationToWork = async (location_id, work_id, attrs = {}) => {
 
 export const createEvent = async (work_id, attrs = {}) => {
     return Event.create({
+        title: attrs.title ?? 'Scouting at dawn',
         work_id,
         location_in_work_id: attrs.location_in_work_id ?? null,
         description: attrs.description ?? 'Scouting at dawn',

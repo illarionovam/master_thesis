@@ -306,7 +306,9 @@ describe('Works API', () => {
 
         const work = await createWork(user.id);
 
-        const resCreate = await http.post(`${base}/${work.id}/events`).send({ description: 'Scouting at dawn' });
+        const resCreate = await http
+            .post(`${base}/${work.id}/events`)
+            .send({ title: 'Scouting at dawn', description: 'Scouting at dawn' });
 
         expect(resCreate.status).toBe(201);
         expect(resCreate.body).toHaveProperty('id');
@@ -328,6 +330,12 @@ describe('Works API', () => {
         expect(resUpdate.status).toBe(200);
         expect(resUpdate.body).toHaveProperty('id', eventId);
         expect(resUpdate.body).toHaveProperty('location_in_work_id', locationInWork.id);
+
+        const resUpdate2 = await http.patch(`${base}/${work.id}/events/${eventId}`).send({ order_in_work: 2 });
+
+        expect(resUpdate2.status).toBe(200);
+        expect(resUpdate2.body).toHaveProperty('id', eventId);
+        expect(resUpdate2.body).toHaveProperty('order_in_work', 2);
 
         const resGet2 = await http.get(`${base}/${work.id}/location-links/${locationInWork.id}/events`);
 

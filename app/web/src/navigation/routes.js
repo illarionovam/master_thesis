@@ -12,6 +12,7 @@ export const ROUTES = {
     LOCATION_DETAILS_PAGE: '/locations/:id',
     WORK_DETAILS_PAGE: '/works/:id',
     LOCATION_IN_WORK_DETAILS_PAGE: '/works/:id/location-links/:locationInWorkId',
+    EVENT_DETAILS_PAGE: '/works/:id/events/:eventId',
     NOT_FOUND_PAGE: '*',
 };
 
