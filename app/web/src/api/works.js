@@ -66,6 +66,9 @@ export const getAppUserEvents = async workId => await axiosInstance.get(`/works/
 export const getAppUserEventsByLocationInWorkId = async (workId, locationInWorkId) =>
     await axiosInstance.get(`/works/${workId}/location-links/${locationInWorkId}/events`);
 
+export const reorderAppUserEvents = async (workId, payload) =>
+    await axiosInstance.post(`/works/${workId}/events/reorder`, payload);
+
 export const createAppUserEvent = async (workId, payload) =>
     await axiosInstance.post(`/works/${workId}/events`, payload);
 

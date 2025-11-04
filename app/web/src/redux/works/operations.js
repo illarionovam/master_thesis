@@ -27,6 +27,7 @@ import {
     getAppUserEvents,
     getAppUserEventsByLocationInWorkId,
     createAppUserEvent,
+    reorderAppUserEvents,
     getAppUserEvent,
     updateAppUserEvent,
     destroyAppUserEvent,
@@ -164,6 +165,11 @@ export const getEventsByLocationInWorkId = createAsyncThunk(
     'works/getEventsByLocationInWorkId',
     async ({ workId, locationInWorkId }, { rejectWithValue }) =>
         wrapper(getAppUserEventsByLocationInWorkId, rejectWithValue)(workId, locationInWorkId)
+);
+
+export const reorderEvents = createAsyncThunk(
+    'works/reorderAppUserEvents',
+    async ({ workId, data }, { rejectWithValue }) => wrapper(reorderAppUserEvents, rejectWithValue)(workId, data)
 );
 
 export const createEvent = createAsyncThunk('works/createEvent', async ({ workId, data }, { rejectWithValue }) =>

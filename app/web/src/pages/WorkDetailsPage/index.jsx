@@ -19,7 +19,7 @@ import {
     deleteLocationInWork,
     getEvents,
     createEvent,
-    updateEvent,
+    reorderEvents,
 } from '../../redux/works/operations';
 
 import {
@@ -281,17 +281,16 @@ export default function WorkDetailsPage() {
         if (!id) return;
         try {
             setSavingReorder(true);
-            const updates = [];
-            localEvents.forEach((ev, idx) => {
-                const newOrder = idx + 1;
-                if (ev.order_in_work !== newOrder) {
-                    updates.push(
-                        dispatch(updateEvent({ workId: id, eventId: ev.id, data: { order_in_work: newOrder } }))
-                    );
-                }
-            });
-            if (updates.length) await Promise.all(updates);
+            const payload = {
+                data: localEvents.map((ev, idx) => ({
+                    id: ev.id,
+                    order_in_work: idx + 1,
+                })),
+            };
+
+            await dispatch(reorderEvents({ workId: id, data: payload })).unwrap();
             await dispatch(getEvents(id));
+
             setReorderMode(false);
         } finally {
             setSavingReorder(false);

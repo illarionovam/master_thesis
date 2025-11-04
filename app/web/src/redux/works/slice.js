@@ -29,6 +29,7 @@ import {
     getEvent,
     updateEvent,
     deleteEvent,
+    reorderEvents,
     getEventParticipants,
     getEventPossibleParticipants,
     linkEventParticipant,
@@ -77,6 +78,7 @@ const initialState = {
     getEvent: { ...op },
     updateEvent: { ...op },
     deleteEvent: { ...op, success: false },
+    reorderEvents: { ...op, success: false },
 
     getEventParticipants: { ...op, participants: [] },
     getEventPossibleParticipants: { ...op, possibleParticipants: [] },
@@ -475,6 +477,20 @@ const worksSlice = createSlice({
             .addCase(deleteEvent.rejected, (state, action) => {
                 state.deleteEvent.loading = false;
                 state.deleteEvent.error = action.payload;
+            });
+        builder
+            .addCase(reorderEvents.pending, state => {
+                state.reorderEvents.loading = true;
+                state.reorderEvents.error = null;
+                state.reorderEvents.success = false;
+            })
+            .addCase(reorderEvents.fulfilled, state => {
+                state.reorderEvents.loading = false;
+                state.reorderEvents.success = true;
+            })
+            .addCase(reorderEvents.rejected, (state, action) => {
+                state.reorderEvents.loading = false;
+                state.reorderEvents.error = action.payload;
             });
         builder
             .addCase(getEventParticipants.pending, state => {

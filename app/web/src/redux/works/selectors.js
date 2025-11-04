@@ -155,6 +155,10 @@ export const selectDeleteEventLoading = state => state.works.deleteEvent.loading
 export const selectDeleteEventError = state => state.works.deleteEvent.error;
 export const selectDeleteEventSuccess = state => state.works.deleteEvent.success;
 
+export const selectReorderEventsLoading = state => state.works.reorderEvents.loading;
+export const selectReorderEventsError = state => state.works.reorderEvents.error;
+export const selectReorderEventsSuccess = state => state.works.reorderEvents.success;
+
 export const selectGetEventParticipantsLoading = state => state.works.getEventParticipants.loading;
 export const selectGetEventParticipantsError = state => state.works.getEventParticipants.error;
 export const selectEventParticipantsRaw = state => state.works.getEventParticipants.participants ?? [];
