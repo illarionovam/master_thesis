@@ -42,6 +42,7 @@ const getEventsByWorkId = async (workId, { transaction } = {}) => {
         include: baseInclude,
         transaction,
         subQuery: false,
+        order: [['order_in_work', 'ASC']],
     });
 };
 
@@ -51,6 +52,7 @@ const getEventsByWorkIdAndLocationInWorkId = async (workId, locationInWorkId, { 
         include: baseInclude,
         transaction,
         subQuery: false,
+        order: [['order_in_work', 'ASC']],
     });
 };
 

@@ -132,14 +132,14 @@ export const selectGetEventsLoading = state => state.works.getEvents.loading;
 export const selectGetEventsError = state => state.works.getEvents.error;
 export const selectEventsRaw = state => state.works.getEvents.events ?? [];
 export const selectEvents = createSelector(selectEventsRaw, list =>
-    list.map(item => ({ ...item, content: item.description, to: `/works/${item.work_id}/events/${item.id}` }))
+    list.map(item => ({ ...item, content: item.title, to: `/works/${item.work_id}/events/${item.id}` }))
 );
 
 export const selectGetEventsByLocationInWorkIdLoading = state => state.works.getEventsByLocationInWorkId.loading;
 export const selectGetEventsByLocationInWorkIdError = state => state.works.getEventsByLocationInWorkId.error;
 export const selectGetEventsByLocationInWorkIdRaw = state => state.works.getEventsByLocationInWorkId.events ?? [];
 export const selectGetEventsByLocationInWorkId = createSelector(selectGetEventsByLocationInWorkIdRaw, list =>
-    list.map(item => ({ ...item, content: item.description, to: `/works/${item.work_id}/events/${item.id}` }))
+    list.map(item => ({ ...item, content: item.title, to: `/works/${item.work_id}/events/${item.id}` }))
 );
 
 export const selectCreateEventLoading = state => state.works.createEvent.loading;

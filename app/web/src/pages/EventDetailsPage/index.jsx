@@ -76,7 +76,6 @@ export default function EventDetailsPage() {
         if (!id || !eventId) return;
         dispatch(getEvent({ workId: id, eventId }));
         dispatch(getEventParticipants({ workId: id, eventId }));
-        // ↓ підтягнемо лінки локацій для селекта
         dispatch(getWorkLocationLinks(id));
     }, [dispatch, id, eventId]);
 
@@ -93,6 +92,7 @@ export default function EventDetailsPage() {
     const handleCancel = () => {
         setEditMode(false);
         if (!formRef.current || !event) return;
+        formRef.current.title.value = event.title ?? '';
         formRef.current.description.value = event.description ?? '';
 
         if (formRef.current.location_in_work_id) {
@@ -108,12 +108,15 @@ export default function EventDetailsPage() {
     const handleSave = async () => {
         if (!formRef.current || !id || !eventId) return;
         const fd = new FormData(formRef.current);
+
+        const title = (fd.get('title') || '').toString().trim();
         const description = (fd.get('description') || '').toString().trim();
         const locRaw = (fd.get('location_in_work_id') || '').toString().trim();
 
-        if (!description) return;
+        if (!title || title.length > 100 || !description) return;
 
         const data = {
+            title,
             description,
             location_in_work_id: locRaw ? locRaw : null,
         };
@@ -175,7 +178,7 @@ export default function EventDetailsPage() {
     };
 
     const workTitle = event?.work?.title ?? '—';
-    const pageTitle = event?.description || '—';
+    const pageTitle = event?.title || '—';
 
     const defaultLocationInWorkId = event?.location_in_work_id;
 
@@ -224,6 +227,22 @@ export default function EventDetailsPage() {
                 <>
                     <section className={styles.card} aria-label="Event info">
                         <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                            <div className={styles.field}>
+                                <label htmlFor="ev-title" className={styles.label}>
+                                    Title
+                                </label>
+                                <input
+                                    id="ev-title"
+                                    name="title"
+                                    type="text"
+                                    defaultValue={event.title ?? ''}
+                                    className={styles.input}
+                                    disabled={!editMode || disableAll}
+                                    required
+                                    maxLength={100}
+                                />
+                            </div>
+
                             <div className={styles.field}>
                                 <label htmlFor="ev-desc" className={styles.label}>
                                     Description

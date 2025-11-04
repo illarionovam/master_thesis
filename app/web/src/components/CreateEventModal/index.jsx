@@ -11,6 +11,7 @@ export default function CreateEventModal({
 }) {
     const dialogRef = useRef(null);
 
+    const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [locationInWorkId, setLocationInWorkId] = useState('');
     const [formError, setFormError] = useState(null);
@@ -18,6 +19,7 @@ export default function CreateEventModal({
     useEffect(() => {
         if (open) {
             dialogRef.current?.showModal?.();
+            setTitle('');
             setDescription('');
             setLocationInWorkId('');
             setFormError(null);
@@ -26,17 +28,22 @@ export default function CreateEventModal({
         }
     }, [open]);
 
-    const isValid = useMemo(() => description.trim().length > 0, [description]);
+    const isValid = useMemo(
+        () => title.trim().length > 0 && title.trim().length <= 100 && description.trim().length > 0,
+        [title, description]
+    );
 
     const handleSubmit = e => {
         e.preventDefault();
         if (!isValid) {
-            setFormError('Description is required.');
-            return;
+            if (!title.trim()) return setFormError('Title is required.');
+            if (title.trim().length > 100) return setFormError('Title must be at most 100 characters.');
+            if (!description.trim()) return setFormError('Description is required.');
         }
         setFormError(null);
 
         const payload = {
+            title: title.trim(),
             description: description.trim(),
             location_in_work_id: locationInWorkId ? String(locationInWorkId) : null,
         };
@@ -50,6 +57,27 @@ export default function CreateEventModal({
                 <h2 id="create-event-title" className={styles.title}>
                     Create Event
                 </h2>
+
+                <div className={styles.field}>
+                    <label htmlFor="ev-title" className={styles.label}>
+                        Title *
+                    </label>
+                    <input
+                        id="ev-title"
+                        type="text"
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        placeholder="e.g., Caravan arrives"
+                        className={styles.input}
+                        disabled={submitting}
+                        required
+                        maxLength={100}
+                        aria-describedby="ev-title-hint"
+                    />
+                    <small id="ev-title-hint" className={styles.hint}>
+                        {Math.max(0, 100 - title.length)} characters left
+                    </small>
+                </div>
 
                 <div className={styles.field}>
                     <label htmlFor="ev-desc" className={styles.label}>
