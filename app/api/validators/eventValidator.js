@@ -74,6 +74,24 @@ const updateEventValidator = Joi.alternatives().try(updateOnlyOrder, updateConte
         'Provide either only order_in_work, or at least one of title, description, location_in_work_id (without order_in_work)',
 });
 
+export const reorderEventsValidator = Joi.object({
+    data: Joi.array()
+        .min(1)
+        .required()
+        .items(
+            Joi.object({
+                id: Joi.string()
+                    .trim()
+                    .guid({ version: ['uuidv4', 'uuidv1'] })
+                    .required(),
+                order_in_work: Joi.number().integer().min(1).required(),
+            })
+        )
+        .messages({
+            'array.min': 'data must contain at least one element',
+        }),
+}).prefs({ abortEarly: false, stripUnknown: true });
+
 const linkParticipantValidator = Joi.object({
     character_in_work_id: Joi.string()
         .trim()
@@ -87,4 +105,4 @@ const linkParticipantValidator = Joi.object({
         }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
-export default { createEventValidator, updateEventValidator, linkParticipantValidator };
+export default { createEventValidator, reorderEventsValidator, updateEventValidator, linkParticipantValidator };

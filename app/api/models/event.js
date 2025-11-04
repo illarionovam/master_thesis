@@ -47,11 +47,6 @@ export const Event = sequelize.define(
         indexes: [
             { name: 'idx_event_work_id', fields: ['work_id'] },
             { name: 'idx_event_location_in_work_id', fields: ['location_in_work_id'] },
-            {
-                name: 'ux_event_work_order_in_work',
-                unique: true,
-                fields: ['work_id', 'order_in_work'],
-            },
         ],
     }
 );

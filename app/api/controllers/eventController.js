@@ -29,6 +29,23 @@ const stripBulkEventParticipantResponse = eventParticipant => {
     };
 };
 
+const reorderEvents = async (req, res) => {
+    const events = await eventService.getEventsByWorkId(req.work.id);
+    const { data } = req.body;
+
+    const allowedIds = new Set(events.map(e => e.id));
+
+    for (const item of data) {
+        if (!allowedIds.has(item.id)) {
+            throw createHttpError(403, 'Forbidden');
+        }
+    }
+
+    await eventService.reorderEvents(data);
+
+    res.sendStatus(200);
+};
+
 const createEvent = async (req, res) => {
     const { location_in_work_id } = req.body;
 
@@ -191,6 +208,7 @@ const getEventPossibleParticipants = async (req, res) => {
 
 export default {
     stripBulkEventResponse,
+    reorderEvents,
     createEvent,
     getEvent,
     getEventsByWorkId,

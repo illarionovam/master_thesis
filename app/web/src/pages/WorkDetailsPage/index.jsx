@@ -19,6 +19,7 @@ import {
     deleteLocationInWork,
     getEvents,
     createEvent,
+    updateEvent,
 } from '../../redux/works/operations';
 
 import {
@@ -102,6 +103,11 @@ export default function WorkDetailsPage() {
     const [eventModalOpen, setEventModalOpen] = useState(false);
     const [creatingEvent, setCreatingEvent] = useState(false);
 
+    const [reorderMode, setReorderMode] = useState(false);
+    const [savingReorder, setSavingReorder] = useState(false);
+    const [localEvents, setLocalEvents] = useState([]);
+    const dragIndexRef = useRef(null);
+
     useEffect(() => {
         if (!id) return;
         dispatch(getWork(id));
@@ -117,6 +123,10 @@ export default function WorkDetailsPage() {
     useEffect(() => {
         if (locAddOpen && id) dispatch(getWorkPossibleLocationLinks(id));
     }, [locAddOpen, dispatch, id]);
+
+    useEffect(() => {
+        if (!reorderMode) setLocalEvents(events);
+    }, [events, reorderMode]);
 
     const disableAll = loading || updateLoading || deleteLoading;
 
@@ -255,6 +265,58 @@ export default function WorkDetailsPage() {
         } finally {
             setCreatingEvent(false);
         }
+    };
+
+    const handleStartReorder = () => {
+        setLocalEvents(events);
+        setReorderMode(true);
+    };
+
+    const handleCancelReorder = () => {
+        setLocalEvents(events);
+        setReorderMode(false);
+    };
+
+    const handleSaveReorder = async () => {
+        if (!id) return;
+        try {
+            setSavingReorder(true);
+            const updates = [];
+            localEvents.forEach((ev, idx) => {
+                const newOrder = idx + 1;
+                if (ev.order_in_work !== newOrder) {
+                    updates.push(
+                        dispatch(updateEvent({ workId: id, eventId: ev.id, data: { order_in_work: newOrder } }))
+                    );
+                }
+            });
+            if (updates.length) await Promise.all(updates);
+            await dispatch(getEvents(id));
+            setReorderMode(false);
+        } finally {
+            setSavingReorder(false);
+        }
+    };
+
+    const onDragStart = index => e => {
+        dragIndexRef.current = index;
+        e.dataTransfer.effectAllowed = 'move';
+    };
+    const onDragOver = overIndex => e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const from = dragIndexRef.current;
+        if (from === null || from === overIndex) return;
+        setLocalEvents(prev => {
+            const next = prev.slice();
+            const [moved] = next.splice(from, 1);
+            next.splice(overIndex, 0, moved);
+            dragIndexRef.current = overIndex;
+            return next;
+        });
+    };
+    const onDrop = () => {
+        dragIndexRef.current = null;
     };
 
     return (
@@ -610,16 +672,53 @@ export default function WorkDetailsPage() {
                     <section className={styles.card} aria-label="Events">
                         <div className={styles.subHeader}>
                             <h2 className={styles.subTitle}>Events</h2>
-                            <button
-                                type="button"
-                                className={styles.primaryBtn}
-                                onClick={openEventModal}
-                                disabled={eventsLoading}
-                                aria-label="Add event"
-                                title="Add event"
-                            >
-                                Add event
-                            </button>
+                            {!reorderMode ? (
+                                <div className={styles.actionsRow}>
+                                    <button
+                                        type="button"
+                                        className={styles.primaryBtn}
+                                        onClick={openEventModal}
+                                        disabled={eventsLoading}
+                                        aria-label="Add event"
+                                        title="Add event"
+                                    >
+                                        Add event
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={styles.ghostBtn}
+                                        onClick={handleStartReorder}
+                                        disabled={eventsLoading || events.length === 0}
+                                        aria-label="Reorder events"
+                                        title="Reorder events"
+                                    >
+                                        Reorder
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className={styles.actionsRow}>
+                                    <button
+                                        type="button"
+                                        className={styles.primaryBtn}
+                                        onClick={handleSaveReorder}
+                                        disabled={savingReorder}
+                                        aria-label="Save order"
+                                        title="Save order"
+                                    >
+                                        {savingReorder ? 'Saving...' : 'Save'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={styles.ghostBtn}
+                                        onClick={handleCancelReorder}
+                                        disabled={savingReorder}
+                                        aria-label="Cancel reorder"
+                                        title="Cancel reorder"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {eventsLoading && (
@@ -636,7 +735,31 @@ export default function WorkDetailsPage() {
                         {!eventsLoading &&
                             !eventsError &&
                             (events.length > 0 ? (
-                                <List items={events} />
+                                !reorderMode ? (
+                                    <List items={events} />
+                                ) : (
+                                    <ul className={styles.draggableList} role="list">
+                                        {localEvents.map((ev, idx) => (
+                                            <li
+                                                key={ev.id}
+                                                className={styles.draggableItem}
+                                                draggable
+                                                onDragStart={onDragStart(idx)}
+                                                onDragOver={onDragOver(idx)}
+                                                onDrop={onDrop}
+                                                aria-label={`Move ${ev.title ?? ev.description}`}
+                                                title="Drag to reorder"
+                                            >
+                                                <span className={styles.dragHandle} aria-hidden>
+                                                    ⋮⋮
+                                                </span>
+                                                <span className={styles.itemText}>
+                                                    {ev.content ?? ev.title ?? ev.description}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )
                             ) : (
                                 <p className={styles.muted}>No events yet.</p>
                             ))}

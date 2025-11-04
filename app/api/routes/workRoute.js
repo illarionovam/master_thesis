@@ -132,6 +132,13 @@ workRoute.delete(
 );
 workRoute.get('/:id/events', controllerWrapper(validateWorkId()), controllerWrapper(eventController.getEventsByWorkId));
 workRoute.post(
+    '/:id/events/reorder',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(validateBody(eventValidator.reorderEventsValidator)),
+    controllerWrapper(eventController.reorderEvents)
+);
+
+workRoute.post(
     '/:id/events',
     controllerWrapper(validateWorkId()),
     controllerWrapper(validateBody(eventValidator.createEventValidator)),

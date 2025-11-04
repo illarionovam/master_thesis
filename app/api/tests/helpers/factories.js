@@ -83,5 +83,6 @@ export const createEvent = async (work_id, attrs = {}) => {
         work_id,
         location_in_work_id: attrs.location_in_work_id ?? null,
         description: attrs.description ?? 'Scouting at dawn',
+        order_in_work: attrs.order_in_work ?? 1,
     });
 };

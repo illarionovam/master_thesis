@@ -301,6 +301,36 @@ describe('Works API', () => {
         expect(res2.body[0]).toHaveProperty('id', event.id);
     });
 
+    test('reorder events', async () => {
+        const { http, user } = await withAuth();
+
+        const work = await createWork(user.id);
+
+        const event1 = await createEvent(work.id, { order_in_work: 1 });
+        const event2 = await createEvent(work.id, { title: 'test2', order_in_work: 2 });
+
+        const res1 = await http.get(`${base}/${work.id}/events`);
+        expect(res1.status).toBe(200);
+        expect(Array.isArray(res1.body)).toBe(true);
+        expect(res1.body[0]).toHaveProperty('id', event1.id);
+        expect(res1.body[1]).toHaveProperty('id', event2.id);
+
+        const res2 = await http.post(`${base}/${work.id}/events/reorder`).send({
+            data: [
+                { id: event1.id, order_in_work: 2 },
+                { id: event2.id, order_in_work: 1 },
+            ],
+        });
+        console.log(res2.body);
+        expect(res2.status).toBe(200);
+
+        const res3 = await http.get(`${base}/${work.id}/events`);
+        expect(res3.status).toBe(200);
+        expect(Array.isArray(res3.body)).toBe(true);
+        expect(res3.body[0]).toHaveProperty('id', event2.id);
+        expect(res3.body[1]).toHaveProperty('id', event1.id);
+    });
+
     test('create / get / update / delete event', async () => {
         const { http, user } = await withAuth();
 

@@ -2,6 +2,7 @@ import { Event } from '../models/event.js';
 import { Work } from '../models/work.js';
 import { LocationInWork } from '../models/locationInWork.js';
 import { Location } from '../models/location.js';
+import { sequelize } from '../db/db.js';
 
 const baseInclude = [
     {
@@ -22,6 +23,16 @@ const baseInclude = [
         ],
     },
 ];
+
+const reorderEvents = async (data, { transaction } = {}) => {
+    const valuesSql = data.map((_, i) => `($${i * 2 + 1}::uuid, $${i * 2 + 2}::int)`).join(', ');
+    const binds = data.flatMap(({ id, order_in_work }) => [id, order_in_work]);
+
+    await sequelize.query(
+        `WITH vals(id, order_in_work) AS (VALUES ${valuesSql}) UPDATE event AS e SET order_in_work = vals.order_in_work FROM vals WHERE e.id = vals.id`,
+        { bind: binds, transaction }
+    );
+};
 
 const createEvent = async (payload, { transaction } = {}) => {
     return Event.create(payload, { transaction });
@@ -66,6 +77,7 @@ const destroyEvent = async (event, { transaction } = {}) => {
 };
 
 export default {
+    reorderEvents,
     createEvent,
     getEvent,
     getEventsByWorkId,
