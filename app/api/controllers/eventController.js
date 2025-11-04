@@ -14,7 +14,7 @@ const stripBulkEventResponse = event => {
         work_id: event.work_id,
         location_in_work_id: event.location_in_work_id,
         title: event.title,
-        order: event.order,
+        order_in_work: event.order_in_work,
         work: workController.stripBulkWorkResponse(event.work),
         location: event.locationLink ? locationController.stripBulkLocationResponse(event.locationLink.location) : null,
     };
