@@ -25,12 +25,20 @@ const baseInclude = [
 ];
 
 const reorderEvents = async (data, { transaction } = {}) => {
-    const valuesSql = data.map((_, i) => `($${i * 2 + 1}::uuid, $${i * 2 + 2}::int)`).join(', ');
-    const binds = data.flatMap(({ id, order_in_work }) => [id, order_in_work]);
-
     await sequelize.query(
-        `WITH vals(id, order_in_work) AS (VALUES ${valuesSql}) UPDATE event AS e SET order_in_work = vals.order_in_work FROM vals WHERE e.id = vals.id`,
-        { bind: binds, transaction }
+        `
+    UPDATE event e
+    SET order_in_work = v.order_in_work
+    FROM json_to_recordset(:payload::json)
+         AS v(id uuid, order_in_work int)
+    WHERE e.id = v.id
+    `,
+        {
+            replacements: {
+                payload: JSON.stringify(data),
+            },
+            transaction,
+        }
     );
 };
 

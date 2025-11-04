@@ -321,7 +321,6 @@ describe('Works API', () => {
                 { id: event2.id, order_in_work: 1 },
             ],
         });
-        console.log(res2.body);
         expect(res2.status).toBe(200);
 
         const res3 = await http.get(`${base}/${work.id}/events`);
