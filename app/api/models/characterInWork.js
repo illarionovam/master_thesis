@@ -39,10 +39,5 @@ export const CharacterInWork = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        indexes: [
-            { name: 'idx_character_in_work_work_id', fields: ['work_id'] },
-            { name: 'idx_character_in_work_character_id', fields: ['character_id'] },
-            { name: 'uq_character_in_work', unique: true, fields: ['character_id', 'work_id'] },
-        ],
     }
 );

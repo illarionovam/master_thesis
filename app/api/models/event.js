@@ -44,9 +44,5 @@ export const Event = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        indexes: [
-            { name: 'idx_event_work_id', fields: ['work_id'] },
-            { name: 'idx_event_location_in_work_id', fields: ['location_in_work_id'] },
-        ],
     }
 );

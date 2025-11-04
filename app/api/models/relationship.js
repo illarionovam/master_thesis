@@ -41,14 +41,5 @@ export const Relationship = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        indexes: [
-            {
-                name: 'uq_relationship_from_to',
-                unique: true,
-                fields: ['from_character_in_work_id', 'to_character_in_work_id'],
-            },
-            { name: 'idx_relationship_from', fields: ['from_character_in_work_id'] },
-            { name: 'idx_relationship_to', fields: ['to_character_in_work_id'] },
-        ],
     }
 );

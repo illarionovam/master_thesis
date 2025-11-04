@@ -26,10 +26,5 @@ export const EventParticipant = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        indexes: [
-            { name: 'idx_event_participant_event_id', fields: ['event_id'] },
-            { name: 'idx_event_participant_character_in_work_id', fields: ['character_in_work_id'] },
-            { name: 'uq_event_participant', unique: true, fields: ['event_id', 'character_in_work_id'] },
-        ],
     }
 );

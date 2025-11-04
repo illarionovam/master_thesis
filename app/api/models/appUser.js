@@ -63,17 +63,5 @@ export const AppUser = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        indexes: [
-            {
-                name: 'idx_app_user_username_unique',
-                unique: true,
-                fields: ['username'],
-            },
-            {
-                name: 'idx_app_user_email_unique',
-                unique: true,
-                fields: ['email'],
-            },
-        ],
     }
 );

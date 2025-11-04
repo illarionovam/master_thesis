@@ -40,9 +40,5 @@ export const Token = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        indexes: [
-            { name: 'idx_token_value_unique', unique: true, fields: ['token'] },
-            { name: 'idx_token_owner_id', fields: ['owner_id'] },
-        ],
     }
 );

@@ -31,10 +31,5 @@ export const LocationInWork = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        indexes: [
-            { name: 'idx_location_in_work_location_id', fields: ['location_id'] },
-            { name: 'idx_location_in_work_work_id', fields: ['work_id'] },
-            { name: 'uq_location_in_work', unique: true, fields: ['location_id', 'work_id'] },
-        ],
     }
 );

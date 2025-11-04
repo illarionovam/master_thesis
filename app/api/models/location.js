@@ -40,9 +40,5 @@ export const Location = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        indexes: [
-            { name: 'idx_location_entity_owner_id', fields: ['owner_id'] },
-            { name: 'idx_location_entity_parent_id', fields: ['parent_location_id'] },
-        ],
     }
 );

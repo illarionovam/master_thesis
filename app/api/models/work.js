@@ -43,7 +43,5 @@ export const Work = sequelize.define(
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-
-        indexes: [{ name: 'idx_work_owner_id', fields: ['owner_id'] }],
     }
 );
