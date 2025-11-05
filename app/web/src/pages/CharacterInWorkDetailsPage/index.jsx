@@ -7,7 +7,6 @@ import List from '../../components/List';
 import styles from './CharacterInWorkDetailsPage.module.css';
 
 import { getCharacterInWork, updateCharacterInWork, getEventsByCharacterInWorkId } from '../../redux/works/operations';
-
 import {
     selectCharacterInWork,
     selectGetCharacterInWorkLoading,
@@ -24,9 +23,10 @@ export default function CharacterInWorkDetailsPage() {
     const titleId = useId();
     const dispatch = useDispatch();
 
-    const characterInWork = useSelector(selectCharacterInWork);
+    const ciw = useSelector(selectCharacterInWork);
     const loading = useSelector(selectGetCharacterInWorkLoading);
     const error = useSelector(selectGetCharacterInWorkError);
+
     const updateLoading = useSelector(selectUpdateCharacterInWorkLoading);
     const updateError = useSelector(selectUpdateCharacterInWorkError);
 
@@ -48,15 +48,21 @@ export default function CharacterInWorkDetailsPage() {
     }, [dispatch, id, characterInWorkId]);
 
     useEffect(() => {
-        if (characterInWork?.attributes && typeof characterInWork.attributes === 'object') {
-            setInitialAttrs(characterInWork.attributes || {});
-            setCurrentAttrs(characterInWork.attributes || {});
+        if (ciw?.character?.attributes && typeof ciw.character.attributes === 'object') {
+            setInitialAttrs(ciw.character.attributes || {});
         }
-    }, [characterInWork]);
+        if (ciw && typeof ciw.attributes === 'object') {
+            setCurrentAttrs(ciw.attributes || {});
+        }
+    }, [ciw]);
 
-    const workTitle = characterInWork?.work?.title || '—';
-    const workId = characterInWork?.work_id;
-    const characterName = characterInWork?.character?.name ?? '—';
+    const workTitle = ciw?.work?.title || '—';
+    const workId = ciw?.work_id;
+    const character = ciw?.character;
+    const characterName = character?.name ?? '—';
+    const characterAppearance = character?.appearance ?? '—';
+    const characterPersonality = character?.personality ?? '—';
+    const characterBio = character?.bio ?? '—';
 
     const disableAll = loading || updateLoading;
 
@@ -123,7 +129,7 @@ export default function CharacterInWorkDetailsPage() {
                 </p>
             )}
 
-            {!loading && !error && characterInWork && (
+            {!loading && !error && ciw && (
                 <>
                     <section className={styles.card} aria-label="Character in work">
                         <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
@@ -133,8 +139,53 @@ export default function CharacterInWorkDetailsPage() {
                             </div>
 
                             <div className={styles.field}>
-                                <label className={styles.label}>Work Title</label>
-                                <input type="text" className={styles.input} value={workTitle} disabled readOnly />
+                                <label className={styles.label}>Appearance</label>
+                                <textarea
+                                    rows={5}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    value={characterAppearance}
+                                    disabled
+                                    readOnly
+                                />
+                            </div>
+
+                            <div className={styles.field}>
+                                <label className={styles.label}>Personality</label>
+                                <textarea
+                                    rows={5}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    value={characterPersonality}
+                                    disabled
+                                    readOnly
+                                />
+                            </div>
+
+                            <div className={styles.field}>
+                                <label className={styles.label}>Bio</label>
+                                <textarea
+                                    rows={6}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    value={characterBio}
+                                    disabled
+                                    readOnly
+                                />
+                            </div>
+
+                            <div className={styles.field}>
+                                <span className={styles.label}>Parent Tags</span>
+                                <div className={styles.chips}>
+                                    {Object.keys(initialAttrs).length === 0 && (
+                                        <span className={styles.muted}>No tags yet.</span>
+                                    )}
+
+                                    {Object.entries(initialAttrs).map(([k, v]) => (
+                                        <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
+                                            <strong className={styles.chipKey}>{k}</strong>
+                                            <span className={styles.chipSep}>:</span>
+                                            <span className={styles.chipVal}>{String(v)}</span>
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className={styles.field}>
@@ -218,7 +269,7 @@ export default function CharacterInWorkDetailsPage() {
                         </form>
                     </section>
 
-                    <section className={styles.card} aria-label="Character events">
+                    <section className={styles.card} aria-label="Used in events">
                         <h2 className={styles.subTitle}>Used in events</h2>
 
                         {eventsLoading && (
