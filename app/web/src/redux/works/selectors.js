@@ -174,7 +174,11 @@ export const selectGetEventParticipantsLoading = state => state.works.getEventPa
 export const selectGetEventParticipantsError = state => state.works.getEventParticipants.error;
 export const selectEventParticipantsRaw = state => state.works.getEventParticipants.participants ?? [];
 export const selectEventParticipants = createSelector(selectEventParticipantsRaw, list =>
-    list.map(item => ({ ...item, content: item.character.name }))
+    list.map(item => ({
+        ...item,
+        content: item.character.name,
+        to: `/works/${item.event.work_id}/cast/${item.character_in_work_id}`,
+    }))
 );
 
 export const selectGetEventPossibleParticipantsLoading = state => state.works.getEventPossibleParticipants.loading;
