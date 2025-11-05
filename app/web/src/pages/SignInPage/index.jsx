@@ -1,9 +1,11 @@
-import { useEffect, useId } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { signIn } from '../../redux/auth/operations';
-import { selectSignInLoading, selectSignInError, selectToken, selectUser } from '../../redux/auth/selectors';
 import { resetSignIn } from '../../redux/auth/slice';
+import { selectSignInLoading, selectSignInError, selectToken, selectUser } from '../../redux/auth/selectors';
+import ResetPasswordModal from '../../components/ResetPasswordModal';
+import VerifyEmailModal from '../../components/VerifyEmailModal';
 import styles from './SignInPage.module.css';
 
 export default function SignInPage() {
@@ -17,6 +19,9 @@ export default function SignInPage() {
     const token = useSelector(selectToken);
     const user = useSelector(selectUser);
 
+    const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
+    const [isVerifyEmailModalOpen, setIsVerifyEmailModalOpen] = useState(false); // State for VerifyEmailModal
+
     useEffect(() => {
         if (!token) return;
         const backTo = location.state?.from?.pathname || '/';
@@ -29,6 +34,22 @@ export default function SignInPage() {
         const email = fd.get('email')?.trim();
         const password = fd.get('password') || '';
         dispatch(signIn({ email, password }));
+    };
+
+    const openResetPasswordModal = () => {
+        setIsResetPasswordModalOpen(true);
+    };
+
+    const closeResetPasswordModal = () => {
+        setIsResetPasswordModalOpen(false);
+    };
+
+    const openVerifyEmailModal = () => {
+        setIsVerifyEmailModalOpen(true);
+    };
+
+    const closeVerifyEmailModal = () => {
+        setIsVerifyEmailModalOpen(false);
     };
 
     return (
@@ -96,6 +117,18 @@ export default function SignInPage() {
                         </Link>
                     </p>
 
+                    <p className={styles.meta}>
+                        <button type="button" className={styles.link} onClick={openResetPasswordModal}>
+                            Forgot password?
+                        </button>
+                    </p>
+
+                    <p className={styles.meta}>
+                        <button type="button" className={styles.link} onClick={openVerifyEmailModal}>
+                            Resend verification email?
+                        </button>
+                    </p>
+
                     {token && user && (
                         <p aria-live="polite" className={styles.success}>
                             Signed in as <strong>{user.name ?? user.username ?? user.email}</strong>.
@@ -103,6 +136,8 @@ export default function SignInPage() {
                     )}
                 </form>
             </section>
+            {isResetPasswordModalOpen && <ResetPasswordModal onClose={closeResetPasswordModal} />}
+            {isVerifyEmailModalOpen && <VerifyEmailModal onClose={closeVerifyEmailModal} />}{' '}
         </main>
     );
 }

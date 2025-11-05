@@ -9,6 +9,12 @@ import appUserValidator from '../validators/appUserValidator.js';
 const appUserRoute = express.Router();
 
 appUserRoute.post(
+    '/verify',
+    controllerWrapper(validateBody(appUserValidator.verifyAppUserEmailValidator)),
+    controllerWrapper(appUserController.verifyAppUserEmail)
+);
+
+appUserRoute.post(
     '/sign-up',
     controllerWrapper(validateBody(appUserValidator.signUpAppUserValidator)),
     controllerWrapper(appUserController.signUpAppUser)

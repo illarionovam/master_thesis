@@ -5,6 +5,8 @@ export const signUpAppUser = async payload => await axiosInstance.post('/auth/si
 
 export const signInAppUser = async payload => await axiosInstance.post('/auth/sign-in', payload);
 
+export const verifyAppUserEmail = async payload => await axiosInstance.post('/auth/verify', payload);
+
 export const resetAppUserPassword = async payload => await axiosInstance.post('/auth/forgot-password', payload);
 
 export const getAppUserInfo = async () => await axiosInstance.get('/auth/user-info');

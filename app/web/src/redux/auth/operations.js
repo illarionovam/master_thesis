@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
     signUpAppUser,
     signInAppUser,
+    verifyAppUserEmail,
     resetAppUserPassword,
     updateAppUser,
     updateAppUserEmail,
@@ -19,6 +20,10 @@ export const signUp = createAsyncThunk('auth/signUp', async (payload, { rejectWi
 
 export const signIn = createAsyncThunk('auth/signIn', async (payload, { rejectWithValue }) =>
     wrapper(signInAppUser, rejectWithValue)(payload)
+);
+
+export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (payload, { rejectWithValue }) =>
+    wrapper(verifyAppUserEmail, rejectWithValue)(payload)
 );
 
 export const resetPassword = createAsyncThunk('auth/resetPassword', async (payload, { rejectWithValue }) =>

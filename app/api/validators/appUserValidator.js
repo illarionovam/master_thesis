@@ -56,6 +56,13 @@ const resetAppUserPasswordValidator = Joi.object({
     }),
 }).prefs({ abortEarly: false, stripUnknown: true });
 
+const verifyAppUserEmailValidator = Joi.object({
+    email: Joi.string().trim().lowercase().min(1).required().messages({
+        'string.min': 'email is required',
+        'any.required': 'email is required',
+    }),
+}).prefs({ abortEarly: false, stripUnknown: true });
+
 const signOutAppUserValidator = Joi.object({
     terminate_all_sessions: Joi.boolean().truthy('true', '1', 1).falsy('false', '0', 0, '').default(false).messages({
         'boolean.base': 'terminate_all_sessions must be a boolean-like value',
@@ -144,6 +151,7 @@ export default {
     signUpAppUserValidator,
     signInAppUserValidator,
     resetAppUserPasswordValidator,
+    verifyAppUserEmailValidator,
     signOutAppUserValidator,
     updateAppUserNormalFieldsValidator,
     updateAppUserEmailValidator,

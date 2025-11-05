@@ -19,6 +19,27 @@ const stripAppUserResponse = appUser => {
     };
 };
 
+const verifyAppUserEmail = async (req, res) => {
+    const { email } = req.body;
+
+    const appUser = await appUserService.getAppUserByEmail(email);
+
+    if (appUser != null && !appUser.verified) {
+        const token = jwt.sign({ sub: appUser.id, scope: 'email_verify' }, process.env.JWT_SECRET, {
+            expiresIn: '15m',
+        });
+        await tokenService.createToken({ owner_id: appUser.id, token, scope: 'email_verify' });
+        await mailer.sendMail({
+            to: appUser.email,
+            from: process.env.EMAIL_USER,
+            subject: 'Verify email',
+            html: `<a target='_blank' href='${process.env.SERVER_URL}/confirm-email#${token}'>Verify email</a>`,
+        });
+    }
+
+    res.sendStatus(200);
+};
+
 const signUpAppUser = async (req, res) => {
     const { password } = req.body;
 
@@ -184,6 +205,7 @@ const getAppUser = async (req, res) => {
 };
 
 export default {
+    verifyAppUserEmail,
     signUpAppUser,
     signInAppUser,
     signOutAppUser,

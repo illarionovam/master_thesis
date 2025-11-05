@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
     signIn,
     signUp,
+    verifyEmail,
     resetPassword,
     getUserInfo,
     updateUser,
@@ -18,6 +19,7 @@ const initialState = {
 
     signUp: { ...op, success: false },
     signIn: { ...op, result: null },
+    verifyEmail: { ...op, success: false },
     resetPassword: { ...op, success: false },
     getUserInfo: { ...op },
     updateUser: { ...op },
@@ -97,6 +99,20 @@ const authSlice = createSlice({
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                 }
+            });
+        builder
+            .addCase(verifyEmail.pending, state => {
+                state.verifyEmail.loading = true;
+                state.verifyEmail.error = null;
+                state.verifyEmail.success = false;
+            })
+            .addCase(verifyEmail.fulfilled, state => {
+                state.verifyEmail.loading = false;
+                state.verifyEmail.success = true;
+            })
+            .addCase(verifyEmail.rejected, (state, action) => {
+                state.verifyEmail.loading = false;
+                state.verifyEmail.error = action.payload;
             });
         builder
             .addCase(resetPassword.pending, state => {

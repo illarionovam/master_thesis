@@ -9,6 +9,10 @@ export const selectSignInLoading = state => state.auth.signIn.loading;
 export const selectSignInError = state => state.auth.signIn.error;
 export const selectSignInResult = state => state.auth.signIn.result;
 
+export const selectVerifyEmailLoading = state => state.auth.verifyEmail.loading;
+export const selectVerifyEmailError = state => state.auth.verifyEmail.error;
+export const selectVerifyEmailSuccess = state => state.auth.verifyEmail.success;
+
 export const selectResetPasswordLoading = state => state.auth.resetPassword.loading;
 export const selectResetPasswordError = state => state.auth.resetPassword.error;
 export const selectResetPasswordSuccess = state => state.auth.resetPassword.success;

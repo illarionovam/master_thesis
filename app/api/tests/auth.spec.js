@@ -19,6 +19,13 @@ beforeEach(() => {
 });
 
 describe('Auth API', () => {
+    test('verify email', async () => {
+        const { user } = await createUser({ verified: false });
+        const verifyRes = await api().post(`${base}/verify`).send({ email: user.email });
+        expect(verifyRes.status).toBe(200);
+        expect(sendMail).toHaveBeenCalledTimes(1);
+    });
+
     test('sign-up + confirm-email + sign-in', async () => {
         const userToCreate = {
             username: `u_${Date.now()}`,
