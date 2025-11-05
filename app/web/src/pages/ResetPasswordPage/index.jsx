@@ -6,6 +6,7 @@ import {
     selectConfirmPasswordError,
     selectConfirmPasswordSuccess,
 } from '../../redux/auth/selectors';
+import styles from './ResetPasswordPage.module.css';
 
 export default function ResetPasswordPage() {
     const titleId = useId();
@@ -33,11 +34,15 @@ export default function ResetPasswordPage() {
 
     return (
         <main aria-labelledby={titleId}>
-            <h1 id={titleId}>Reset Password</h1>
+            <h1 id={titleId} className={styles.title}>
+                Reset Password
+            </h1>
 
-            <form onSubmit={handleSubmit} noValidate>
-                <div>
-                    <label htmlFor="new_password">New password</label>
+            <form onSubmit={handleSubmit} noValidate className={styles.form}>
+                <div className={styles.field}>
+                    <label htmlFor="new_password" className={styles.label}>
+                        New password
+                    </label>
                     <input
                         id="new_password"
                         name="new_password"
@@ -45,18 +50,27 @@ export default function ResetPasswordPage() {
                         autoComplete="new-password"
                         required
                         disabled={loading || !token}
+                        className={styles.input}
                     />
                 </div>
 
-                <div>
-                    <button type="submit" disabled={loading || !token}>
+                <div className={styles.actions}>
+                    <button type="submit" disabled={loading || !token} className={styles.primaryBtn}>
                         {loading ? 'Submitting...' : 'Set New Password'}
                     </button>
                 </div>
             </form>
 
-            {success && <p aria-live="polite">Password changed.</p>}
-            {error && <p role="alert">{error}</p>}
+            {success && (
+                <p aria-live="polite" className={styles.success}>
+                    Password changed.
+                </p>
+            )}
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {error}
+                </p>
+            )}
         </main>
     );
 }
