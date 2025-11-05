@@ -64,6 +64,7 @@ export default function CharacterInWorkDetailsPage() {
     const [selectedTargetId, setSelectedTargetId] = useState('');
     const [addingRel, setAddingRel] = useState(false);
     const [removingRelId, setRemovingRelId] = useState(null);
+    const [relType, setRelType] = useState('');
     const formRef = useRef(null);
 
     useEffect(() => {
@@ -127,6 +128,7 @@ export default function CharacterInWorkDetailsPage() {
         if (addingRel) return;
         setAddRelOpen(false);
         setSelectedTargetId('');
+        setRelType('');
     };
 
     const handleAddRelationship = async () => {
@@ -137,12 +139,13 @@ export default function CharacterInWorkDetailsPage() {
                 createRelationship({
                     workId: id,
                     characterInWorkId,
-                    data: { to_character_in_work_id: selectedTargetId, type: 'default' },
+                    data: { to_character_in_work_id: selectedTargetId, type: relType.trim() },
                 })
             );
             if (createRelationship.fulfilled.match(action)) {
                 setAddRelOpen(false);
                 setSelectedTargetId('');
+                setRelType('');
                 dispatch(getCharacterInWorkRelationships({ workId: id, characterInWorkId }));
             }
         } finally {
@@ -475,6 +478,21 @@ export default function CharacterInWorkDetailsPage() {
                                             ))}
                                         </ul>
                                     ))}
+
+                                <div className={styles.field} style={{ marginTop: 12 }}>
+                                    <label className={styles.label}>
+                                        Type
+                                        <input
+                                            className={styles.input}
+                                            type="text"
+                                            value={relType}
+                                            onChange={e => setRelType(e.target.value)}
+                                            placeholder="e.g. ally, enemy, mentor"
+                                            required
+                                        />
+                                    </label>
+                                    <small className={styles.muted}>This field is required.</small>
+                                </div>
 
                                 <div className={styles.modalActions}>
                                     <button
