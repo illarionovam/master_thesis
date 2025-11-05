@@ -25,6 +25,7 @@ import {
     deleteLocationInWork,
     getEvents,
     getEventsByLocationInWorkId,
+    getEventsByCharacterInWorkId,
     createEvent,
     getEvent,
     updateEvent,
@@ -73,6 +74,7 @@ const initialState = {
 
     getEvents: { ...op, events: [] },
     getEventsByLocationInWorkId: { ...op, events: [] },
+    getEventsByCharacterInWorkId: { ...op, events: [] },
     createEvent: { ...op },
     event: null,
     getEvent: { ...op },
@@ -423,6 +425,19 @@ const worksSlice = createSlice({
             .addCase(getEventsByLocationInWorkId.rejected, (state, action) => {
                 state.getEventsByLocationInWorkId.loading = false;
                 state.getEventsByLocationInWorkId.error = action.payload;
+            });
+        builder
+            .addCase(getEventsByCharacterInWorkId.pending, state => {
+                state.getEventsByCharacterInWorkId.loading = true;
+                state.getEventsByCharacterInWorkId.error = null;
+            })
+            .addCase(getEventsByCharacterInWorkId.fulfilled, (state, action) => {
+                state.getEventsByCharacterInWorkId.loading = false;
+                state.getEventsByCharacterInWorkId.events = action.payload;
+            })
+            .addCase(getEventsByCharacterInWorkId.rejected, (state, action) => {
+                state.getEventsByCharacterInWorkId.loading = false;
+                state.getEventsByCharacterInWorkId.error = action.payload;
             });
         builder
             .addCase(createEvent.pending, state => {

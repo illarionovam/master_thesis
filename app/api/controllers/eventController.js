@@ -26,6 +26,7 @@ const stripBulkEventParticipantResponse = eventParticipant => {
         event_id: eventParticipant.event_id,
         character_in_work_id: eventParticipant.character_in_work_id,
         character: characterController.stripBulkCharacterResponse(eventParticipant.characterLink.character),
+        event: stripBulkEventResponse(eventParticipant.event),
     };
 };
 

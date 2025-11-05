@@ -142,6 +142,13 @@ export const selectGetEventsByLocationInWorkId = createSelector(selectGetEventsB
     list.map(item => ({ ...item, content: item.title, to: `/works/${item.work_id}/events/${item.id}` }))
 );
 
+export const selectGetEventsByCharacterInWorkIdLoading = state => state.works.getEventsByCharacterInWorkId.loading;
+export const selectGetEventsByCharacterInWorkIdError = state => state.works.getEventsByCharacterInWorkId.error;
+export const selectGetEventsByCharacterInWorkIdRaw = state => state.works.getEventsByCharacterInWorkId.events ?? [];
+export const selectGetEventsByCharacterInWorkId = createSelector(selectGetEventsByCharacterInWorkIdRaw, list =>
+    list.map(item => ({ ...item, content: item.event.title, to: `/works/${item.work_id}/events/${item.event_id}` }))
+);
+
 export const selectCreateEventLoading = state => state.works.createEvent.loading;
 export const selectCreateEventError = state => state.works.createEvent.error;
 

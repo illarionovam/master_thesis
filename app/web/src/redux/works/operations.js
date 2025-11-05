@@ -35,6 +35,7 @@ import {
     getAppUserEventPossibleParticipants,
     linkAppUserEventParticipant,
     unlinkAppUserEventParticipant,
+    getAppUserEventsByCharacterInWorkId,
 } from '../../api/works.js';
 
 export const getWorks = createAsyncThunk('works/getWorks', async (_, { rejectWithValue }) =>
@@ -165,6 +166,12 @@ export const getEventsByLocationInWorkId = createAsyncThunk(
     'works/getEventsByLocationInWorkId',
     async ({ workId, locationInWorkId }, { rejectWithValue }) =>
         wrapper(getAppUserEventsByLocationInWorkId, rejectWithValue)(workId, locationInWorkId)
+);
+
+export const getEventsByCharacterInWorkId = createAsyncThunk(
+    'works/getEventsByCharacterInWorkId',
+    async ({ workId, characterInWorkId }, { rejectWithValue }) =>
+        wrapper(getAppUserEventsByCharacterInWorkId, rejectWithValue)(workId, characterInWorkId)
 );
 
 export const reorderEvents = createAsyncThunk(
