@@ -6,7 +6,15 @@ import Title from '../../components/Title';
 import List from '../../components/List';
 import styles from './CharacterInWorkDetailsPage.module.css';
 
-import { getCharacterInWork, updateCharacterInWork, getEventsByCharacterInWorkId } from '../../redux/works/operations';
+import {
+    getCharacterInWork,
+    updateCharacterInWork,
+    getEventsByCharacterInWorkId,
+    getCharacterInWorkRelationships,
+    getCharacterInWorkPossibleRelationships,
+    createRelationship,
+    deleteRelationship,
+} from '../../redux/works/operations';
 import {
     selectCharacterInWork,
     selectGetCharacterInWorkLoading,
@@ -16,6 +24,12 @@ import {
     selectGetEventsByCharacterInWorkIdLoading,
     selectGetEventsByCharacterInWorkIdError,
     selectGetEventsByCharacterInWorkId,
+    selectGetCharacterInWorkRelationshipsLoading,
+    selectGetCharacterInWorkRelationshipsError,
+    selectCharacterInWorkRelationships,
+    selectGetCharacterInWorkPossibleRelationshipsLoading,
+    selectGetCharacterInWorkPossibleRelationshipsError,
+    selectCharacterInWorkPossibleRelationships,
 } from '../../redux/works/selectors';
 
 export default function CharacterInWorkDetailsPage() {
@@ -34,17 +48,29 @@ export default function CharacterInWorkDetailsPage() {
     const eventsError = useSelector(selectGetEventsByCharacterInWorkIdError);
     const events = useSelector(selectGetEventsByCharacterInWorkId) || [];
 
+    const relLoading = useSelector(selectGetCharacterInWorkRelationshipsLoading);
+    const relError = useSelector(selectGetCharacterInWorkRelationshipsError);
+    const relationships = useSelector(selectCharacterInWorkRelationships) || [];
+
+    const possibleRelLoading = useSelector(selectGetCharacterInWorkPossibleRelationshipsLoading);
+    const possibleRelError = useSelector(selectGetCharacterInWorkPossibleRelationshipsError);
+    const possibleRels = useSelector(selectCharacterInWorkPossibleRelationships) || [];
+
     const [editMode, setEditMode] = useState(false);
     const [currentAttrs, setCurrentAttrs] = useState({});
     const [initialAttrs, setInitialAttrs] = useState({});
     const [addTagOpen, setAddTagOpen] = useState(false);
-
+    const [addRelOpen, setAddRelOpen] = useState(false);
+    const [selectedTargetId, setSelectedTargetId] = useState('');
+    const [addingRel, setAddingRel] = useState(false);
+    const [removingRelId, setRemovingRelId] = useState(null);
     const formRef = useRef(null);
 
     useEffect(() => {
         if (!characterInWorkId) return;
         dispatch(getCharacterInWork({ workId: id, characterInWorkId }));
         dispatch(getEventsByCharacterInWorkId({ workId: id, characterInWorkId }));
+        dispatch(getCharacterInWorkRelationships({ workId: id, characterInWorkId }));
     }, [dispatch, id, characterInWorkId]);
 
     useEffect(() => {
@@ -55,6 +81,11 @@ export default function CharacterInWorkDetailsPage() {
             setCurrentAttrs(ciw.attributes || {});
         }
     }, [ciw]);
+
+    useEffect(() => {
+        if (!addRelOpen || !id || !characterInWorkId) return;
+        dispatch(getCharacterInWorkPossibleRelationships({ workId: id, characterInWorkId }));
+    }, [addRelOpen, dispatch, id, characterInWorkId]);
 
     const workTitle = ciw?.work?.title || '—';
     const workId = ciw?.work_id;
@@ -86,6 +117,49 @@ export default function CharacterInWorkDetailsPage() {
         const data = { attributes: currentAttrs };
         const action = await dispatch(updateCharacterInWork({ workId: id, characterInWorkId, data }));
         if (updateCharacterInWork.fulfilled.match(action)) setEditMode(false);
+    };
+
+    const openAddRelModal = () => {
+        setSelectedTargetId('');
+        setAddRelOpen(true);
+    };
+    const closeAddRelModal = () => {
+        if (addingRel) return;
+        setAddRelOpen(false);
+        setSelectedTargetId('');
+    };
+
+    const handleAddRelationship = async () => {
+        if (!id || !characterInWorkId || !selectedTargetId) return;
+        try {
+            setAddingRel(true);
+            const action = await dispatch(
+                createRelationship({
+                    workId: id,
+                    characterInWorkId,
+                    data: { to_character_in_work_id: selectedTargetId, type: 'default' },
+                })
+            );
+            if (createRelationship.fulfilled.match(action)) {
+                setAddRelOpen(false);
+                setSelectedTargetId('');
+                dispatch(getCharacterInWorkRelationships({ workId: id, characterInWorkId }));
+            }
+        } finally {
+            setAddingRel(false);
+        }
+    };
+
+    const handleRemoveRelationship = async (workId, relationshipId) => {
+        try {
+            setRemovingRelId(relationshipId);
+            const action = await dispatch(deleteRelationship({ workId, characterInWorkId, relationshipId }));
+            if (deleteRelationship.fulfilled.match(action)) {
+                dispatch(getCharacterInWorkRelationships({ workId: id, characterInWorkId }));
+            }
+        } finally {
+            setRemovingRelId(null);
+        }
     };
 
     return (
@@ -311,6 +385,115 @@ export default function CharacterInWorkDetailsPage() {
                                     }}
                                     onCancel={() => setAddTagOpen(false)}
                                 />
+                            </form>
+                        </dialog>
+                    )}
+
+                    <section className={styles.card} aria-label="Relationships">
+                        <div className={styles.subHeader}>
+                            <h2 className={styles.subTitle}>Relationships</h2>
+                            <button
+                                type="button"
+                                className={styles.primaryBtn}
+                                onClick={openAddRelModal}
+                                disabled={relLoading}
+                                aria-label="Add relationship"
+                                title="Add relationship"
+                            >
+                                Add relationship
+                            </button>
+                        </div>
+
+                        {relLoading && (
+                            <p aria-live="polite" className={styles.muted}>
+                                Loading...
+                            </p>
+                        )}
+                        {!relLoading && relError && (
+                            <p role="alert" className={styles.error}>
+                                {String(relError)}
+                            </p>
+                        )}
+
+                        {!relLoading &&
+                            !relError &&
+                            (relationships.length > 0 ? (
+                                <List
+                                    items={relationships}
+                                    onRemove={({ id: relationshipId, work_id: workId }) => {
+                                        if (removingRelId) return;
+                                        handleRemoveRelationship(workId, relationshipId);
+                                    }}
+                                />
+                            ) : (
+                                <p className={styles.muted}>No relationships yet.</p>
+                            ))}
+                    </section>
+
+                    {addRelOpen && (
+                        <dialog
+                            open
+                            className={styles.dialog}
+                            aria-labelledby="add-rel-title"
+                            onClose={closeAddRelModal}
+                        >
+                            <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                                <h3 id="add-rel-title" className={styles.modalTitle}>
+                                    Add relationship
+                                </h3>
+
+                                {possibleRelLoading && (
+                                    <p className={styles.muted} aria-live="polite">
+                                        Loading candidates...
+                                    </p>
+                                )}
+                                {!possibleRelLoading && possibleRelError && (
+                                    <p className={styles.error} role="alert">
+                                        {String(possibleRelError)}
+                                    </p>
+                                )}
+
+                                {!possibleRelLoading &&
+                                    !possibleRelError &&
+                                    (possibleRels.length === 0 ? (
+                                        <p className={styles.muted}>No available characters to relate.</p>
+                                    ) : (
+                                        <ul className={styles.radioList}>
+                                            {possibleRels.map(t => (
+                                                <li key={t.id}>
+                                                    <label className={styles.radioRow}>
+                                                        <input
+                                                            type="radio"
+                                                            name="rel-target"
+                                                            value={t.id}
+                                                            checked={String(selectedTargetId) === String(t.id)}
+                                                            onChange={e => setSelectedTargetId(e.target.value)}
+                                                        />
+                                                        <span>{t.content}</span>
+                                                    </label>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ))}
+
+                                <div className={styles.modalActions}>
+                                    <button
+                                        type="button"
+                                        className={styles.primaryBtn}
+                                        onClick={handleAddRelationship}
+                                        disabled={addingRel || possibleRelLoading || !selectedTargetId}
+                                    >
+                                        {addingRel ? 'Adding...' : 'Add'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={styles.ghostBtn}
+                                        onClick={closeAddRelModal}
+                                        disabled={addingRel}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </form>
                         </dialog>
                     )}

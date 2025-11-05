@@ -6,6 +6,7 @@ import characterController from './characterController.js';
 const stripBulkRelationshipResponse = relationship => {
     return {
         id: relationship.id,
+        work_id: relationship.from.work_id,
         from_character_in_work_id: relationship.from_character_in_work_id,
         to_character_in_work_id: relationship.to_character_in_work_id,
         type: relationship.type,

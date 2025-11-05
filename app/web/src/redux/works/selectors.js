@@ -58,10 +58,8 @@ export const selectDeleteCharacterInWorkSuccess = state => state.works.deleteCha
 export const selectGetCharacterInWorkRelationshipsLoading = state =>
     state.works.getCharacterInWorkRelationships.loading;
 export const selectGetCharacterInWorkRelationshipsError = state => state.works.getCharacterInWorkRelationships.error;
-
 export const selectCharacterInWorkRelationshipsRaw = state =>
     state.works.getCharacterInWorkRelationships.relationships ?? [];
-
 export const selectCharacterInWorkRelationships = createSelector(selectCharacterInWorkRelationshipsRaw, list =>
     list.map(item => ({
         ...item,
@@ -74,10 +72,8 @@ export const selectGetCharacterInWorkPossibleRelationshipsLoading = state =>
     state.works.getCharacterInWorkPossibleRelationships.loading;
 export const selectGetCharacterInWorkPossibleRelationshipsError = state =>
     state.works.getCharacterInWorkPossibleRelationships.error;
-
 export const selectCharacterInWorkPossibleRelationshipsRaw = state =>
     state.works.getCharacterInWorkPossibleRelationships.possibleRelationships ?? [];
-
 export const selectCharacterInWorkPossibleRelationships = createSelector(
     selectCharacterInWorkPossibleRelationshipsRaw,
     list => list.map(item => ({ ...item, content: item.character.name, to: `/works/${item.work_id}/cast/${item.id}` }))
