@@ -44,6 +44,15 @@ const getEventParticipant = async (id, { transaction } = {}) => {
     });
 };
 
+const getEventParticipantsByCharacterInWorkId = async (charcaterInWorkId, { transaction } = {}) => {
+    return EventParticipant.findAll({
+        where: { character_in_work_id: charcaterInWorkId },
+        include: baseInclude,
+        transaction,
+        subQuery: false,
+    });
+};
+
 const getEventParticipantsByEventId = async (eventId, { transaction } = {}) => {
     return EventParticipant.findAll({
         where: { event_id: eventId },
@@ -61,5 +70,6 @@ export default {
     createEventParticipant,
     getEventParticipant,
     getEventParticipantsByEventId,
+    getEventParticipantsByCharacterInWorkId,
     destroyEventParticipant,
 };

@@ -67,6 +67,11 @@ workRoute.post(
     controllerWrapper(relationshipController.createRelationship)
 );
 workRoute.get(
+    '/:id/cast/:characterInWorkId/events',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(eventController.getEventParticipantsByWorkIdAndCharacterInWorkId)
+);
+workRoute.get(
     '/:id/cast/:characterInWorkId/relationships/:relationshipId',
     controllerWrapper(validateWorkId()),
     controllerWrapper(relationshipController.getRelationship)

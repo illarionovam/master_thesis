@@ -97,6 +97,20 @@ const getEventsByWorkIdAndLocationInWorkId = async (req, res) => {
     res.json(events.map(stripBulkEventResponse));
 };
 
+const getEventParticipantsByWorkIdAndCharacterInWorkId = async (req, res) => {
+    const { characterInWorkId } = req.params;
+
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
+
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const eventParticipants = await eventParticipantService.getEventParticipantsByCharacterInWorkId(characterInWorkId);
+
+    res.json(eventParticipants.map(stripBulkEventParticipantResponse));
+};
+
 const updateEvent = async (req, res) => {
     const { eventId } = req.params;
     const { location_in_work_id } = req.body;
@@ -219,4 +233,5 @@ export default {
     destroyEvent,
     linkParticipant,
     unlinkParticipant,
+    getEventParticipantsByWorkIdAndCharacterInWorkId,
 };

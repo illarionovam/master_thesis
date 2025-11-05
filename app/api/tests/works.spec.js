@@ -417,6 +417,12 @@ describe('Works API', () => {
         expect(Array.isArray(res5.body)).toBe(true);
         expect(res5.body[0]).toHaveProperty('id', eventParticipantId);
 
+        const resParticipatesInEvents = await http.get(`${base}/${work.id}/cast/${characterInWork.id}/events`);
+        console.log(resParticipatesInEvents.body);
+        expect(resParticipatesInEvents.status).toBe(200);
+        expect(Array.isArray(resParticipatesInEvents.body)).toBe(true);
+        expect(resParticipatesInEvents.body[0]).toHaveProperty('id', eventParticipantId);
+
         const res6 = await http.delete(`${base}/${work.id}/events/${event.id}/participants/${eventParticipantId}`);
         expect(res6.status).toBe(204);
 
