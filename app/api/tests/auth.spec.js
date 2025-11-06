@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 
 const sendMail = jest.fn().mockResolvedValue({ messageId: 'stubbed' });
 
-await jest.unstable_mockModule('../mailer/mailer.js', () => ({
+await jest.unstable_mockModule('../utilities/mailer.js', () => ({
     __esModule: true,
     mailer: { sendMail },
 }));

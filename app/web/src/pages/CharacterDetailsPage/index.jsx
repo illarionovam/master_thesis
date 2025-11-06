@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { uploadImage } from '../../api/upload';
 
 import Title from '../../components/Title';
 import List from '../../components/List';
@@ -68,6 +69,11 @@ export default function CharacterDetailsPage() {
 
     const [removingId, setRemovingId] = useState(null);
 
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState('');
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState('');
+
     const formRef = useRef(null);
 
     useEffect(() => {
@@ -86,6 +92,12 @@ export default function CharacterDetailsPage() {
         if (!addWorkOpen || !id) return;
         dispatch(getCharacterPossibleAppearances(id));
     }, [addWorkOpen, dispatch, id]);
+
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
 
     const disableAll = loading || updateLoading || deleteLoading;
 
@@ -173,6 +185,50 @@ export default function CharacterDetailsPage() {
         }
     };
 
+    const onPickFile = e => {
+        setUploadError('');
+        const file = e.target.files?.[0];
+        if (!file) {
+            setSelectedFile(null);
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            setPreviewUrl('');
+            return;
+        }
+
+        setSelectedFile(file);
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(URL.createObjectURL(file));
+    };
+
+    const handleUploadImage = async () => {
+        if (!selectedFile || !id) return;
+        try {
+            setUploading(true);
+            setUploadError('');
+
+            const fd = new FormData();
+            fd.append('file', selectedFile);
+
+            const res = await uploadImage(fd);
+            const url = res?.data?.url || res?.data?.secure_url || res?.data;
+
+            if (!url || typeof url !== 'string') {
+                throw new Error('Upload succeeded but no URL was returned');
+            }
+
+            const action = await dispatch(updateCharacter({ id, data: { image_url: url } }));
+            if (updateCharacter.fulfilled.match(action)) {
+                setSelectedFile(null);
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                setPreviewUrl('');
+            }
+        } catch (err) {
+            setUploadError(err?.message || 'Failed to upload image');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     return (
         <main aria-labelledby={titleId} className={styles.page}>
             <div className={styles.header}>
@@ -206,6 +262,77 @@ export default function CharacterDetailsPage() {
 
             {!loading && !error && character && (
                 <>
+                    <section className={styles.card} aria-label="Character image">
+                        <div className={styles.field}>
+                            <span className={styles.label}>Image</span>
+
+                            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+                                <div>
+                                    {previewUrl ? (
+                                        <img src={previewUrl} alt="Preview" />
+                                    ) : character?.image_url ? (
+                                        <img
+                                            src={character.image_url}
+                                            alt={`${character?.name ?? 'Character'} image`}
+                                        />
+                                    ) : (
+                                        <span className={styles.muted}>No image</span>
+                                    )}
+                                </div>
+
+                                <div style={{ flex: 1 }}>
+                                    <label className={styles.label} htmlFor="ch-image-picker">
+                                        Upload new image
+                                    </label>
+                                    <input
+                                        id="ch-image-picker"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={onPickFile}
+                                        disabled={uploading || disableAll}
+                                        aria-describedby="ch-image-help"
+                                    />
+                                    <div id="ch-image-help" className={styles.muted}>
+                                        Accepted: image/* • The file is uploaded first, then saved to this character.
+                                    </div>
+
+                                    {uploadError && (
+                                        <p role="alert" className={styles.error}>
+                                            {uploadError}
+                                        </p>
+                                    )}
+
+                                    <div>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleUploadImage}
+                                            disabled={!selectedFile || uploading || disableAll}
+                                            aria-label="Upload and attach image"
+                                            title="Upload and attach image"
+                                        >
+                                            {uploading ? 'Uploading…' : 'Upload & Attach'}
+                                        </button>
+                                        {selectedFile && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedFile(null);
+                                                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                                    setPreviewUrl('');
+                                                    setUploadError('');
+                                                }}
+                                                disabled={uploading}
+                                            >
+                                                Clear
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <section className={styles.card} aria-label="Character info">
                         <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
                             <div className={styles.field}>

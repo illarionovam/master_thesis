@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
 import appUserService from '../services/appUserService.js';
 import tokenService from '../services/tokenService.js';
-import { mailer } from '../mailer/mailer.js';
+import { mailer } from '../utilities/mailer.js';
 
 const stripAppUserResponse = appUser => {
     return {
