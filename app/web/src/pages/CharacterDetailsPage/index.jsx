@@ -347,12 +347,7 @@ export default function CharacterDetailsPage() {
                                         >
                                             Save
                                         </button>
-                                        <button
-                                            type="button"
-                                            className="ghostBtn"
-                                            onClick={handleCancel}
-                                            disabled={updateLoading}
-                                        >
+                                        <button type="button" onClick={handleCancel} disabled={updateLoading}>
                                             Cancel
                                         </button>
                                     </>
@@ -480,12 +475,7 @@ export default function CharacterDetailsPage() {
                                     >
                                         {adding ? 'Adding...' : 'Add'}
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={closeAddWorkModal}
-                                        disabled={adding}
-                                    >
+                                    <button type="button" onClick={closeAddWorkModal} disabled={adding}>
                                         Cancel
                                     </button>
                                 </div>
@@ -548,7 +538,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <button type="button" className="primaryBtn" onClick={save}>
                     Save
                 </button>
-                <button type="button" className="ghostBtn" onClick={onCancel}>
+                <button type="button" onClick={onCancel}>
                     Cancel
                 </button>
             </div>

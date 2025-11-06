@@ -6,10 +6,8 @@
     --black: #111827;
     --white: #ffffff;
     --red: #dc2626;
-    --light-gray: #d1d5db;
-
-    --shadow-color: rgba(0, 0, 0, 0.08);
-    --link-base-color: #111827;
+    --light-gray: rgba(0, 0, 0, 0.08);
+    --shadow-gray: rgba(0, 0, 0, 0.16);
 
     color: var(--black);
     background-color: var(--white);
@@ -52,11 +50,16 @@ ol {
 button {
     margin: 0;
     padding: 0 16px;
-    border: none;
+
+    border: 1px solid var(--light-gray);
     border-radius: 8px;
+
     height: 40px;
     cursor: pointer;
+
     background-color: var(--white);
+    color: var(--black);
+
     font-weight: 600;
 
     &:hover {
@@ -69,6 +72,16 @@ button {
     }
 }
 
+.roundBtn {
+    padding: 0;
+    width: 40px;
+    border-radius: 9999px;
+    box-shadow: 4px 4px 8px var(--light-gray);
+
+    display: grid;
+    place-items: center;
+}
+
 .primaryBtn {
     background: var(--black);
     color: var(--white);
@@ -79,8 +92,10 @@ button {
     color: var(--white);
 }
 
-.ghostBtn {
-    border: 1px solid var(--light-gray);
-    background: var(--white);
-    color: var(--black);
+.icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    pointer-events: none;
+    fill: currentColor;
 }

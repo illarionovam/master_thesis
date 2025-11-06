@@ -205,11 +205,3 @@
     outline: none;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 0 0 3px rgba(17, 24, 39, 0.15);
 }
-
-.icon {
-    width: 20px;
-    height: 20px;
-    display: block;
-    pointer-events: none;
-    fill: currentColor;
-}

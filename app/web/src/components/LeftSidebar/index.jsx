@@ -14,13 +14,13 @@ export default function LeftSidebar({ defaultCollapsed = true }) {
         >
             <button
                 type="button"
-                className={styles.toggleBtn}
+                className={`roundBtn ${styles.toggleBtn}`}
                 onClick={() => setCollapsed(v => !v)}
                 aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                 title={collapsed ? 'Expand' : 'Collapse'}
                 aria-expanded={!collapsed}
             >
-                <svg className={styles.icon} aria-hidden="true" focusable="false">
+                <svg className="icon" aria-hidden="true" focusable="false">
                     <use href={`/icons.svg#${collapsed ? 'rightArrow' : 'leftArrow'}`} />
                 </svg>
             </button>

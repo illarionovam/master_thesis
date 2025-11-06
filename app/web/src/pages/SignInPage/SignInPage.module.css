@@ -9,9 +9,9 @@
     width: 100%;
     max-width: 420px;
     background: white;
-    border: 1px solid var(--shadow-color);
+    border: 1px solid var(--light-gray);
     border-radius: 12px;
-    box-shadow: 0 8px 24px var(--shadow-color);
+    box-shadow: 0 8px 24px var(--light-gray);
     padding: 24px;
 }
 
@@ -48,7 +48,7 @@
 
 .input:focus {
     outline: none;
-    border-color: var(--link-base-color);
+    border-color: var(--black);
     box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.15);
 }
 
@@ -91,7 +91,7 @@
 }
 
 .link {
-    color: var(--link-base-color);
+    color: var(--black);
     font-weight: 600;
     text-decoration: none;
 }

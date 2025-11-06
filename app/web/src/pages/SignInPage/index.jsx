@@ -100,12 +100,7 @@ export default function SignInPage() {
                         <button type="submit" disabled={loading} className="primaryBtn">
                             {loading ? 'Loading...' : 'Sign In'}
                         </button>
-                        <button
-                            type="button"
-                            onClick={() => dispatch(resetSignIn())}
-                            disabled={loading}
-                            className="ghostBtn"
-                        >
+                        <button type="button" onClick={() => dispatch(resetSignIn())} disabled={loading}>
                             Reset
                         </button>
                     </div>

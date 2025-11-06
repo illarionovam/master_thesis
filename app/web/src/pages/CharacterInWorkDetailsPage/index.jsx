@@ -332,12 +332,7 @@ export default function CharacterInWorkDetailsPage() {
                                         >
                                             Save
                                         </button>
-                                        <button
-                                            type="button"
-                                            className="ghostBtn"
-                                            onClick={handleCancel}
-                                            disabled={updateLoading}
-                                        >
+                                        <button type="button" onClick={handleCancel} disabled={updateLoading}>
                                             Cancel
                                         </button>
                                     </>
@@ -503,12 +498,7 @@ export default function CharacterInWorkDetailsPage() {
                                     >
                                         {addingRel ? 'Adding...' : 'Add'}
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={closeAddRelModal}
-                                        disabled={addingRel}
-                                    >
+                                    <button type="button" onClick={closeAddRelModal} disabled={addingRel}>
                                         Cancel
                                     </button>
                                 </div>
@@ -571,7 +561,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <button type="button" className="primaryBtn" onClick={save}>
                     Save
                 </button>
-                <button type="button" className="ghostBtn" onClick={onCancel}>
+                <button type="button" onClick={onCancel}>
                     Cancel
                 </button>
             </div>

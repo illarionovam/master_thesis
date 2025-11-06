@@ -287,12 +287,7 @@ export default function LocationDetailsPage() {
                                         >
                                             Save
                                         </button>
-                                        <button
-                                            type="button"
-                                            className="ghostBtn"
-                                            onClick={handleCancel}
-                                            disabled={updateLoading}
-                                        >
+                                        <button type="button" onClick={handleCancel} disabled={updateLoading}>
                                             Cancel
                                         </button>
                                     </>
@@ -397,12 +392,7 @@ export default function LocationDetailsPage() {
                                     >
                                         {adding ? 'Adding...' : 'Add'}
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={closeAddModal}
-                                        disabled={adding}
-                                    >
+                                    <button type="button" onClick={closeAddModal} disabled={adding}>
                                         Cancel
                                     </button>
                                 </div>

@@ -329,12 +329,7 @@ export default function EventDetailsPage() {
                                         >
                                             Save
                                         </button>
-                                        <button
-                                            type="button"
-                                            className="ghostBtn"
-                                            onClick={handleCancel}
-                                            disabled={updateLoading}
-                                        >
+                                        <button type="button" onClick={handleCancel} disabled={updateLoading}>
                                             Cancel
                                         </button>
                                     </>
@@ -434,12 +429,7 @@ export default function EventDetailsPage() {
                                     >
                                         {addingCast ? 'Adding...' : 'Add'}
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={closeAddCast}
-                                        disabled={addingCast}
-                                    >
+                                    <button type="button" onClick={closeAddCast} disabled={addingCast}>
                                         Cancel
                                     </button>
                                 </div>

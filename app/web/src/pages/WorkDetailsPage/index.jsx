@@ -438,12 +438,7 @@ export default function WorkDetailsPage() {
                                         >
                                             Save
                                         </button>
-                                        <button
-                                            type="button"
-                                            className="ghostBtn"
-                                            onClick={handleCancel}
-                                            disabled={updateLoading}
-                                        >
+                                        <button type="button" onClick={handleCancel} disabled={updateLoading}>
                                             Cancel
                                         </button>
                                     </>
@@ -590,12 +585,7 @@ export default function WorkDetailsPage() {
                                     >
                                         {addingCast ? 'Adding...' : 'Add'}
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={closeCastAdd}
-                                        disabled={addingCast}
-                                    >
+                                    <button type="button" onClick={closeCastAdd} disabled={addingCast}>
                                         Cancel
                                     </button>
                                 </div>
@@ -655,12 +645,7 @@ export default function WorkDetailsPage() {
                                     >
                                         {addingLoc ? 'Adding...' : 'Add'}
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={closeLocAdd}
-                                        disabled={addingLoc}
-                                    >
+                                    <button type="button" onClick={closeLocAdd} disabled={addingLoc}>
                                         Cancel
                                     </button>
                                 </div>
@@ -685,7 +670,6 @@ export default function WorkDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className="ghostBtn"
                                         onClick={handleStartReorder}
                                         disabled={eventsLoading || events.length === 0}
                                         aria-label="Reorder events"
@@ -708,7 +692,6 @@ export default function WorkDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className="ghostBtn"
                                         onClick={handleCancelReorder}
                                         disabled={savingReorder}
                                         aria-label="Cancel reorder"

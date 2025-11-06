@@ -154,12 +154,7 @@ export default function UserDetailPage() {
                             </div>
 
                             {!emailEdit ? (
-                                <button
-                                    type="button"
-                                    className="ghostBtn"
-                                    onClick={handleStartEmailEdit}
-                                    disabled={disableAll}
-                                >
+                                <button type="button" onClick={handleStartEmailEdit} disabled={disableAll}>
                                     Change email
                                 </button>
                             ) : (
@@ -172,12 +167,7 @@ export default function UserDetailPage() {
                                     >
                                         Save
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={handleCancelEmailEdit}
-                                        disabled={emailLoading}
-                                    >
+                                    <button type="button" onClick={handleCancelEmailEdit} disabled={emailLoading}>
                                         Cancel
                                     </button>
                                 </div>
@@ -237,12 +227,7 @@ export default function UserDetailPage() {
                                         Edit
                                     </button>
 
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={handleOpenChangePass}
-                                        disabled={disableAll}
-                                    >
+                                    <button type="button" onClick={handleOpenChangePass} disabled={disableAll}>
                                         Change password
                                     </button>
 
@@ -265,12 +250,7 @@ export default function UserDetailPage() {
                                     >
                                         Save
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="ghostBtn"
-                                        onClick={handleCancelEdit}
-                                        disabled={updateLoading}
-                                    >
+                                    <button type="button" onClick={handleCancelEdit} disabled={updateLoading}>
                                         Cancel
                                     </button>
                                 </>

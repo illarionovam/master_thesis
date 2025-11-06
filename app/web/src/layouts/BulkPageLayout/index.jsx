@@ -69,12 +69,12 @@ export default function BulkPageLayout({
                 <>
                     <button
                         type="button"
-                        className={styles.fab}
+                        className={`roundBtn ${styles.fab}`}
                         onClick={handleOpenCreate}
                         aria-label={`Create ${title}`}
                         title={`Create ${title}`}
                     >
-                        <svg className={styles.icon} aria-hidden="true" focusable="false">
+                        <svg className="icon" aria-hidden="true" focusable="false">
                             <use href="/icons.svg#plus" />
                         </svg>
                     </button>

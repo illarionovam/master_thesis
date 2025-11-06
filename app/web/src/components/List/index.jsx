@@ -17,7 +17,7 @@ export default function List({ items = [], onRemove }) {
                             {typeof onRemove === 'function' && (
                                 <button
                                     type="button"
-                                    className={styles.removeBtn}
+                                    className="roundBtn"
                                     aria-label="Remove"
                                     title="Remove"
                                     onClick={e => {
@@ -26,7 +26,9 @@ export default function List({ items = [], onRemove }) {
                                         onRemove(item);
                                     }}
                                 >
-                                    &mdash;
+                                    <svg className="icon" aria-hidden="true" focusable="false">
+                                        <use href="/icons.svg#minus" />
+                                    </svg>
                                 </button>
                             )}
                         </div>
