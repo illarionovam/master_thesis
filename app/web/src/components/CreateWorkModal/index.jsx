@@ -103,7 +103,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, submitting = 
                     <button type="button" className={styles.ghostBtn} onClick={onClose} disabled={submitting}>
                         Cancel
                     </button>
-                    <button type="submit" className={styles.primaryBtn} disabled={!isValid || submitting}>
+                    <button type="submit" className="primaryBtn" disabled={!isValid || submitting}>
                         {submitting ? 'Submitting...' : 'Create'}
                     </button>
                 </div>

@@ -38,17 +38,6 @@
     justify-content: flex-end;
 }
 
-.primaryBtn {
-    height: 40px;
-    padding: 0 14px;
-    border: 1px solid #111827;
-    background: #111827;
-    color: #fff;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
 .ghostBtn {
     height: 40px;
     padding: 0 14px;

@@ -64,7 +64,7 @@ export default function VerifyEmailModal({ onClose }) {
                 {success && <p className={styles.success}>Verification link sent. Check your email!</p>}
 
                 <div className={styles.actions}>
-                    <button type="submit" className={styles.primaryBtn} disabled={loading}>
+                    <button type="submit" className="primaryBtn" disabled={loading}>
                         {loading ? 'Submitting...' : 'Verify'}
                     </button>
                     <button type="button" className={styles.ghostBtn} onClick={handleCancel} disabled={loading}>

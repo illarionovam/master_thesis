@@ -413,7 +413,7 @@ export default function WorkDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleEdit}
                                             disabled={disableAll}
                                         >
@@ -432,7 +432,7 @@ export default function WorkDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleSave}
                                             disabled={updateLoading}
                                         >
@@ -457,7 +457,7 @@ export default function WorkDetailsPage() {
                             <h2 className={styles.subTitle}>Cast</h2>
                             <button
                                 type="button"
-                                className={styles.primaryBtn}
+                                className="primaryBtn"
                                 onClick={openCastAdd}
                                 disabled={castLoading}
                                 aria-label="Add character"
@@ -500,7 +500,7 @@ export default function WorkDetailsPage() {
                             <h2 className={styles.subTitle}>Location links</h2>
                             <button
                                 type="button"
-                                className={styles.primaryBtn}
+                                className="primaryBtn"
                                 onClick={openLocAdd}
                                 disabled={locLinksLoading}
                                 aria-label="Add location"
@@ -584,7 +584,7 @@ export default function WorkDetailsPage() {
                                 <div className={styles.modalActions}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleAddCast}
                                         disabled={addingCast || possibleCastLoading || !selectedCharacterId}
                                     >
@@ -649,7 +649,7 @@ export default function WorkDetailsPage() {
                                 <div className={styles.modalActions}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleAddLocation}
                                         disabled={addingLoc || possibleLocLinksLoading || !selectedLocationId}
                                     >
@@ -675,7 +675,7 @@ export default function WorkDetailsPage() {
                                 <div className={styles.actionsRow}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={openEventModal}
                                         disabled={eventsLoading}
                                         aria-label="Add event"
@@ -698,7 +698,7 @@ export default function WorkDetailsPage() {
                                 <div className={styles.actionsRow}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleSaveReorder}
                                         disabled={savingReorder}
                                         aria-label="Save order"

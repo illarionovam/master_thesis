@@ -18,7 +18,7 @@ export default function ConfirmSignOutModal({ open, onClose, onCurrent, onAll })
                 <p className={styles.text}>Choose what to sign out:</p>
 
                 <div className={styles.actions}>
-                    <button type="button" onClick={onCurrent} className={styles.primaryBtn}>
+                    <button type="button" onClick={onCurrent} className="primaryBtn">
                         Only current
                     </button>
                     <button type="button" onClick={onAll} className="dangerBtn">

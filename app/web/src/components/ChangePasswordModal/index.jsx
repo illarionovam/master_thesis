@@ -72,7 +72,7 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
                 </div>
 
                 <div className={styles.actions}>
-                    <button type="submit" disabled={loading} className={styles.primaryBtn}>
+                    <button type="submit" disabled={loading} className="primaryBtn">
                         {loading ? 'Saving...' : 'Save'}
                     </button>
                     <button type="button" onClick={onClose} disabled={loading} className={styles.ghostBtn}>

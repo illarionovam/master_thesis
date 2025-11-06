@@ -304,7 +304,7 @@ export default function EventDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleEdit}
                                             disabled={disableAll}
                                         >
@@ -323,7 +323,7 @@ export default function EventDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleSave}
                                             disabled={updateLoading}
                                         >
@@ -348,7 +348,7 @@ export default function EventDetailsPage() {
                             <h2 className={styles.subTitle}>Cast</h2>
                             <button
                                 type="button"
-                                className={styles.primaryBtn}
+                                className="primaryBtn"
                                 onClick={openAddCast}
                                 disabled={participantsLoading}
                                 aria-label="Add participant"
@@ -428,7 +428,7 @@ export default function EventDetailsPage() {
                                 <div className={styles.modalActions}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleAddCast}
                                         disabled={addingCast || possibleParticipantsLoading || !selectedCharacterId}
                                     >

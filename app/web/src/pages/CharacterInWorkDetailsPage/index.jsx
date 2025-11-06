@@ -316,7 +316,7 @@ export default function CharacterInWorkDetailsPage() {
                                 {!editMode ? (
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleEdit}
                                         disabled={disableAll}
                                     >
@@ -326,7 +326,7 @@ export default function CharacterInWorkDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleSave}
                                             disabled={updateLoading}
                                         >
@@ -397,7 +397,7 @@ export default function CharacterInWorkDetailsPage() {
                             <h2 className={styles.subTitle}>Relationships</h2>
                             <button
                                 type="button"
-                                className={styles.primaryBtn}
+                                className="primaryBtn"
                                 onClick={openAddRelModal}
                                 disabled={relLoading}
                                 aria-label="Add relationship"
@@ -497,7 +497,7 @@ export default function CharacterInWorkDetailsPage() {
                                 <div className={styles.modalActions}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleAddRelationship}
                                         disabled={addingRel || possibleRelLoading || !selectedTargetId}
                                     >
@@ -568,7 +568,7 @@ function AddTagFields({ onAdd, onCancel }) {
             )}
 
             <div className={styles.modalActions}>
-                <button type="button" className={styles.primaryBtn} onClick={save}>
+                <button type="button" className="primaryBtn" onClick={save}>
                     Save
                 </button>
                 <button type="button" className={styles.ghostBtn} onClick={onCancel}>

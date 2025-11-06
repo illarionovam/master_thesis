@@ -185,7 +185,7 @@ export default function RelationshipDetailsPage() {
                                 <>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleEdit}
                                         disabled={disableAll}
                                     >
@@ -204,7 +204,7 @@ export default function RelationshipDetailsPage() {
                                 <>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleSave}
                                         disabled={updateLoading || !typeVal.trim()}
                                     >

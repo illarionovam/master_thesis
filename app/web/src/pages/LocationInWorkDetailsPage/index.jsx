@@ -217,7 +217,7 @@ export default function LocationInWorkDetailsPage() {
                                 {!editMode ? (
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleEdit}
                                         disabled={disableAll}
                                     >
@@ -227,7 +227,7 @@ export default function LocationInWorkDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleSave}
                                             disabled={updateLoading}
                                         >
@@ -345,7 +345,7 @@ function AddTagFields({ onAdd, onCancel }) {
             )}
 
             <div className={styles.modalActions}>
-                <button type="button" className={styles.primaryBtn} onClick={save}>
+                <button type="button" className="primaryBtn" onClick={save}>
                     Save
                 </button>
                 <button type="button" className={styles.ghostBtn} onClick={onCancel}>

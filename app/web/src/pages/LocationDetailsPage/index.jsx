@@ -262,7 +262,7 @@ export default function LocationDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleEdit}
                                             disabled={disableAll}
                                         >
@@ -281,7 +281,7 @@ export default function LocationDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleSave}
                                             disabled={updateLoading}
                                         >
@@ -306,7 +306,7 @@ export default function LocationDetailsPage() {
                             <h2 className={styles.subTitle}>Placements</h2>
                             <button
                                 type="button"
-                                className={styles.primaryBtn}
+                                className="primaryBtn"
                                 onClick={openAddModal}
                                 disabled={placementsLoading}
                                 aria-label="Add to work"
@@ -391,7 +391,7 @@ export default function LocationDetailsPage() {
                                 <div className={styles.modalActions}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleAddToWork}
                                         disabled={adding || possibleLoading || !selectedWorkId}
                                     >

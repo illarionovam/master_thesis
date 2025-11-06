@@ -322,7 +322,7 @@ export default function CharacterDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleEdit}
                                             disabled={disableAll}
                                         >
@@ -341,7 +341,7 @@ export default function CharacterDetailsPage() {
                                     <>
                                         <button
                                             type="button"
-                                            className={styles.primaryBtn}
+                                            className="primaryBtn"
                                             onClick={handleSave}
                                             disabled={updateLoading}
                                         >
@@ -366,7 +366,7 @@ export default function CharacterDetailsPage() {
                             <h2 className={styles.subTitle}>Appearances</h2>
                             <button
                                 type="button"
-                                className={styles.primaryBtn}
+                                className="primaryBtn"
                                 onClick={openAddWorkModal}
                                 disabled={appearancesLoading}
                                 aria-label="Add to work"
@@ -474,7 +474,7 @@ export default function CharacterDetailsPage() {
                                 <div className={styles.modalActions}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleAddToWork}
                                         disabled={adding || possibleLoading || !selectedWorkId}
                                     >
@@ -545,7 +545,7 @@ function AddTagFields({ onAdd, onCancel }) {
             )}
 
             <div className={styles.modalActions}>
-                <button type="button" className={styles.primaryBtn} onClick={save}>
+                <button type="button" className="primaryBtn" onClick={save}>
                     Save
                 </button>
                 <button type="button" className={styles.ghostBtn} onClick={onCancel}>

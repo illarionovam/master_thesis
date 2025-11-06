@@ -73,3 +73,8 @@ button {
     color: var(--white);
     font-weight: 600;
 }
+
+.primaryBtn {
+    background: var(--black);
+    color: var(--white);
+}

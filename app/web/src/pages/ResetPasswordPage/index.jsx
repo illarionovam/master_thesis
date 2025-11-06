@@ -55,7 +55,7 @@ export default function ResetPasswordPage() {
                 </div>
 
                 <div className={styles.actions}>
-                    <button type="submit" disabled={loading || !token} className={styles.primaryBtn}>
+                    <button type="submit" disabled={loading || !token} className="primaryBtn">
                         {loading ? 'Submitting...' : 'Set New Password'}
                     </button>
                 </div>

@@ -68,7 +68,7 @@ export default function ResetPasswordModal({ onClose }) {
                 {success && <p className={styles.success}>Reset link sent. Check your email!</p>}
 
                 <div className={styles.actions}>
-                    <button type="submit" className={styles.primaryBtn} disabled={loading}>
+                    <button type="submit" className="primaryBtn" disabled={loading}>
                         {loading ? 'Submitting...' : 'Reset'}
                     </button>
                     <button type="button" className={styles.ghostBtn} onClick={handleCancel} disabled={loading}>

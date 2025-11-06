@@ -166,7 +166,7 @@ export default function UserDetailPage() {
                                 <div className={styles.rowActions}>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleSaveEmail}
                                         disabled={emailLoading}
                                     >
@@ -230,7 +230,7 @@ export default function UserDetailPage() {
                                 <>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleEdit}
                                         disabled={disableAll}
                                     >
@@ -259,7 +259,7 @@ export default function UserDetailPage() {
                                 <>
                                     <button
                                         type="button"
-                                        className={styles.primaryBtn}
+                                        className="primaryBtn"
                                         onClick={handleSaveEdit}
                                         disabled={updateLoading}
                                     >
