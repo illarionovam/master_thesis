@@ -210,7 +210,7 @@ export default function CharacterDetailsPage() {
             fd.append('file', selectedFile);
 
             const res = await uploadImage(fd);
-            const url = res?.data?.url || res?.data?.secure_url || res?.data;
+            const url = res?.url;
 
             if (!url || typeof url !== 'string') {
                 throw new Error('Upload succeeded but no URL was returned');
