@@ -248,7 +248,7 @@ export default function UserDetailPage() {
 
                                     <button
                                         type="button"
-                                        className={styles.dangerBtn}
+                                        className="dangerBtn"
                                         onClick={handleSignOut}
                                         disabled={disableAll}
                                     >

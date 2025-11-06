@@ -330,7 +330,7 @@ export default function CharacterDetailsPage() {
                                         </button>
                                         <button
                                             type="button"
-                                            className={styles.dangerBtn}
+                                            className="dangerBtn"
                                             onClick={handleDelete}
                                             disabled={disableAll}
                                         >
