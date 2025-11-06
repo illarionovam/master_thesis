@@ -14,6 +14,7 @@ export const ROUTES = {
     LOCATION_IN_WORK_DETAILS_PAGE: '/works/:id/location-links/:locationInWorkId',
     CHARACTER_IN_WORK_DETAILS_PAGE: '/works/:id/cast/:characterInWorkId',
     EVENT_DETAILS_PAGE: '/works/:id/events/:eventId',
+    RELATIONSHIP_DETAILS_PAGE: '/works/:id/cast/:characterInWorkId/relationships/:relationshipId',
     NOT_FOUND_PAGE: '*',
 };
 
