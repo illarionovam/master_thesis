@@ -108,7 +108,10 @@ export default function LocationInWorkDetailsPage() {
                             )}
                         </li>
                         <li aria-current="page">
-                            <Link to={`/work-locations/${locationInWorkId}`} className={styles.crumbLink}>
+                            <Link
+                                to={`/works/${workId}/location-links/${locationInWorkId}`}
+                                className={styles.crumbLink}
+                            >
                                 {location?.title ?? '—'}
                             </Link>
                         </li>
