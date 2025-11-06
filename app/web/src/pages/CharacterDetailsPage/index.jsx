@@ -262,25 +262,26 @@ export default function CharacterDetailsPage() {
 
             {!loading && !error && character && (
                 <>
-                    <section className={styles.card} aria-label="Character image">
-                        <div className={styles.field}>
-                            <span className={styles.label}>Image</span>
+                    <div className={styles.split}>
+                        <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
+                            <div className={styles.imageColumn}>
+                                <span className={styles.label}>Image</span>
 
-                            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                                <div>
+                                <div className={styles.portraitWrap}>
                                     {previewUrl ? (
-                                        <img src={previewUrl} alt="Preview" />
+                                        <img className={styles.portraitImg} src={previewUrl} alt="Preview" />
                                     ) : character?.image_url ? (
                                         <img
+                                            className={styles.portraitImg}
                                             src={character.image_url}
                                             alt={`${character?.name ?? 'Character'} image`}
                                         />
                                     ) : (
-                                        <span className={styles.muted}>No image</span>
+                                        <div className={styles.portraitEmpty}>No image</div>
                                     )}
                                 </div>
 
-                                <div style={{ flex: 1 }}>
+                                <div className={styles.uploader}>
                                     <label className={styles.label} htmlFor="ch-image-picker">
                                         Upload new image
                                     </label>
@@ -292,9 +293,6 @@ export default function CharacterDetailsPage() {
                                         disabled={uploading || disableAll}
                                         aria-describedby="ch-image-help"
                                     />
-                                    <div id="ch-image-help" className={styles.muted}>
-                                        Accepted: image/* • The file is uploaded first, then saved to this character.
-                                    </div>
 
                                     {uploadError && (
                                         <p role="alert" className={styles.error}>
@@ -302,7 +300,7 @@ export default function CharacterDetailsPage() {
                                         </p>
                                     )}
 
-                                    <div>
+                                    <div className={styles.imageActions}>
                                         <button
                                             type="button"
                                             className="primaryBtn"
@@ -330,158 +328,158 @@ export default function CharacterDetailsPage() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
+                        </section>
 
-                    <section className={styles.card} aria-label="Character info">
-                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                            <div className={styles.field}>
-                                <label htmlFor="ch-name" className={styles.label}>
-                                    Name
-                                </label>
-                                <input
-                                    id="ch-name"
-                                    name="name"
-                                    type="text"
-                                    defaultValue={character.name ?? ''}
-                                    className={styles.input}
-                                    disabled={!editMode || disableAll}
-                                    required
-                                />
-                            </div>
+                        <section className={styles.card} aria-label="Character info">
+                            <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                                <div className={styles.field}>
+                                    <label htmlFor="ch-name" className={styles.label}>
+                                        Name
+                                    </label>
+                                    <input
+                                        id="ch-name"
+                                        name="name"
+                                        type="text"
+                                        defaultValue={character.name ?? ''}
+                                        className={styles.input}
+                                        disabled={!editMode || disableAll}
+                                        required
+                                    />
+                                </div>
 
-                            <div className={styles.field}>
-                                <label htmlFor="ch-appearance" className={styles.label}>
-                                    Appearance
-                                </label>
-                                <textarea
-                                    id="ch-appearance"
-                                    name="appearance"
-                                    rows={5}
-                                    defaultValue={character.appearance ?? ''}
-                                    className={`${styles.input} ${styles.textarea}`}
-                                    disabled={!editMode || disableAll}
-                                />
-                            </div>
+                                <div className={styles.field}>
+                                    <label htmlFor="ch-appearance" className={styles.label}>
+                                        Appearance
+                                    </label>
+                                    <textarea
+                                        id="ch-appearance"
+                                        name="appearance"
+                                        rows={5}
+                                        defaultValue={character.appearance ?? ''}
+                                        className={`${styles.input} ${styles.textarea}`}
+                                        disabled={!editMode || disableAll}
+                                    />
+                                </div>
 
-                            <div className={styles.field}>
-                                <label htmlFor="ch-personality" className={styles.label}>
-                                    Personality
-                                </label>
-                                <textarea
-                                    id="ch-personality"
-                                    name="personality"
-                                    rows={5}
-                                    defaultValue={character.personality ?? ''}
-                                    className={`${styles.input} ${styles.textarea}`}
-                                    disabled={!editMode || disableAll}
-                                />
-                            </div>
+                                <div className={styles.field}>
+                                    <label htmlFor="ch-personality" className={styles.label}>
+                                        Personality
+                                    </label>
+                                    <textarea
+                                        id="ch-personality"
+                                        name="personality"
+                                        rows={5}
+                                        defaultValue={character.personality ?? ''}
+                                        className={`${styles.input} ${styles.textarea}`}
+                                        disabled={!editMode || disableAll}
+                                    />
+                                </div>
 
-                            <div className={styles.field}>
-                                <label htmlFor="ch-bio" className={styles.label}>
-                                    Bio
-                                </label>
-                                <textarea
-                                    id="ch-bio"
-                                    name="bio"
-                                    rows={6}
-                                    defaultValue={character.bio ?? ''}
-                                    className={`${styles.input} ${styles.textarea}`}
-                                    disabled={!editMode || disableAll}
-                                />
-                            </div>
+                                <div className={styles.field}>
+                                    <label htmlFor="ch-bio" className={styles.label}>
+                                        Bio
+                                    </label>
+                                    <textarea
+                                        id="ch-bio"
+                                        name="bio"
+                                        rows={6}
+                                        defaultValue={character.bio ?? ''}
+                                        className={`${styles.input} ${styles.textarea}`}
+                                        disabled={!editMode || disableAll}
+                                    />
+                                </div>
 
-                            <div className={styles.field}>
-                                <span className={styles.label}>Tags</span>
-                                <div className={styles.chips}>
-                                    {Object.keys(attrs).length === 0 && (
-                                        <span className={styles.muted}>No tags yet.</span>
-                                    )}
+                                <div className={styles.field}>
+                                    <span className={styles.label}>Tags</span>
+                                    <div className={styles.chips}>
+                                        {Object.keys(attrs).length === 0 && (
+                                            <span className={styles.muted}>No tags yet.</span>
+                                        )}
 
-                                    {Object.entries(attrs).map(([k, v]) => (
-                                        <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
-                                            <strong className={styles.chipKey}>{k}</strong>
-                                            <span className={styles.chipSep}>:</span>
-                                            <span className={styles.chipVal}>{String(v)}</span>
+                                        {Object.entries(attrs).map(([k, v]) => (
+                                            <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
+                                                <strong className={styles.chipKey}>{k}</strong>
+                                                <span className={styles.chipSep}>:</span>
+                                                <span className={styles.chipVal}>{String(v)}</span>
 
-                                            {editMode && (
-                                                <button
-                                                    type="button"
-                                                    className={styles.chipRemove}
-                                                    onClick={() => removeAttr(k)}
-                                                    aria-label={`Remove tag ${k}`}
-                                                    title="Remove"
-                                                >
-                                                    x
-                                                </button>
-                                            )}
-                                        </span>
-                                    ))}
+                                                {editMode && (
+                                                    <button
+                                                        type="button"
+                                                        className={styles.chipRemove}
+                                                        onClick={() => removeAttr(k)}
+                                                        aria-label={`Remove tag ${k}`}
+                                                        title="Remove"
+                                                    >
+                                                        x
+                                                    </button>
+                                                )}
+                                            </span>
+                                        ))}
 
-                                    {editMode && (
-                                        <button
-                                            type="button"
-                                            className={styles.addChipBtn}
-                                            onClick={() => setAddTagOpen(true)}
-                                            aria-label="Add tag"
-                                            title="Add tag"
-                                        >
-                                            +
-                                        </button>
+                                        {editMode && (
+                                            <button
+                                                type="button"
+                                                className={styles.addChipBtn}
+                                                onClick={() => setAddTagOpen(true)}
+                                                aria-label="Add tag"
+                                                title="Add tag"
+                                            >
+                                                +
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {updateError && (
+                                    <p role="alert" className={styles.error}>
+                                        {String(updateError)}
+                                    </p>
+                                )}
+                                {deleteError && (
+                                    <p role="alert" className={styles.error}>
+                                        {String(deleteError)}
+                                    </p>
+                                )}
+
+                                <div className={styles.actions}>
+                                    {!editMode ? (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleEdit}
+                                                disabled={disableAll}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="dangerBtn"
+                                                onClick={handleDelete}
+                                                disabled={disableAll}
+                                            >
+                                                {deleteLoading ? 'Deleting...' : 'Delete'}
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleSave}
+                                                disabled={updateLoading}
+                                            >
+                                                Save
+                                            </button>
+                                            <button type="button" onClick={handleCancel} disabled={updateLoading}>
+                                                Cancel
+                                            </button>
+                                        </>
                                     )}
                                 </div>
-                            </div>
-
-                            {updateError && (
-                                <p role="alert" className={styles.error}>
-                                    {String(updateError)}
-                                </p>
-                            )}
-                            {deleteError && (
-                                <p role="alert" className={styles.error}>
-                                    {String(deleteError)}
-                                </p>
-                            )}
-
-                            <div className={styles.actions}>
-                                {!editMode ? (
-                                    <>
-                                        <button
-                                            type="button"
-                                            className="primaryBtn"
-                                            onClick={handleEdit}
-                                            disabled={disableAll}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="dangerBtn"
-                                            onClick={handleDelete}
-                                            disabled={disableAll}
-                                        >
-                                            {deleteLoading ? 'Deleting...' : 'Delete'}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button
-                                            type="button"
-                                            className="primaryBtn"
-                                            onClick={handleSave}
-                                            disabled={updateLoading}
-                                        >
-                                            Save
-                                        </button>
-                                        <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                            Cancel
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        </form>
-                    </section>
+                            </form>
+                        </section>
+                    </div>
 
                     <section className={styles.card} aria-label="Character appearances">
                         <div className={styles.subHeader}>
