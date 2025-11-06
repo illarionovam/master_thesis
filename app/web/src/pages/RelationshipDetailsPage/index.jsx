@@ -104,8 +104,26 @@ export default function RelationshipDetailsPage() {
                                 <span className={styles.crumbLink}>{workTitle}</span>
                             )}
                         </li>
-                        <li aria-current="page">
-                            <span className={styles.crumbLink}>{`[${fromName} > ${toName}]`}</span>
+                        <li>
+                            {characterInWorkId ? (
+                                <Link to={`/works/${workId}/cast/${characterInWorkId}`} className={styles.crumbLink}>
+                                    {fromName}
+                                </Link>
+                            ) : (
+                                <span className={styles.crumbLink}>{fromName}</span>
+                            )}
+                        </li>
+                        <li>
+                            {rel?.to_character_in_work_id ? (
+                                <Link
+                                    to={`/works/${workId}/cast/${rel.to_character_in_work_id}`}
+                                    className={styles.crumbLink}
+                                >
+                                    {toName}
+                                </Link>
+                            ) : (
+                                <span className={styles.crumbLink}>{toName}</span>
+                            )}
                         </li>
                     </ol>
                 </nav>
