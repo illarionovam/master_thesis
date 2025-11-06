@@ -104,7 +104,7 @@ export default function SignInPage() {
                             type="button"
                             onClick={() => dispatch(resetSignIn())}
                             disabled={loading}
-                            className={styles.ghostBtn}
+                            className="ghostBtn"
                         >
                             Reset
                         </button>

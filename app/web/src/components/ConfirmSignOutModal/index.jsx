@@ -24,7 +24,7 @@ export default function ConfirmSignOutModal({ open, onClose, onCurrent, onAll })
                     <button type="button" onClick={onAll} className="dangerBtn">
                         All
                     </button>
-                    <button type="button" onClick={onClose} className={styles.ghostBtn}>
+                    <button type="button" onClick={onClose} className="ghostBtn">
                         Cancel
                     </button>
                 </div>

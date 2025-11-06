@@ -212,7 +212,7 @@ export default function RelationshipDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={handleCancel}
                                         disabled={updateLoading}
                                     >

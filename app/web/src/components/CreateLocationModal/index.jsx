@@ -113,7 +113,7 @@ export default function CreateLocationModal({
                 )}
 
                 <div className={styles.actions}>
-                    <button type="button" className={styles.ghostBtn} onClick={onClose} disabled={submitting}>
+                    <button type="button" className="ghostBtn" onClick={onClose} disabled={submitting}>
                         Cancel
                     </button>
                     <button type="submit" className="primaryBtn" disabled={!isValid || submitting}>

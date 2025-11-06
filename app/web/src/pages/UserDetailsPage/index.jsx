@@ -156,7 +156,7 @@ export default function UserDetailPage() {
                             {!emailEdit ? (
                                 <button
                                     type="button"
-                                    className={styles.ghostBtn}
+                                    className="ghostBtn"
                                     onClick={handleStartEmailEdit}
                                     disabled={disableAll}
                                 >
@@ -174,7 +174,7 @@ export default function UserDetailPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={handleCancelEmailEdit}
                                         disabled={emailLoading}
                                     >
@@ -239,7 +239,7 @@ export default function UserDetailPage() {
 
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={handleOpenChangePass}
                                         disabled={disableAll}
                                     >
@@ -267,7 +267,7 @@ export default function UserDetailPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={handleCancelEdit}
                                         disabled={updateLoading}
                                     >

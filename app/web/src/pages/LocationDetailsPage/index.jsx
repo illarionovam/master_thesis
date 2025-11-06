@@ -289,7 +289,7 @@ export default function LocationDetailsPage() {
                                         </button>
                                         <button
                                             type="button"
-                                            className={styles.ghostBtn}
+                                            className="ghostBtn"
                                             onClick={handleCancel}
                                             disabled={updateLoading}
                                         >
@@ -399,7 +399,7 @@ export default function LocationDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={closeAddModal}
                                         disabled={adding}
                                     >

@@ -6,6 +6,7 @@
     --black: #111827;
     --white: #ffffff;
     --red: #dc2626;
+    --light-gray: #d1d5db;
 
     --shadow-color: rgba(0, 0, 0, 0.08);
     --link-base-color: #111827;
@@ -64,17 +65,22 @@ button {
 
     &:disabled {
         opacity: 0.7;
-        cursor: not-allowed;
+        cursor: progress;
     }
-}
-
-.dangerBtn {
-    background: var(--red);
-    color: var(--white);
-    font-weight: 600;
 }
 
 .primaryBtn {
     background: var(--black);
     color: var(--white);
+}
+
+.dangerBtn {
+    background: var(--red);
+    color: var(--white);
+}
+
+.ghostBtn {
+    border: 1px solid var(--light-gray);
+    background: var(--white);
+    color: var(--black);
 }

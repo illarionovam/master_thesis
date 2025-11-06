@@ -146,7 +146,7 @@ export default function SignUpPage() {
                                 dispatch(resetSignUp());
                             }}
                             disabled={loading}
-                            className={styles.ghostBtn}
+                            className="ghostBtn"
                         >
                             Reset
                         </button>

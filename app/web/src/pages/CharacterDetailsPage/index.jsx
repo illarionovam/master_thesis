@@ -349,7 +349,7 @@ export default function CharacterDetailsPage() {
                                         </button>
                                         <button
                                             type="button"
-                                            className={styles.ghostBtn}
+                                            className="ghostBtn"
                                             onClick={handleCancel}
                                             disabled={updateLoading}
                                         >
@@ -482,7 +482,7 @@ export default function CharacterDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={closeAddWorkModal}
                                         disabled={adding}
                                     >
@@ -548,7 +548,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <button type="button" className="primaryBtn" onClick={save}>
                     Save
                 </button>
-                <button type="button" className={styles.ghostBtn} onClick={onCancel}>
+                <button type="button" className="ghostBtn" onClick={onCancel}>
                     Cancel
                 </button>
             </div>

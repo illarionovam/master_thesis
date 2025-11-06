@@ -440,7 +440,7 @@ export default function WorkDetailsPage() {
                                         </button>
                                         <button
                                             type="button"
-                                            className={styles.ghostBtn}
+                                            className="ghostBtn"
                                             onClick={handleCancel}
                                             disabled={updateLoading}
                                         >
@@ -592,7 +592,7 @@ export default function WorkDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={closeCastAdd}
                                         disabled={addingCast}
                                     >
@@ -657,7 +657,7 @@ export default function WorkDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={closeLocAdd}
                                         disabled={addingLoc}
                                     >
@@ -685,7 +685,7 @@ export default function WorkDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={handleStartReorder}
                                         disabled={eventsLoading || events.length === 0}
                                         aria-label="Reorder events"
@@ -708,7 +708,7 @@ export default function WorkDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={handleCancelReorder}
                                         disabled={savingReorder}
                                         aria-label="Cancel reorder"

@@ -71,7 +71,7 @@ export default function ResetPasswordModal({ onClose }) {
                     <button type="submit" className="primaryBtn" disabled={loading}>
                         {loading ? 'Submitting...' : 'Reset'}
                     </button>
-                    <button type="button" className={styles.ghostBtn} onClick={handleCancel} disabled={loading}>
+                    <button type="button" className="ghostBtn" onClick={handleCancel} disabled={loading}>
                         Cancel
                     </button>
                 </div>

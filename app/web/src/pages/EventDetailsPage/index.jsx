@@ -331,7 +331,7 @@ export default function EventDetailsPage() {
                                         </button>
                                         <button
                                             type="button"
-                                            className={styles.ghostBtn}
+                                            className="ghostBtn"
                                             onClick={handleCancel}
                                             disabled={updateLoading}
                                         >
@@ -436,7 +436,7 @@ export default function EventDetailsPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        className={styles.ghostBtn}
+                                        className="ghostBtn"
                                         onClick={closeAddCast}
                                         disabled={addingCast}
                                     >
