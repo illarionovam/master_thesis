@@ -45,13 +45,6 @@ export const AppUser = sequelize.define(
             type: DataTypes.TEXT,
             allowNull: false,
         },
-        avatar_url: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-            set(v) {
-                this.setDataValue('avatar_url', normalizeOptionalText(v));
-            },
-        },
         verified: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
