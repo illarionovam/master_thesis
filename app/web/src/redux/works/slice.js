@@ -159,9 +159,8 @@ const worksSlice = createSlice({
                 state.createWork.loading = true;
                 state.createWork.error = null;
             })
-            .addCase(createWork.fulfilled, (state, action) => {
+            .addCase(createWork.fulfilled, state => {
                 state.createWork.loading = false;
-                state.work = action.payload;
             })
             .addCase(createWork.rejected, (state, action) => {
                 state.createWork.loading = false;
@@ -226,9 +225,8 @@ const worksSlice = createSlice({
                 state.linkWorkCharacter.loading = true;
                 state.linkWorkCharacter.error = null;
             })
-            .addCase(linkWorkCharacter.fulfilled, (state, action) => {
+            .addCase(linkWorkCharacter.fulfilled, state => {
                 state.linkWorkCharacter.loading = false;
-                state.characterInWork = action.payload;
             })
             .addCase(linkWorkCharacter.rejected, (state, action) => {
                 state.linkWorkCharacter.loading = false;
@@ -319,9 +317,8 @@ const worksSlice = createSlice({
                 state.createRelationship.loading = true;
                 state.createRelationship.error = null;
             })
-            .addCase(createRelationship.fulfilled, (state, action) => {
+            .addCase(createRelationship.fulfilled, state => {
                 state.createRelationship.loading = false;
-                state.relationship = action.payload;
             })
             .addCase(createRelationship.rejected, (state, action) => {
                 state.createRelationship.loading = false;
@@ -399,9 +396,8 @@ const worksSlice = createSlice({
                 state.linkWorkLocation.loading = true;
                 state.linkWorkLocation.error = null;
             })
-            .addCase(linkWorkLocation.fulfilled, (state, action) => {
+            .addCase(linkWorkLocation.fulfilled, state => {
                 state.linkWorkLocation.loading = false;
-                state.locationInWork = action.payload;
             })
             .addCase(linkWorkLocation.rejected, (state, action) => {
                 state.linkWorkLocation.loading = false;
@@ -492,9 +488,8 @@ const worksSlice = createSlice({
                 state.createEvent.loading = true;
                 state.createEvent.error = null;
             })
-            .addCase(createEvent.fulfilled, (state, action) => {
+            .addCase(createEvent.fulfilled, state => {
                 state.createEvent.loading = false;
-                state.event = action.payload;
             })
             .addCase(createEvent.rejected, (state, action) => {
                 state.createEvent.loading = false;

@@ -17,6 +17,8 @@ import {
     selectDeleteRelationshipError,
 } from '../../redux/works/selectors';
 
+import { resetRelationship } from '../../redux/works/slice';
+
 export default function RelationshipDetailsPage() {
     const { id: workId, characterInWorkId, relationshipId } = useParams();
     const titleId = useId();
@@ -38,10 +40,24 @@ export default function RelationshipDetailsPage() {
     const [typeVal, setTypeVal] = useState('');
     const [notesVal, setNotesVal] = useState('');
 
+    const [prePageLoading, setPrePageLoading] = useState(true);
+
     useEffect(() => {
-        if (!workId || !characterInWorkId || !relationshipId) return;
+        if (!workId || !characterInWorkId || !relationshipId) {
+            setPrePageLoading(false);
+            return;
+        }
+        if (rel != null) {
+            if (rel.id === relationshipId) {
+                setPrePageLoading(false);
+                return;
+            } else {
+                dispatch(resetRelationship());
+            }
+        }
+        setPrePageLoading(false);
         dispatch(getRelationship({ workId, characterInWorkId, relationshipId }));
-    }, [dispatch, workId, characterInWorkId, relationshipId]);
+    }, [dispatch, workId, characterInWorkId, relationshipId, rel]);
 
     useEffect(() => {
         if (!rel) return;
@@ -86,157 +102,164 @@ export default function RelationshipDetailsPage() {
     const toName = rel?.to?.character?.name ?? rel?.to?.name ?? rel?.to_name ?? '—';
 
     return (
-        <main aria-labelledby={titleId} className={styles.page}>
-            <div className={styles.header}>
-                <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
-                    <ol>
-                        <li>
-                            <Link to="/works" className={styles.crumbLink}>
-                                WORKS
-                            </Link>
-                        </li>
-                        <li>
-                            {workId ? (
-                                <Link to={`/works/${workId}`} className={styles.crumbLink}>
-                                    {workTitle}
-                                </Link>
-                            ) : (
-                                <span className={styles.crumbLink}>{workTitle}</span>
-                            )}
-                        </li>
-                        <li>
-                            {characterInWorkId ? (
-                                <Link to={`/works/${workId}/cast/${characterInWorkId}`} className={styles.crumbLink}>
-                                    {fromName}
-                                </Link>
-                            ) : (
-                                <span className={styles.crumbLink}>{fromName}</span>
-                            )}
-                        </li>
-                        <li>
-                            {rel?.to_character_in_work_id ? (
-                                <Link
-                                    to={`/works/${workId}/cast/${rel.to_character_in_work_id}`}
-                                    className={styles.crumbLink}
-                                >
-                                    {toName}
-                                </Link>
-                            ) : (
-                                <span className={styles.crumbLink}>{toName}</span>
-                            )}
-                        </li>
-                    </ol>
-                </nav>
-                <Title id={titleId}>Relationship</Title>
-            </div>
+        <>
+            {!prePageLoading && (
+                <main aria-labelledby={titleId} className={styles.page}>
+                    <div className={styles.header}>
+                        <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+                            <ol>
+                                <li>
+                                    <Link to="/works" className={styles.crumbLink}>
+                                        WORKS
+                                    </Link>
+                                </li>
+                                <li>
+                                    {workId ? (
+                                        <Link to={`/works/${workId}`} className={styles.crumbLink}>
+                                            {workTitle}
+                                        </Link>
+                                    ) : (
+                                        <span className={styles.crumbLink}>{workTitle}</span>
+                                    )}
+                                </li>
+                                <li>
+                                    {characterInWorkId ? (
+                                        <Link
+                                            to={`/works/${workId}/cast/${characterInWorkId}`}
+                                            className={styles.crumbLink}
+                                        >
+                                            {fromName}
+                                        </Link>
+                                    ) : (
+                                        <span className={styles.crumbLink}>{fromName}</span>
+                                    )}
+                                </li>
+                                <li>
+                                    {rel?.to_character_in_work_id ? (
+                                        <Link
+                                            to={`/works/${workId}/cast/${rel.to_character_in_work_id}`}
+                                            className={styles.crumbLink}
+                                        >
+                                            {toName}
+                                        </Link>
+                                    ) : (
+                                        <span className={styles.crumbLink}>{toName}</span>
+                                    )}
+                                </li>
+                            </ol>
+                        </nav>
+                        <Title id={titleId}>Relationship</Title>
+                    </div>
 
-            {loading && (
-                <p aria-live="polite" className={styles.muted}>
-                    Loading...
-                </p>
+                    {loading && (
+                        <p aria-live="polite" className={styles.muted}>
+                            Loading...
+                        </p>
+                    )}
+                    {error && (
+                        <p role="alert" className={styles.error}>
+                            {String(error)}
+                        </p>
+                    )}
+
+                    {!loading && !error && rel && (
+                        <section className={styles.card} aria-label="Relationship details">
+                            <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                                <div className={styles.field}>
+                                    <label className={styles.label}>From</label>
+                                    <input type="text" className={styles.input} value={fromName} disabled readOnly />
+                                </div>
+
+                                <div className={styles.field}>
+                                    <label className={styles.label}>To</label>
+                                    <input type="text" className={styles.input} value={toName} disabled readOnly />
+                                </div>
+
+                                <div className={styles.field}>
+                                    <label className={styles.label} htmlFor="rel-type">
+                                        Type
+                                    </label>
+                                    <input
+                                        id="rel-type"
+                                        name="type"
+                                        type="text"
+                                        className={styles.input}
+                                        value={typeVal}
+                                        onChange={e => setTypeVal(e.target.value)}
+                                        disabled={!editMode || disableAll}
+                                        required
+                                        placeholder="e.g. ally, enemy, mentor"
+                                    />
+                                </div>
+
+                                <div className={styles.field}>
+                                    <label className={styles.label} htmlFor="rel-notes">
+                                        Notes
+                                    </label>
+                                    <textarea
+                                        id="rel-notes"
+                                        name="notes"
+                                        rows={5}
+                                        className={`${styles.input} ${styles.textarea}`}
+                                        value={notesVal}
+                                        onChange={e => setNotesVal(e.target.value)}
+                                        disabled={!editMode || disableAll}
+                                        placeholder="Optional notes..."
+                                    />
+                                </div>
+
+                                {updateError && (
+                                    <p role="alert" className={styles.error}>
+                                        {String(updateError)}
+                                    </p>
+                                )}
+                                {deleteError && (
+                                    <p role="alert" className={styles.error}>
+                                        {String(deleteError)}
+                                    </p>
+                                )}
+
+                                <div className={styles.actions}>
+                                    {!editMode ? (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleEdit}
+                                                disabled={disableAll}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="dangerBtn"
+                                                onClick={handleDelete}
+                                                disabled={disableAll}
+                                            >
+                                                {deleteLoading ? 'Deleting...' : 'Delete'}
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleSave}
+                                                disabled={updateLoading || !typeVal.trim()}
+                                            >
+                                                Save
+                                            </button>
+                                            <button type="button" onClick={handleCancel} disabled={updateLoading}>
+                                                Cancel
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </form>
+                        </section>
+                    )}
+                </main>
             )}
-            {error && (
-                <p role="alert" className={styles.error}>
-                    {String(error)}
-                </p>
-            )}
-
-            {!loading && !error && rel && (
-                <section className={styles.card} aria-label="Relationship details">
-                    <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                        <div className={styles.field}>
-                            <label className={styles.label}>From</label>
-                            <input type="text" className={styles.input} value={fromName} disabled readOnly />
-                        </div>
-
-                        <div className={styles.field}>
-                            <label className={styles.label}>To</label>
-                            <input type="text" className={styles.input} value={toName} disabled readOnly />
-                        </div>
-
-                        <div className={styles.field}>
-                            <label className={styles.label} htmlFor="rel-type">
-                                Type
-                            </label>
-                            <input
-                                id="rel-type"
-                                name="type"
-                                type="text"
-                                className={styles.input}
-                                value={typeVal}
-                                onChange={e => setTypeVal(e.target.value)}
-                                disabled={!editMode || disableAll}
-                                required
-                                placeholder="e.g. ally, enemy, mentor"
-                            />
-                        </div>
-
-                        <div className={styles.field}>
-                            <label className={styles.label} htmlFor="rel-notes">
-                                Notes
-                            </label>
-                            <textarea
-                                id="rel-notes"
-                                name="notes"
-                                rows={5}
-                                className={`${styles.input} ${styles.textarea}`}
-                                value={notesVal}
-                                onChange={e => setNotesVal(e.target.value)}
-                                disabled={!editMode || disableAll}
-                                placeholder="Optional notes..."
-                            />
-                        </div>
-
-                        {updateError && (
-                            <p role="alert" className={styles.error}>
-                                {String(updateError)}
-                            </p>
-                        )}
-                        {deleteError && (
-                            <p role="alert" className={styles.error}>
-                                {String(deleteError)}
-                            </p>
-                        )}
-
-                        <div className={styles.actions}>
-                            {!editMode ? (
-                                <>
-                                    <button
-                                        type="button"
-                                        className="primaryBtn"
-                                        onClick={handleEdit}
-                                        disabled={disableAll}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="dangerBtn"
-                                        onClick={handleDelete}
-                                        disabled={disableAll}
-                                    >
-                                        {deleteLoading ? 'Deleting...' : 'Delete'}
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <button
-                                        type="button"
-                                        className="primaryBtn"
-                                        onClick={handleSave}
-                                        disabled={updateLoading || !typeVal.trim()}
-                                    >
-                                        Save
-                                    </button>
-                                    <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                        Cancel
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </form>
-                </section>
-            )}
-        </main>
+        </>
     );
 }

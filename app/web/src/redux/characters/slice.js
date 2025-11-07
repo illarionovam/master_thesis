@@ -56,9 +56,8 @@ const charactersSlice = createSlice({
                 state.createCharacter.loading = true;
                 state.createCharacter.error = null;
             })
-            .addCase(createCharacter.fulfilled, (state, action) => {
+            .addCase(createCharacter.fulfilled, state => {
                 state.createCharacter.loading = false;
-                state.character = action.payload;
             })
             .addCase(createCharacter.rejected, (state, action) => {
                 state.createCharacter.loading = false;

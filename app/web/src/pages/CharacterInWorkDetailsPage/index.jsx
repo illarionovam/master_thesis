@@ -33,6 +33,8 @@ import {
     selectCharacterInWorkPossibleRelationships,
 } from '../../redux/works/selectors';
 
+import { resetCharacterInWork } from '../../redux/works/slice';
+
 export default function CharacterInWorkDetailsPage() {
     const { id, characterInWorkId } = useParams();
     const titleId = useId();
@@ -70,14 +72,29 @@ export default function CharacterInWorkDetailsPage() {
     const [previewUrl, setPreviewUrl] = useState('');
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState('');
+
+    const [prePageLoading, setPrePageLoading] = useState(true);
+
     const formRef = useRef(null);
 
     useEffect(() => {
-        if (!characterInWorkId) return;
+        if (!id || !characterInWorkId) {
+            setPrePageLoading(false);
+            return;
+        }
+        if (ciw != null) {
+            if (ciw.id === characterInWorkId) {
+                setPrePageLoading(false);
+                return;
+            } else {
+                dispatch(resetCharacterInWork());
+            }
+        }
+        setPrePageLoading(false);
         dispatch(getCharacterInWork({ workId: id, characterInWorkId }));
         dispatch(getEventsByCharacterInWorkId({ workId: id, characterInWorkId }));
         dispatch(getCharacterInWorkRelationships({ workId: id, characterInWorkId }));
-    }, [dispatch, id, characterInWorkId]);
+    }, [dispatch, id, characterInWorkId, ciw]);
 
     useEffect(() => {
         if (ciw?.character?.attributes && typeof ciw.character.attributes === 'object') {
@@ -223,428 +240,460 @@ export default function CharacterInWorkDetailsPage() {
     };
 
     return (
-        <main aria-labelledby={titleId} className={styles.page}>
-            <div className={styles.header}>
-                <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
-                    <ol>
-                        <li>
-                            <Link to="/works" className={styles.crumbLink}>
-                                WORKS
-                            </Link>
-                        </li>
-                        <li>
-                            {workId ? (
-                                <Link to={`/works/${workId}`} className={styles.crumbLink}>
-                                    {workTitle}
-                                </Link>
-                            ) : (
-                                <span className={styles.crumbLink}>{workTitle}</span>
-                            )}
-                        </li>
-                        <li aria-current="page">
-                            <Link to={`/works/${workId}/cast/${characterInWorkId}`} className={styles.crumbLink}>
-                                {characterName}
-                            </Link>
-                        </li>
-                    </ol>
-                </nav>
-
-                <Title id={titleId}>{characterName}</Title>
-            </div>
-
-            {loading && (
-                <p aria-live="polite" className={styles.muted}>
-                    Loading...
-                </p>
-            )}
-            {error && (
-                <p role="alert" className={styles.error}>
-                    {String(error)}
-                </p>
-            )}
-
-            {!loading && !error && ciw && (
-                <>
-                    <div className={styles.split}>
-                        <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
-                            <div className={styles.imageColumn}>
-                                <span className={styles.label}>Image</span>
-
-                                <div className={styles.portraitWrap}>
-                                    {previewUrl ? (
-                                        <img className={styles.portraitImg} src={previewUrl} alt="Preview" />
-                                    ) : ciw?.image_url ? (
-                                        <img
-                                            className={styles.portraitImg}
-                                            src={ciw.image_url}
-                                            alt={`${ciw?.character?.name ?? 'Character'} image`}
-                                        />
-                                    ) : ciw?.character?.image_url ? (
-                                        <img
-                                            className={styles.portraitImg}
-                                            src={ciw.character.image_url}
-                                            alt={`${ciw?.character?.name ?? 'Character'} image`}
-                                        />
+        <>
+            {!prePageLoading && (
+                <main aria-labelledby={titleId} className={styles.page}>
+                    <div className={styles.header}>
+                        <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+                            <ol>
+                                <li>
+                                    <Link to="/works" className={styles.crumbLink}>
+                                        WORKS
+                                    </Link>
+                                </li>
+                                <li>
+                                    {workId ? (
+                                        <Link to={`/works/${workId}`} className={styles.crumbLink}>
+                                            {workTitle}
+                                        </Link>
                                     ) : (
-                                        <div className={styles.portraitEmpty}>No image</div>
+                                        <span className={styles.crumbLink}>{workTitle}</span>
                                     )}
-                                </div>
+                                </li>
+                                <li aria-current="page">
+                                    <Link
+                                        to={`/works/${workId}/cast/${characterInWorkId}`}
+                                        className={styles.crumbLink}
+                                    >
+                                        {characterName}
+                                    </Link>
+                                </li>
+                            </ol>
+                        </nav>
 
-                                <div className={styles.uploader}>
-                                    <label className={styles.label} htmlFor="ch-image-picker">
-                                        Upload new image
-                                    </label>
-                                    <input
-                                        id="ch-image-picker"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={onPickFile}
-                                        disabled={uploading || disableAll}
-                                        aria-describedby="ch-image-help"
-                                    />
+                        <Title id={titleId}>{characterName}</Title>
+                    </div>
 
-                                    {uploadError && (
-                                        <p role="alert" className={styles.error}>
-                                            {uploadError}
-                                        </p>
-                                    )}
+                    {loading && (
+                        <p aria-live="polite" className={styles.muted}>
+                            Loading...
+                        </p>
+                    )}
+                    {error && (
+                        <p role="alert" className={styles.error}>
+                            {String(error)}
+                        </p>
+                    )}
 
-                                    <div className={styles.imageActions}>
-                                        <button
-                                            type="button"
-                                            className="primaryBtn"
-                                            onClick={handleUploadImage}
-                                            disabled={!selectedFile || uploading || disableAll}
-                                            aria-label="Upload and attach image"
-                                            title="Upload and attach image"
-                                        >
-                                            {uploading ? 'Uploading…' : 'Upload & Attach'}
-                                        </button>
-                                        {selectedFile && (
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setSelectedFile(null);
-                                                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                                                    setPreviewUrl('');
-                                                    setUploadError('');
-                                                }}
-                                                disabled={uploading}
-                                            >
-                                                Clear
-                                            </button>
-                                        )}
+                    {!loading && !error && ciw && (
+                        <>
+                            <div className={styles.split}>
+                                <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
+                                    <div className={styles.imageColumn}>
+                                        <span className={styles.label}>Image</span>
+
+                                        <div className={styles.portraitWrap}>
+                                            {previewUrl ? (
+                                                <img className={styles.portraitImg} src={previewUrl} alt="Preview" />
+                                            ) : ciw?.image_url ? (
+                                                <img
+                                                    className={styles.portraitImg}
+                                                    src={ciw.image_url}
+                                                    alt={`${ciw?.character?.name ?? 'Character'} image`}
+                                                />
+                                            ) : ciw?.character?.image_url ? (
+                                                <img
+                                                    className={styles.portraitImg}
+                                                    src={ciw.character.image_url}
+                                                    alt={`${ciw?.character?.name ?? 'Character'} image`}
+                                                />
+                                            ) : (
+                                                <div className={styles.portraitEmpty}>No image</div>
+                                            )}
+                                        </div>
+
+                                        <div className={styles.uploader}>
+                                            <label className={styles.label} htmlFor="ch-image-picker">
+                                                Upload new image
+                                            </label>
+                                            <input
+                                                id="ch-image-picker"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={onPickFile}
+                                                disabled={uploading || disableAll}
+                                                aria-describedby="ch-image-help"
+                                            />
+
+                                            {uploadError && (
+                                                <p role="alert" className={styles.error}>
+                                                    {uploadError}
+                                                </p>
+                                            )}
+
+                                            <div className={styles.imageActions}>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleUploadImage}
+                                                    disabled={!selectedFile || uploading || disableAll}
+                                                    aria-label="Upload and attach image"
+                                                    title="Upload and attach image"
+                                                >
+                                                    {uploading ? 'Uploading…' : 'Upload & Attach'}
+                                                </button>
+                                                {selectedFile && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setSelectedFile(null);
+                                                            if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                                            setPreviewUrl('');
+                                                            setUploadError('');
+                                                        }}
+                                                        disabled={uploading}
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </section>
-                        <section className={styles.card} aria-label="Character in work">
-                            <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                                <div className={styles.field}>
-                                    <label className={styles.label}>Character Name</label>
-                                    <input
-                                        type="text"
-                                        className={styles.input}
-                                        value={characterName}
-                                        disabled
-                                        readOnly
-                                    />
-                                </div>
+                                </section>
+                                <section className={styles.card} aria-label="Character in work">
+                                    <form
+                                        ref={formRef}
+                                        className={styles.form}
+                                        onSubmit={e => e.preventDefault()}
+                                        noValidate
+                                    >
+                                        <div className={styles.field}>
+                                            <label className={styles.label}>Character Name</label>
+                                            <input
+                                                type="text"
+                                                className={styles.input}
+                                                value={characterName}
+                                                disabled
+                                                readOnly
+                                            />
+                                        </div>
 
-                                <div className={styles.field}>
-                                    <label className={styles.label}>Appearance</label>
-                                    <textarea
-                                        rows={5}
-                                        className={`${styles.input} ${styles.textarea}`}
-                                        value={characterAppearance}
-                                        disabled
-                                        readOnly
-                                    />
-                                </div>
+                                        <div className={styles.field}>
+                                            <label className={styles.label}>Appearance</label>
+                                            <textarea
+                                                rows={5}
+                                                className={`${styles.input} ${styles.textarea}`}
+                                                value={characterAppearance}
+                                                disabled
+                                                readOnly
+                                            />
+                                        </div>
 
-                                <div className={styles.field}>
-                                    <label className={styles.label}>Personality</label>
-                                    <textarea
-                                        rows={5}
-                                        className={`${styles.input} ${styles.textarea}`}
-                                        value={characterPersonality}
-                                        disabled
-                                        readOnly
-                                    />
-                                </div>
+                                        <div className={styles.field}>
+                                            <label className={styles.label}>Personality</label>
+                                            <textarea
+                                                rows={5}
+                                                className={`${styles.input} ${styles.textarea}`}
+                                                value={characterPersonality}
+                                                disabled
+                                                readOnly
+                                            />
+                                        </div>
 
-                                <div className={styles.field}>
-                                    <label className={styles.label}>Bio</label>
-                                    <textarea
-                                        rows={6}
-                                        className={`${styles.input} ${styles.textarea}`}
-                                        value={characterBio}
-                                        disabled
-                                        readOnly
-                                    />
-                                </div>
+                                        <div className={styles.field}>
+                                            <label className={styles.label}>Bio</label>
+                                            <textarea
+                                                rows={6}
+                                                className={`${styles.input} ${styles.textarea}`}
+                                                value={characterBio}
+                                                disabled
+                                                readOnly
+                                            />
+                                        </div>
 
-                                <div className={styles.field}>
-                                    <span className={styles.label}>Parent Tags</span>
-                                    <div className={styles.chips}>
-                                        {Object.keys(initialAttrs).length === 0 && (
-                                            <span className={styles.muted}>No tags yet.</span>
-                                        )}
+                                        <div className={styles.field}>
+                                            <span className={styles.label}>Parent Tags</span>
+                                            <div className={styles.chips}>
+                                                {Object.keys(initialAttrs).length === 0 && (
+                                                    <span className={styles.muted}>No tags yet.</span>
+                                                )}
 
-                                        {Object.entries(initialAttrs).map(([k, v]) => (
-                                            <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
-                                                <strong className={styles.chipKey}>{k}</strong>
-                                                <span className={styles.chipSep}>:</span>
-                                                <span className={styles.chipVal}>{String(v)}</span>
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
+                                                {Object.entries(initialAttrs).map(([k, v]) => (
+                                                    <span
+                                                        key={k}
+                                                        className={styles.chip}
+                                                        aria-label={`${k}: ${String(v)}`}
+                                                    >
+                                                        <strong className={styles.chipKey}>{k}</strong>
+                                                        <span className={styles.chipSep}>:</span>
+                                                        <span className={styles.chipVal}>{String(v)}</span>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
 
-                                <div className={styles.field}>
-                                    <span className={styles.label}>Current Tags</span>
-                                    <div className={styles.chips}>
-                                        {Object.keys(currentAttrs).length === 0 && (
-                                            <span className={styles.muted}>No tags yet.</span>
-                                        )}
+                                        <div className={styles.field}>
+                                            <span className={styles.label}>Current Tags</span>
+                                            <div className={styles.chips}>
+                                                {Object.keys(currentAttrs).length === 0 && (
+                                                    <span className={styles.muted}>No tags yet.</span>
+                                                )}
 
-                                        {Object.entries(currentAttrs).map(([k, v]) => (
-                                            <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
-                                                <strong className={styles.chipKey}>{k}</strong>
-                                                <span className={styles.chipSep}>:</span>
-                                                <span className={styles.chipVal}>{String(v)}</span>
+                                                {Object.entries(currentAttrs).map(([k, v]) => (
+                                                    <span
+                                                        key={k}
+                                                        className={styles.chip}
+                                                        aria-label={`${k}: ${String(v)}`}
+                                                    >
+                                                        <strong className={styles.chipKey}>{k}</strong>
+                                                        <span className={styles.chipSep}>:</span>
+                                                        <span className={styles.chipVal}>{String(v)}</span>
+
+                                                        {editMode && (
+                                                            <button
+                                                                type="button"
+                                                                className={styles.chipRemove}
+                                                                onClick={() => removeAttr(k)}
+                                                                aria-label={`Remove tag ${k}`}
+                                                                title="Remove"
+                                                            >
+                                                                x
+                                                            </button>
+                                                        )}
+                                                    </span>
+                                                ))}
 
                                                 {editMode && (
                                                     <button
                                                         type="button"
-                                                        className={styles.chipRemove}
-                                                        onClick={() => removeAttr(k)}
-                                                        aria-label={`Remove tag ${k}`}
-                                                        title="Remove"
+                                                        className={styles.addChipBtn}
+                                                        onClick={() => setAddTagOpen(true)}
+                                                        aria-label="Add tag"
+                                                        title="Add tag"
                                                     >
-                                                        x
+                                                        +
                                                     </button>
                                                 )}
-                                            </span>
-                                        ))}
+                                            </div>
+                                        </div>
 
-                                        {editMode && (
-                                            <button
-                                                type="button"
-                                                className={styles.addChipBtn}
-                                                onClick={() => setAddTagOpen(true)}
-                                                aria-label="Add tag"
-                                                title="Add tag"
-                                            >
-                                                +
-                                            </button>
+                                        {updateError && (
+                                            <p role="alert" className={styles.error}>
+                                                {String(updateError)}
+                                            </p>
                                         )}
-                                    </div>
-                                </div>
 
-                                {updateError && (
+                                        <div className={styles.actions}>
+                                            {!editMode ? (
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleEdit}
+                                                    disabled={disableAll}
+                                                >
+                                                    Edit
+                                                </button>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        className="primaryBtn"
+                                                        onClick={handleSave}
+                                                        disabled={updateLoading}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleCancel}
+                                                        disabled={updateLoading}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </form>
+                                </section>
+                            </div>
+
+                            <section className={styles.card} aria-label="Used in events">
+                                <h2 className={styles.subTitle}>Used in events</h2>
+
+                                {eventsLoading && (
+                                    <p aria-live="polite" className={styles.muted}>
+                                        Loading...
+                                    </p>
+                                )}
+                                {!eventsLoading && eventsError && (
                                     <p role="alert" className={styles.error}>
-                                        {String(updateError)}
+                                        {String(eventsError)}
                                     </p>
                                 )}
 
-                                <div className={styles.actions}>
-                                    {!editMode ? (
-                                        <button
-                                            type="button"
-                                            className="primaryBtn"
-                                            onClick={handleEdit}
-                                            disabled={disableAll}
-                                        >
-                                            Edit
-                                        </button>
+                                {!eventsLoading &&
+                                    !eventsError &&
+                                    (events.length > 0 ? (
+                                        <List items={events} />
                                     ) : (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleSave}
-                                                disabled={updateLoading}
-                                            >
-                                                Save
-                                            </button>
-                                            <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                                Cancel
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            </form>
-                        </section>
-                    </div>
-
-                    <section className={styles.card} aria-label="Used in events">
-                        <h2 className={styles.subTitle}>Used in events</h2>
-
-                        {eventsLoading && (
-                            <p aria-live="polite" className={styles.muted}>
-                                Loading...
-                            </p>
-                        )}
-                        {!eventsLoading && eventsError && (
-                            <p role="alert" className={styles.error}>
-                                {String(eventsError)}
-                            </p>
-                        )}
-
-                        {!eventsLoading &&
-                            !eventsError &&
-                            (events.length > 0 ? (
-                                <List items={events} />
-                            ) : (
-                                <p className={styles.muted}>No events yet.</p>
-                            ))}
-                    </section>
-
-                    {addTagOpen && (
-                        <dialog
-                            open
-                            className={styles.dialog}
-                            aria-labelledby="add-tag-title"
-                            onClose={() => setAddTagOpen(false)}
-                        >
-                            <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
-                                <h3 id="add-tag-title" className={styles.modalTitle}>
-                                    Add tag
-                                </h3>
-                                <AddTagFields
-                                    onAdd={(k, v) => {
-                                        if (!k) return;
-                                        setCurrentAttrs(prev => ({ ...prev, [k]: v }));
-                                        setAddTagOpen(false);
-                                    }}
-                                    onCancel={() => setAddTagOpen(false)}
-                                />
-                            </form>
-                        </dialog>
-                    )}
-
-                    <section className={styles.card} aria-label="Relationships">
-                        <div className={styles.subHeader}>
-                            <h2 className={styles.subTitle}>Relationships</h2>
-                            <button
-                                type="button"
-                                className="primaryBtn"
-                                onClick={openAddRelModal}
-                                disabled={relLoading}
-                                aria-label="Add relationship"
-                                title="Add relationship"
-                            >
-                                Add relationship
-                            </button>
-                        </div>
-
-                        {relLoading && (
-                            <p aria-live="polite" className={styles.muted}>
-                                Loading...
-                            </p>
-                        )}
-                        {!relLoading && relError && (
-                            <p role="alert" className={styles.error}>
-                                {String(relError)}
-                            </p>
-                        )}
-
-                        {!relLoading &&
-                            !relError &&
-                            (relationships.length > 0 ? (
-                                <List
-                                    items={relationships}
-                                    onRemove={({ id: relationshipId, work_id: workId }) => {
-                                        if (removingRelId) return;
-                                        handleRemoveRelationship(workId, relationshipId);
-                                    }}
-                                />
-                            ) : (
-                                <p className={styles.muted}>No relationships yet.</p>
-                            ))}
-                    </section>
-
-                    {addRelOpen && (
-                        <dialog
-                            open
-                            className={styles.dialog}
-                            aria-labelledby="add-rel-title"
-                            onClose={closeAddRelModal}
-                        >
-                            <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
-                                <h3 id="add-rel-title" className={styles.modalTitle}>
-                                    Add relationship
-                                </h3>
-
-                                {possibleRelLoading && (
-                                    <p className={styles.muted} aria-live="polite">
-                                        Loading candidates...
-                                    </p>
-                                )}
-                                {!possibleRelLoading && possibleRelError && (
-                                    <p className={styles.error} role="alert">
-                                        {String(possibleRelError)}
-                                    </p>
-                                )}
-
-                                {!possibleRelLoading &&
-                                    !possibleRelError &&
-                                    (possibleRels.length === 0 ? (
-                                        <p className={styles.muted}>No available characters to relate.</p>
-                                    ) : (
-                                        <ul className={styles.radioList}>
-                                            {possibleRels.map(t => (
-                                                <li key={t.id}>
-                                                    <label className={styles.radioRow}>
-                                                        <input
-                                                            type="radio"
-                                                            name="rel-target"
-                                                            value={t.id}
-                                                            checked={String(selectedTargetId) === String(t.id)}
-                                                            onChange={e => setSelectedTargetId(e.target.value)}
-                                                        />
-                                                        <span>{t.content}</span>
-                                                    </label>
-                                                </li>
-                                            ))}
-                                        </ul>
+                                        <p className={styles.muted}>No events yet.</p>
                                     ))}
+                            </section>
 
-                                <div className={styles.field} style={{ marginTop: 12 }}>
-                                    <label className={styles.label}>
-                                        Type
-                                        <input
-                                            className={styles.input}
-                                            type="text"
-                                            value={relType}
-                                            onChange={e => setRelType(e.target.value)}
-                                            placeholder="e.g. ally, enemy, mentor"
-                                            required
+                            {addTagOpen && (
+                                <dialog
+                                    open
+                                    className={styles.dialog}
+                                    aria-labelledby="add-tag-title"
+                                    onClose={() => setAddTagOpen(false)}
+                                >
+                                    <form
+                                        method="dialog"
+                                        className={styles.modalBody}
+                                        onSubmit={e => e.preventDefault()}
+                                    >
+                                        <h3 id="add-tag-title" className={styles.modalTitle}>
+                                            Add tag
+                                        </h3>
+                                        <AddTagFields
+                                            onAdd={(k, v) => {
+                                                if (!k) return;
+                                                setCurrentAttrs(prev => ({ ...prev, [k]: v }));
+                                                setAddTagOpen(false);
+                                            }}
+                                            onCancel={() => setAddTagOpen(false)}
                                         />
-                                    </label>
-                                    <small className={styles.muted}>This field is required.</small>
-                                </div>
+                                    </form>
+                                </dialog>
+                            )}
 
-                                <div className={styles.modalActions}>
+                            <section className={styles.card} aria-label="Relationships">
+                                <div className={styles.subHeader}>
+                                    <h2 className={styles.subTitle}>Relationships</h2>
                                     <button
                                         type="button"
                                         className="primaryBtn"
-                                        onClick={handleAddRelationship}
-                                        disabled={addingRel || possibleRelLoading || !selectedTargetId}
+                                        onClick={openAddRelModal}
+                                        disabled={relLoading}
+                                        aria-label="Add relationship"
+                                        title="Add relationship"
                                     >
-                                        {addingRel ? 'Adding...' : 'Add'}
-                                    </button>
-                                    <button type="button" onClick={closeAddRelModal} disabled={addingRel}>
-                                        Cancel
+                                        Add relationship
                                     </button>
                                 </div>
-                            </form>
-                        </dialog>
+
+                                {relLoading && (
+                                    <p aria-live="polite" className={styles.muted}>
+                                        Loading...
+                                    </p>
+                                )}
+                                {!relLoading && relError && (
+                                    <p role="alert" className={styles.error}>
+                                        {String(relError)}
+                                    </p>
+                                )}
+
+                                {!relLoading &&
+                                    !relError &&
+                                    (relationships.length > 0 ? (
+                                        <List
+                                            items={relationships}
+                                            onRemove={({ id: relationshipId, work_id: workId }) => {
+                                                if (removingRelId) return;
+                                                handleRemoveRelationship(workId, relationshipId);
+                                            }}
+                                        />
+                                    ) : (
+                                        <p className={styles.muted}>No relationships yet.</p>
+                                    ))}
+                            </section>
+
+                            {addRelOpen && (
+                                <dialog
+                                    open
+                                    className={styles.dialog}
+                                    aria-labelledby="add-rel-title"
+                                    onClose={closeAddRelModal}
+                                >
+                                    <form
+                                        method="dialog"
+                                        className={styles.modalBody}
+                                        onSubmit={e => e.preventDefault()}
+                                    >
+                                        <h3 id="add-rel-title" className={styles.modalTitle}>
+                                            Add relationship
+                                        </h3>
+
+                                        {possibleRelLoading && (
+                                            <p className={styles.muted} aria-live="polite">
+                                                Loading candidates...
+                                            </p>
+                                        )}
+                                        {!possibleRelLoading && possibleRelError && (
+                                            <p className={styles.error} role="alert">
+                                                {String(possibleRelError)}
+                                            </p>
+                                        )}
+
+                                        {!possibleRelLoading &&
+                                            !possibleRelError &&
+                                            (possibleRels.length === 0 ? (
+                                                <p className={styles.muted}>No available characters to relate.</p>
+                                            ) : (
+                                                <ul className={styles.radioList}>
+                                                    {possibleRels.map(t => (
+                                                        <li key={t.id}>
+                                                            <label className={styles.radioRow}>
+                                                                <input
+                                                                    type="radio"
+                                                                    name="rel-target"
+                                                                    value={t.id}
+                                                                    checked={String(selectedTargetId) === String(t.id)}
+                                                                    onChange={e => setSelectedTargetId(e.target.value)}
+                                                                />
+                                                                <span>{t.content}</span>
+                                                            </label>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ))}
+
+                                        <div className={styles.field} style={{ marginTop: 12 }}>
+                                            <label className={styles.label}>
+                                                Type
+                                                <input
+                                                    className={styles.input}
+                                                    type="text"
+                                                    value={relType}
+                                                    onChange={e => setRelType(e.target.value)}
+                                                    placeholder="e.g. ally, enemy, mentor"
+                                                    required
+                                                />
+                                            </label>
+                                            <small className={styles.muted}>This field is required.</small>
+                                        </div>
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleAddRelationship}
+                                                disabled={addingRel || possibleRelLoading || !selectedTargetId}
+                                            >
+                                                {addingRel ? 'Adding...' : 'Add'}
+                                            </button>
+                                            <button type="button" onClick={closeAddRelModal} disabled={addingRel}>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            )}
+                        </>
                     )}
-                </>
+                </main>
             )}
-        </main>
+        </>
     );
 }
 

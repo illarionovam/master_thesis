@@ -9,14 +9,9 @@ import {
     selectGetCharactersLoading,
     selectGetCharactersError,
 } from '../../redux/characters/selectors';
-
-import { resetCharacter } from '../../redux/characters/slice';
-
 import CreateCharacterModal from '../../components/CreateCharacterModal';
-import { useDispatch } from 'react-redux';
 
 export default function CharactersPage() {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     return (
@@ -31,10 +26,7 @@ export default function CharactersPage() {
             createAction={createCharacter}
             onCreated={created => {
                 const id = typeof created === 'object' ? created?.id : created;
-                if (id) {
-                    dispatch(resetCharacter());
-                    navigate(`/characters/${id}`);
-                }
+                if (id) navigate(`/characters/${id}`);
             }}
         />
     );

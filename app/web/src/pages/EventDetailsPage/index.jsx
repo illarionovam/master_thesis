@@ -35,6 +35,8 @@ import {
     selectGetWorkLocationLinksError,
 } from '../../redux/works/selectors';
 
+import { resetEvent } from '../../redux/works/slice';
+
 import styles from './EventDetailsPage.module.css';
 
 export default function EventDetailsPage() {
@@ -72,12 +74,26 @@ export default function EventDetailsPage() {
     const [addingCast, setAddingCast] = useState(false);
     const [removingCastId, setRemovingCastId] = useState(null);
 
+    const [prePageLoading, setPrePageLoading] = useState(true);
+
     useEffect(() => {
-        if (!id || !eventId) return;
+        if (!id || !eventId) {
+            setPrePageLoading(false);
+            return;
+        }
+        if (event != null) {
+            if (event.id === eventId) {
+                setPrePageLoading(false);
+                return;
+            } else {
+                dispatch(resetEvent());
+            }
+        }
+        setPrePageLoading(false);
         dispatch(getEvent({ workId: id, eventId }));
         dispatch(getEventParticipants({ workId: id, eventId }));
         dispatch(getWorkLocationLinks(id));
-    }, [dispatch, id, eventId]);
+    }, [dispatch, id, eventId, event]);
 
     useEffect(() => {
         if (addCastOpen && id && eventId) {
@@ -183,261 +199,285 @@ export default function EventDetailsPage() {
     const defaultLocationInWorkId = event?.location_in_work_id;
 
     return (
-        <main aria-labelledby={titleId} className={styles.page}>
-            <div className={styles.header}>
-                <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
-                    <ol>
-                        <li>
-                            <Link to="/works" className={styles.crumbLink}>
-                                WORKS
-                            </Link>
-                        </li>
-                        <li>
-                            {id ? (
-                                <Link to={`/works/${id}`} className={styles.crumbLink}>
-                                    {workTitle}
-                                </Link>
-                            ) : (
-                                <span className={styles.crumbLink}>{workTitle}</span>
-                            )}
-                        </li>
-                        <li aria-current="page">
-                            <Link to={`/works/${id}/events/${eventId}`} className={styles.crumbLink}>
-                                {pageTitle}
-                            </Link>
-                        </li>
-                    </ol>
-                </nav>
-
-                <Title id={titleId}>{pageTitle}</Title>
-            </div>
-
-            {loading && (
-                <p aria-live="polite" className={styles.muted}>
-                    Loading...
-                </p>
-            )}
-            {error && (
-                <p role="alert" className={styles.error}>
-                    {String(error)}
-                </p>
-            )}
-
-            {!loading && !error && event && (
-                <>
-                    <section className={styles.card} aria-label="Event info">
-                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                            <div className={styles.field}>
-                                <label htmlFor="ev-title" className={styles.label}>
-                                    Title
-                                </label>
-                                <input
-                                    id="ev-title"
-                                    name="title"
-                                    type="text"
-                                    defaultValue={event.title ?? ''}
-                                    className={styles.input}
-                                    disabled={!editMode || disableAll}
-                                    required
-                                    maxLength={100}
-                                />
-                            </div>
-
-                            <div className={styles.field}>
-                                <label htmlFor="ev-desc" className={styles.label}>
-                                    Description
-                                </label>
-                                <textarea
-                                    id="ev-desc"
-                                    name="description"
-                                    rows={6}
-                                    defaultValue={event.description ?? ''}
-                                    className={`${styles.input} ${styles.textarea}`}
-                                    disabled={!editMode || disableAll}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles.field}>
-                                <label htmlFor="ev-location" className={styles.label}>
-                                    Location (in this work)
-                                </label>
-                                <select
-                                    id="ev-location"
-                                    name="location_in_work_id"
-                                    defaultValue={defaultLocationInWorkId}
-                                    className={styles.input}
-                                    disabled={!editMode || disableAll || locLinksLoading}
-                                >
-                                    <option value="">— None —</option>
-                                    {locationLinks.map(opt => (
-                                        <option key={String(opt.id)} value={String(opt.id)}>
-                                            {opt.content ?? opt.title ?? `#${opt.id}`}
-                                        </option>
-                                    ))}
-                                </select>
-                                {locLinksLoading && (
-                                    <p className={styles.muted} aria-live="polite">
-                                        Loading locations...
-                                    </p>
-                                )}
-                                {!locLinksLoading && locLinksError && (
-                                    <p className={styles.error} role="alert">
-                                        {String(locLinksError)}
-                                    </p>
-                                )}
-                            </div>
-
-                            {updateError && (
-                                <p role="alert" className={styles.error}>
-                                    {String(updateError)}
-                                </p>
-                            )}
-                            {deleteError && (
-                                <p role="alert" className={styles.error}>
-                                    {String(deleteError)}
-                                </p>
-                            )}
-
-                            <div className={styles.actions}>
-                                {!editMode ? (
-                                    <>
-                                        <button
-                                            type="button"
-                                            className="primaryBtn"
-                                            onClick={handleEdit}
-                                            disabled={disableAll}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="dangerBtn"
-                                            onClick={handleDelete}
-                                            disabled={disableAll}
-                                        >
-                                            {deleteLoading ? 'Deleting...' : 'Delete'}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button
-                                            type="button"
-                                            className="primaryBtn"
-                                            onClick={handleSave}
-                                            disabled={updateLoading}
-                                        >
-                                            Save
-                                        </button>
-                                        <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                            Cancel
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        </form>
-                    </section>
-
-                    <section className={styles.card} aria-label="Cast">
-                        <div className={styles.subHeader}>
-                            <h2 className={styles.subTitle}>Cast</h2>
-                            <button
-                                type="button"
-                                className="primaryBtn"
-                                onClick={openAddCast}
-                                disabled={participantsLoading}
-                                aria-label="Add participant"
-                                title="Add participant"
-                            >
-                                Add participant
-                            </button>
-                        </div>
-
-                        {participantsLoading && (
-                            <p aria-live="polite" className={styles.muted}>
-                                Loading...
-                            </p>
-                        )}
-                        {!participantsLoading && participantsError && (
-                            <p role="alert" className={styles.error}>
-                                {String(participantsError)}
-                            </p>
-                        )}
-
-                        {!participantsLoading &&
-                            !participantsError &&
-                            (participants.length > 0 ? (
-                                <List
-                                    items={participants}
-                                    onRemove={({ id: participantId, work_id: workIdProp }) => {
-                                        if (removingCastId) return;
-                                        handleRemoveCast(workIdProp || id, participantId);
-                                    }}
-                                />
-                            ) : (
-                                <p className={styles.muted}>No participants yet.</p>
-                            ))}
-                    </section>
-
-                    {addCastOpen && (
-                        <dialog open className={styles.dialog} aria-labelledby="add-cast-title" onClose={closeAddCast}>
-                            <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
-                                <h3 id="add-cast-title" className={styles.modalTitle}>
-                                    Add participant
-                                </h3>
-
-                                {possibleParticipantsLoading && (
-                                    <p className={styles.muted} aria-live="polite">
-                                        Loading characters...
-                                    </p>
-                                )}
-                                {!possibleParticipantsLoading && possibleParticipantsError && (
-                                    <p className={styles.error} role="alert">
-                                        {String(possibleParticipantsError)}
-                                    </p>
-                                )}
-
-                                {!possibleParticipantsLoading &&
-                                    !possibleParticipantsError &&
-                                    (possibleParticipants.length === 0 ? (
-                                        <p className={styles.muted}>No available characters to add.</p>
+        <>
+            {!prePageLoading && (
+                <main aria-labelledby={titleId} className={styles.page}>
+                    <div className={styles.header}>
+                        <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+                            <ol>
+                                <li>
+                                    <Link to="/works" className={styles.crumbLink}>
+                                        WORKS
+                                    </Link>
+                                </li>
+                                <li>
+                                    {id ? (
+                                        <Link to={`/works/${id}`} className={styles.crumbLink}>
+                                            {workTitle}
+                                        </Link>
                                     ) : (
-                                        <ul className={styles.radioList}>
-                                            {possibleParticipants.map(p => (
-                                                <li key={p.id}>
-                                                    <label className={styles.radioRow}>
-                                                        <input
-                                                            type="radio"
-                                                            name="participant"
-                                                            value={p.id}
-                                                            checked={String(selectedCharacterId) === String(p.id)}
-                                                            onChange={e => setSelectedCharacterId(e.target.value)}
-                                                        />
-                                                        <span>{p.content}</span>
-                                                    </label>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ))}
+                                        <span className={styles.crumbLink}>{workTitle}</span>
+                                    )}
+                                </li>
+                                <li aria-current="page">
+                                    <Link to={`/works/${id}/events/${eventId}`} className={styles.crumbLink}>
+                                        {pageTitle}
+                                    </Link>
+                                </li>
+                            </ol>
+                        </nav>
 
-                                <div className={styles.modalActions}>
+                        <Title id={titleId}>{pageTitle}</Title>
+                    </div>
+
+                    {loading && (
+                        <p aria-live="polite" className={styles.muted}>
+                            Loading...
+                        </p>
+                    )}
+                    {error && (
+                        <p role="alert" className={styles.error}>
+                            {String(error)}
+                        </p>
+                    )}
+
+                    {!loading && !error && event && (
+                        <>
+                            <section className={styles.card} aria-label="Event info">
+                                <form
+                                    ref={formRef}
+                                    className={styles.form}
+                                    onSubmit={e => e.preventDefault()}
+                                    noValidate
+                                >
+                                    <div className={styles.field}>
+                                        <label htmlFor="ev-title" className={styles.label}>
+                                            Title
+                                        </label>
+                                        <input
+                                            id="ev-title"
+                                            name="title"
+                                            type="text"
+                                            defaultValue={event.title ?? ''}
+                                            className={styles.input}
+                                            disabled={!editMode || disableAll}
+                                            required
+                                            maxLength={100}
+                                        />
+                                    </div>
+
+                                    <div className={styles.field}>
+                                        <label htmlFor="ev-desc" className={styles.label}>
+                                            Description
+                                        </label>
+                                        <textarea
+                                            id="ev-desc"
+                                            name="description"
+                                            rows={6}
+                                            defaultValue={event.description ?? ''}
+                                            className={`${styles.input} ${styles.textarea}`}
+                                            disabled={!editMode || disableAll}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className={styles.field}>
+                                        <label htmlFor="ev-location" className={styles.label}>
+                                            Location (in this work)
+                                        </label>
+                                        <select
+                                            id="ev-location"
+                                            name="location_in_work_id"
+                                            defaultValue={defaultLocationInWorkId}
+                                            className={styles.input}
+                                            disabled={!editMode || disableAll || locLinksLoading}
+                                        >
+                                            <option value="">— None —</option>
+                                            {locationLinks.map(opt => (
+                                                <option key={String(opt.id)} value={String(opt.id)}>
+                                                    {opt.content ?? opt.title ?? `#${opt.id}`}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {locLinksLoading && (
+                                            <p className={styles.muted} aria-live="polite">
+                                                Loading locations...
+                                            </p>
+                                        )}
+                                        {!locLinksLoading && locLinksError && (
+                                            <p className={styles.error} role="alert">
+                                                {String(locLinksError)}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {updateError && (
+                                        <p role="alert" className={styles.error}>
+                                            {String(updateError)}
+                                        </p>
+                                    )}
+                                    {deleteError && (
+                                        <p role="alert" className={styles.error}>
+                                            {String(deleteError)}
+                                        </p>
+                                    )}
+
+                                    <div className={styles.actions}>
+                                        {!editMode ? (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleEdit}
+                                                    disabled={disableAll}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="dangerBtn"
+                                                    onClick={handleDelete}
+                                                    disabled={disableAll}
+                                                >
+                                                    {deleteLoading ? 'Deleting...' : 'Delete'}
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleSave}
+                                                    disabled={updateLoading}
+                                                >
+                                                    Save
+                                                </button>
+                                                <button type="button" onClick={handleCancel} disabled={updateLoading}>
+                                                    Cancel
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </form>
+                            </section>
+
+                            <section className={styles.card} aria-label="Cast">
+                                <div className={styles.subHeader}>
+                                    <h2 className={styles.subTitle}>Cast</h2>
                                     <button
                                         type="button"
                                         className="primaryBtn"
-                                        onClick={handleAddCast}
-                                        disabled={addingCast || possibleParticipantsLoading || !selectedCharacterId}
+                                        onClick={openAddCast}
+                                        disabled={participantsLoading}
+                                        aria-label="Add participant"
+                                        title="Add participant"
                                     >
-                                        {addingCast ? 'Adding...' : 'Add'}
-                                    </button>
-                                    <button type="button" onClick={closeAddCast} disabled={addingCast}>
-                                        Cancel
+                                        Add participant
                                     </button>
                                 </div>
-                            </form>
-                        </dialog>
+
+                                {participantsLoading && (
+                                    <p aria-live="polite" className={styles.muted}>
+                                        Loading...
+                                    </p>
+                                )}
+                                {!participantsLoading && participantsError && (
+                                    <p role="alert" className={styles.error}>
+                                        {String(participantsError)}
+                                    </p>
+                                )}
+
+                                {!participantsLoading &&
+                                    !participantsError &&
+                                    (participants.length > 0 ? (
+                                        <List
+                                            items={participants}
+                                            onRemove={({ id: participantId, work_id: workIdProp }) => {
+                                                if (removingCastId) return;
+                                                handleRemoveCast(workIdProp || id, participantId);
+                                            }}
+                                        />
+                                    ) : (
+                                        <p className={styles.muted}>No participants yet.</p>
+                                    ))}
+                            </section>
+
+                            {addCastOpen && (
+                                <dialog
+                                    open
+                                    className={styles.dialog}
+                                    aria-labelledby="add-cast-title"
+                                    onClose={closeAddCast}
+                                >
+                                    <form
+                                        method="dialog"
+                                        className={styles.modalBody}
+                                        onSubmit={e => e.preventDefault()}
+                                    >
+                                        <h3 id="add-cast-title" className={styles.modalTitle}>
+                                            Add participant
+                                        </h3>
+
+                                        {possibleParticipantsLoading && (
+                                            <p className={styles.muted} aria-live="polite">
+                                                Loading characters...
+                                            </p>
+                                        )}
+                                        {!possibleParticipantsLoading && possibleParticipantsError && (
+                                            <p className={styles.error} role="alert">
+                                                {String(possibleParticipantsError)}
+                                            </p>
+                                        )}
+
+                                        {!possibleParticipantsLoading &&
+                                            !possibleParticipantsError &&
+                                            (possibleParticipants.length === 0 ? (
+                                                <p className={styles.muted}>No available characters to add.</p>
+                                            ) : (
+                                                <ul className={styles.radioList}>
+                                                    {possibleParticipants.map(p => (
+                                                        <li key={p.id}>
+                                                            <label className={styles.radioRow}>
+                                                                <input
+                                                                    type="radio"
+                                                                    name="participant"
+                                                                    value={p.id}
+                                                                    checked={
+                                                                        String(selectedCharacterId) === String(p.id)
+                                                                    }
+                                                                    onChange={e =>
+                                                                        setSelectedCharacterId(e.target.value)
+                                                                    }
+                                                                />
+                                                                <span>{p.content}</span>
+                                                            </label>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ))}
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleAddCast}
+                                                disabled={
+                                                    addingCast || possibleParticipantsLoading || !selectedCharacterId
+                                                }
+                                            >
+                                                {addingCast ? 'Adding...' : 'Add'}
+                                            </button>
+                                            <button type="button" onClick={closeAddCast} disabled={addingCast}>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            )}
+                        </>
                     )}
-                </>
+                </main>
             )}
-        </main>
+        </>
     );
 }
