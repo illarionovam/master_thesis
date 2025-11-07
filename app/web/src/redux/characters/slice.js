@@ -9,7 +9,6 @@ import {
     getCharacterPossibleAppearances,
 } from './operations';
 import { linkWorkCharacter } from '../works/operations';
-import { stripBulkCharacterInWorkResponse } from '../../../../api/controllers/characterInWorkController';
 
 const op = { loading: false, error: null };
 
@@ -135,10 +134,7 @@ const charactersSlice = createSlice({
             });
         builder.addCase(linkWorkCharacter.fulfilled, (state, action) => {
             const ciw = action.payload;
-            state.getCharacterAppearances.appearances = [
-                ...state.getCharacterAppearances.appearances,
-                stripBulkCharacterInWorkResponse(ciw),
-            ];
+            state.getCharacterAppearances.appearances = [...state.getCharacterAppearances.appearances, ciw];
 
             const workId = action.meta?.arg?.workId ?? ciw.work_id;
             state.getCharacterPossibleAppearances.possibleAppearances =

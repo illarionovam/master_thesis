@@ -14,7 +14,7 @@ import {
     stripBulkCharacterResponse,
     stripBulkLocationInWorkResponse,
     stripBulkLocationResponse,
-} from '../helpers/strippers';
+} from '../helpers/strippers.js';
 
 const createWork = async (req, res) => {
     const work = await workService.createWork({
