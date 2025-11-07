@@ -55,6 +55,8 @@ export default function BulkPageLayout({
         }
     };
 
+    const modalProps = { ...createModalProps, parentOptions: data };
+
     return (
         <main aria-labelledby={titleId} className={styles.page}>
             <div className={styles.header}>
@@ -81,7 +83,7 @@ export default function BulkPageLayout({
 
                     {openCreate && (
                         <CreateModal
-                            {...createModalProps}
+                            {...modalProps}
                             open={openCreate}
                             mode="create"
                             onClose={handleCloseCreate}
