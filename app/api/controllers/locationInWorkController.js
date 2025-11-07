@@ -1,17 +1,5 @@
 import createHttpError from 'http-errors';
 import locationInWorkService from '../services/locationInWorkService.js';
-import locationController from './locationController.js';
-import workController from './workController.js';
-
-const stripBulkLocationInWorkResponse = locationInWork => {
-    return {
-        id: locationInWork.id,
-        location_id: locationInWork.location_id,
-        work_id: locationInWork.work_id,
-        work: workController.stripBulkWorkResponse(locationInWork.work),
-        location: locationController.stripBulkLocationResponse(locationInWork.location),
-    };
-};
 
 const getLocationInWork = async (req, res) => {
     const { locationInWorkId } = req.params;
@@ -54,7 +42,6 @@ const destroyLocationInWork = async (req, res) => {
 };
 
 export default {
-    stripBulkLocationInWorkResponse,
     getLocationInWork,
     updateLocationInWork,
     destroyLocationInWork,

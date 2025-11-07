@@ -1,19 +1,6 @@
 import characterInWorkService from '../services/characterInWorkService.js';
 import relationshipService from '../services/relationshipService.js';
 import createHttpError from 'http-errors';
-import characterController from './characterController.js';
-
-const stripBulkRelationshipResponse = relationship => {
-    return {
-        id: relationship.id,
-        work_id: relationship.from.work_id,
-        from_character_in_work_id: relationship.from_character_in_work_id,
-        to_character_in_work_id: relationship.to_character_in_work_id,
-        type: relationship.type,
-        from: characterController.stripBulkCharacterResponse(relationship.from.character),
-        to: characterController.stripBulkCharacterResponse(relationship.to.character),
-    };
-};
 
 const createRelationship = async (req, res) => {
     const { characterInWorkId } = req.params;
@@ -98,7 +85,6 @@ const destroyRelationship = async (req, res) => {
 };
 
 export default {
-    stripBulkRelationshipResponse,
     createRelationship,
     getRelationship,
     updateRelationship,

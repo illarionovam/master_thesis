@@ -1,19 +1,7 @@
 import characterInWorkService from '../services/characterInWorkService.js';
 import relationshipService from '../services/relationshipService.js';
-import characterController from './characterController.js';
-import relationshipController from './relationshipController.js';
-import workController from './workController.js';
 import createHttpError from 'http-errors';
-
-const stripBulkCharacterInWorkResponse = characterInWork => {
-    return {
-        id: characterInWork.id,
-        character_id: characterInWork.character_id,
-        work_id: characterInWork.work_id,
-        work: workController.stripBulkWorkResponse(characterInWork.work),
-        character: characterController.stripBulkCharacterResponse(characterInWork.character),
-    };
-};
+import { stripBulkCharacterInWorkResponse, stripBulkRelationshipResponse } from '../helpers/strippers.js';
 
 const getCharacterInWork = async (req, res) => {
     const { characterInWorkId } = req.params;
@@ -38,7 +26,7 @@ const getCharacterInWorkRelationships = async (req, res) => {
 
     const relationships = await relationshipService.getRelationships(characterInWorkId, characterInWork.work_id);
 
-    res.json(relationships.map(relationshipController.stripBulkRelationshipResponse));
+    res.json(relationships.map(stripBulkRelationshipResponse));
 };
 
 const getCharacterInWorkPossibleRelationships = async (req, res) => {
@@ -95,7 +83,6 @@ const destroyCharacterInWork = async (req, res) => {
 };
 
 export default {
-    stripBulkCharacterInWorkResponse,
     getCharacterInWork,
     getCharacterInWorkRelationships,
     getCharacterInWorkPossibleRelationships,

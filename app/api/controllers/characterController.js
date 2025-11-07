@@ -1,15 +1,11 @@
 import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
-import characterInWorkController from './characterInWorkController.js';
-import workController from './workController.js';
-
-const stripBulkCharacterResponse = character => {
-    return {
-        id: character.id,
-        name: character.name,
-    };
-};
+import {
+    stripBulkCharacterResponse,
+    stripBulkCharacterInWorkResponse,
+    stripBulkWorkResponse,
+} from '../helpers/strippers.js';
 
 const createCharacter = async (req, res) => {
     const character = await characterService.createCharacter({
@@ -45,17 +41,16 @@ const destroyCharacter = async (req, res) => {
 const getCharacterAppearances = async (req, res) => {
     const appearances = await characterInWorkService.getCharactersInWorkByCharacterId(req.character.id);
 
-    res.json(appearances.map(characterInWorkController.stripBulkCharacterInWorkResponse));
+    res.json(appearances.map(stripBulkCharacterInWorkResponse));
 };
 
 const getCharacterPossibleAppearances = async (req, res) => {
     const possibleAppearances = await workService.getWorksNotLinkedToCharacter(req.character.id, req.appUser.id);
 
-    res.json(possibleAppearances.map(workController.stripBulkWorkResponse));
+    res.json(possibleAppearances.map(stripBulkWorkResponse));
 };
 
 export default {
-    stripBulkCharacterResponse,
     createCharacter,
     getCharacter,
     getCharacters,

@@ -8,13 +8,13 @@ import characterController from './characterController.js';
 import locationController from './locationController.js';
 import locationService from '../services/locationService.js';
 import locationInWorkService from '../services/locationInWorkService.js';
-
-const stripBulkWorkResponse = work => {
-    return {
-        id: work.id,
-        title: work.title,
-    };
-};
+import {
+    stripBulkWorkResponse,
+    stripBulkCharacterInWorkResponse,
+    stripBulkCharacterResponse,
+    stripBulkLocationInWorkResponse,
+    stripBulkLocationResponse,
+} from '../helpers/strippers';
 
 const createWork = async (req, res) => {
     const work = await workService.createWork({
@@ -67,13 +67,13 @@ const linkCharacter = async (req, res) => {
 const getWorkCast = async (req, res) => {
     const cast = await characterInWorkService.getCharactersInWorkByWorkId(req.work.id);
 
-    res.json(cast.map(characterInWorkController.stripBulkCharacterInWorkResponse));
+    res.json(cast.map(stripBulkCharacterInWorkResponse));
 };
 
 const getWorkPossibleCast = async (req, res) => {
     const possibleCast = await characterService.getCharactersNotLinkedToWork(req.work.id, req.appUser.id);
 
-    res.json(possibleCast.map(characterController.stripBulkCharacterResponse));
+    res.json(possibleCast.map(stripBulkCharacterResponse));
 };
 
 const linkLocation = async (req, res) => {
@@ -96,17 +96,16 @@ const linkLocation = async (req, res) => {
 const getWorkLocationLinks = async (req, res) => {
     const locationLinks = await locationInWorkService.getLocationsInWorkByWorkId(req.work.id);
 
-    res.json(locationLinks.map(locationInWorkController.stripBulkLocationInWorkResponse));
+    res.json(locationLinks.map(stripBulkLocationInWorkResponse));
 };
 
 const getWorkPossibleLocationLinks = async (req, res) => {
     const possibleLocationLinks = await locationService.getLocationsNotLinkedToWork(req.work.id, req.appUser.id);
 
-    res.json(possibleLocationLinks.map(locationController.stripBulkLocationResponse));
+    res.json(possibleLocationLinks.map(stripBulkLocationResponse));
 };
 
 export default {
-    stripBulkWorkResponse,
     createWork,
     getWork,
     getWorks,

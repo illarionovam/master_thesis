@@ -8,6 +8,8 @@ import {
     getCharacterAppearances,
     getCharacterPossibleAppearances,
 } from './operations';
+import { linkWorkCharacter } from '../works/operations';
+import { stripBulkCharacterInWorkResponse } from '../../../../api/controllers/characterInWorkController';
 
 const op = { loading: false, error: null };
 
@@ -26,7 +28,17 @@ const initialState = {
 const charactersSlice = createSlice({
     name: 'characters',
     initialState,
-    reducers: {},
+    reducers: {
+        resetCharacter(state) {
+            state.character = null;
+            state.getCharacter = { ...op };
+            state.createCharacter = { ...op };
+            state.updateCharacter = { ...op };
+            state.deleteCharacter = { ...op };
+            state.getCharacterAppearances = { ...op, appearances: [] };
+            state.getCharacterPossibleAppearances = { ...op, possibleAppearances: [] };
+        },
+    },
     extraReducers: builder => {
         builder
             .addCase(getCharacters.pending, state => {
@@ -121,7 +133,19 @@ const charactersSlice = createSlice({
                 state.getCharacterPossibleAppearances.loading = false;
                 state.getCharacterPossibleAppearances.error = action.payload;
             });
+        builder.addCase(linkWorkCharacter.fulfilled, (state, action) => {
+            const ciw = action.payload;
+            state.getCharacterAppearances.appearances = [
+                ...state.getCharacterAppearances.appearances,
+                stripBulkCharacterInWorkResponse(ciw),
+            ];
+
+            const workId = action.meta?.arg?.workId ?? ciw.work_id;
+            state.getCharacterPossibleAppearances.possibleAppearances =
+                state.getCharacterPossibleAppearances.possibleAppearances.filter(w => String(w.id) !== String(workId));
+        });
     },
 });
 
+export const { resetCharacter } = charactersSlice.actions;
 export default charactersSlice.reducer;

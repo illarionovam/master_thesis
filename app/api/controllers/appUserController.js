@@ -6,17 +6,7 @@ import createHttpError from 'http-errors';
 import appUserService from '../services/appUserService.js';
 import tokenService from '../services/tokenService.js';
 import { mailer } from '../utilities/mailer.js';
-
-const stripAppUserResponse = appUser => {
-    return {
-        id: appUser.id,
-        username: appUser.username,
-        email: appUser.email,
-        name: appUser.name,
-        created_at: appUser.created_at,
-        updated_at: appUser.updated_at,
-    };
-};
+import { stripAppUserResponse } from '../helpers/strippers.js';
 
 const verifyAppUserEmail = async (req, res) => {
     const { email } = req.body;

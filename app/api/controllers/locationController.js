@@ -2,15 +2,11 @@ import createHttpError from 'http-errors';
 import workService from '../services/workService.js';
 import locationService from '../services/locationService.js';
 import locationInWorkService from '../services/locationInWorkService.js';
-import locationInWorkController from './locationInWorkController.js';
-import workController from './workController.js';
-
-const stripBulkLocationResponse = location => {
-    return {
-        id: location.id,
-        title: location.title,
-    };
-};
+import {
+    stripBulkLocationResponse,
+    stripBulkLocationInWorkResponse,
+    stripBulkWorkResponse,
+} from '../helpers/strippers.js';
 
 const createLocation = async (req, res) => {
     const { parent_location_id } = req.body;
@@ -66,17 +62,16 @@ const destroyLocation = async (req, res) => {
 const getLocationPlacements = async (req, res) => {
     const placements = await locationInWorkService.getLocationsInWorkByLocationId(req.location.id);
 
-    res.json(placements.map(locationInWorkController.stripBulkLocationInWorkResponse));
+    res.json(placements.map(stripBulkLocationInWorkResponse));
 };
 
 const getLocationPossiblePlacements = async (req, res) => {
     const possiblePlacements = await workService.getWorksNotLinkedToLocation(req.location.id, req.appUser.id);
 
-    res.json(possiblePlacements.map(workController.stripBulkWorkResponse));
+    res.json(possiblePlacements.map(stripBulkWorkResponse));
 };
 
 export default {
-    stripBulkLocationResponse,
     createLocation,
     getLocation,
     getLocations,

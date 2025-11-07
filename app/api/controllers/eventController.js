@@ -1,34 +1,13 @@
 import createHttpError from 'http-errors';
 import characterInWorkService from '../services/characterInWorkService.js';
-import characterInWorkController from './characterInWorkController.js';
 import locationInWorkService from '../services/locationInWorkService.js';
 import eventService from '../services/eventService.js';
 import eventParticipantService from '../services/eventParticipantService.js';
-import workController from './workController.js';
-import locationController from './locationController.js';
-import characterController from './characterController.js';
-
-const stripBulkEventResponse = event => {
-    return {
-        id: event.id,
-        work_id: event.work_id,
-        location_in_work_id: event.location_in_work_id,
-        title: event.title,
-        order_in_work: event.order_in_work,
-        work: workController.stripBulkWorkResponse(event.work),
-        location: event.locationLink ? locationController.stripBulkLocationResponse(event.locationLink.location) : null,
-    };
-};
-
-const stripBulkEventParticipantResponse = eventParticipant => {
-    return {
-        id: eventParticipant.id,
-        event_id: eventParticipant.event_id,
-        character_in_work_id: eventParticipant.character_in_work_id,
-        character: characterController.stripBulkCharacterResponse(eventParticipant.characterLink.character),
-        event: stripBulkEventResponse(eventParticipant.event),
-    };
-};
+import {
+    stripBulkEventResponse,
+    stripBulkEventParticipantResponse,
+    stripBulkCharacterInWorkResponse,
+} from '../helpers/strippers.js';
 
 const reorderEvents = async (req, res) => {
     const events = await eventService.getEventsByWorkId(req.work.id);
@@ -218,11 +197,10 @@ const getEventPossibleParticipants = async (req, res) => {
 
     const possibleParticipants = await characterInWorkService.getCharactersInWorkNotLinkedToEvent(event);
 
-    res.json(possibleParticipants.map(characterInWorkController.stripBulkCharacterInWorkResponse));
+    res.json(possibleParticipants.map(stripBulkCharacterInWorkResponse));
 };
 
 export default {
-    stripBulkEventResponse,
     reorderEvents,
     createEvent,
     getEvent,
