@@ -90,14 +90,18 @@ export default function CharacterDetailsPage() {
                 setPrePageLoading(false);
                 return;
             } else {
-                dispatch(resetCharacter);
+                dispatch(resetCharacter());
             }
         }
         setPrePageLoading(false);
         dispatch(getCharacter(id));
         dispatch(getCharacterAppearances(id));
-        dispatch(getCharacterPossibleAppearances(id));
     }, [dispatch, id, character]);
+
+    useEffect(() => {
+        if (!addWorkOpen || !id) return;
+        dispatch(getCharacterPossibleAppearances(id));
+    }, [addWorkOpen, dispatch, id]);
 
     useEffect(() => {
         if (character) {
@@ -177,6 +181,7 @@ export default function CharacterDetailsPage() {
             if (linkWorkCharacter.fulfilled.match(action)) {
                 setAddWorkOpen(false);
                 setSelectedWorkId('');
+                dispatch(getCharacterAppearances(id));
             }
         } finally {
             setAdding(false);

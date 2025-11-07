@@ -8,7 +8,6 @@ import {
     getCharacterAppearances,
     getCharacterPossibleAppearances,
 } from './operations';
-import { linkWorkCharacter } from '../works/operations';
 
 const op = { loading: false, error: null };
 
@@ -33,7 +32,7 @@ const charactersSlice = createSlice({
             state.getCharacter = { ...op };
             state.createCharacter = { ...op };
             state.updateCharacter = { ...op };
-            state.deleteCharacter = { ...op };
+            state.deleteCharacter = { ...op, success: false };
             state.getCharacterAppearances = { ...op, appearances: [] };
             state.getCharacterPossibleAppearances = { ...op, possibleAppearances: [] };
         },
@@ -132,14 +131,6 @@ const charactersSlice = createSlice({
                 state.getCharacterPossibleAppearances.loading = false;
                 state.getCharacterPossibleAppearances.error = action.payload;
             });
-        builder.addCase(linkWorkCharacter.fulfilled, (state, action) => {
-            const ciw = action.payload;
-            state.getCharacterAppearances.appearances = [...state.getCharacterAppearances.appearances, ciw];
-
-            const workId = action.meta?.arg?.workId ?? ciw.work_id;
-            state.getCharacterPossibleAppearances.possibleAppearances =
-                state.getCharacterPossibleAppearances.possibleAppearances.filter(w => String(w.id) !== String(workId));
-        });
     },
 });
 

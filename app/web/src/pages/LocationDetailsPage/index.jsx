@@ -31,6 +31,8 @@ import {
     selectDeleteLocationError,
 } from '../../redux/locations/selectors';
 
+import { resetLocation } from '../../redux/locations/slice';
+
 import styles from './LocationDetailsPage.module.css';
 
 export default function LocationDetailsPage() {
@@ -63,15 +65,29 @@ export default function LocationDetailsPage() {
     const [adding, setAdding] = useState(false);
 
     const [editMode, setEditMode] = useState(false);
+
+    const [prePageLoading, setPrePageLoading] = useState(true);
+
     const formRef = useRef(null);
 
     useEffect(() => {
-        if (id) {
-            dispatch(getLocation(id));
-            dispatch(getLocationPlacements(id));
+        if (!id) {
+            setPrePageLoading(false);
+            return;
         }
+        if (location != null) {
+            if (location.id === id) {
+                setPrePageLoading(false);
+                return;
+            } else {
+                dispatch(resetLocation());
+            }
+        }
+        setPrePageLoading(false);
+        dispatch(getLocation(id));
+        dispatch(getLocationPlacements(id));
         dispatch(getLocations());
-    }, [dispatch, id]);
+    }, [dispatch, id, location]);
 
     useEffect(() => {
         if (!addOpen || !id) return;
@@ -160,247 +176,269 @@ export default function LocationDetailsPage() {
     };
 
     return (
-        <main aria-labelledby={titleId} className={styles.page}>
-            <div className={styles.header}>
-                <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
-                    <ol>
-                        <li>
-                            <Link to="/locations" className={styles.crumbLink}>
-                                LOCATIONS
-                            </Link>
-                        </li>
-                        <li aria-current="page">
-                            <Link to={`/locations/${id}`} className={styles.crumbLink}>
-                                {location?.title ?? '—'}
-                            </Link>
-                        </li>
-                    </ol>
-                </nav>
+        <>
+            {!prePageLoading && (
+                <main aria-labelledby={titleId} className={styles.page}>
+                    <div className={styles.header}>
+                        <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+                            <ol>
+                                <li>
+                                    <Link to="/locations" className={styles.crumbLink}>
+                                        LOCATIONS
+                                    </Link>
+                                </li>
+                                <li aria-current="page">
+                                    <Link to={`/locations/${id}`} className={styles.crumbLink}>
+                                        {location?.title ?? '—'}
+                                    </Link>
+                                </li>
+                            </ol>
+                        </nav>
 
-                <Title id={titleId}>{location?.title ?? '—'}</Title>
-            </div>
+                        <Title id={titleId}>{location?.title ?? '—'}</Title>
+                    </div>
 
-            {loading && (
-                <p aria-live="polite" className={styles.muted}>
-                    Loading...
-                </p>
-            )}
-            {error && (
-                <p role="alert" className={styles.error}>
-                    {error}
-                </p>
-            )}
+                    {loading && (
+                        <p aria-live="polite" className={styles.muted}>
+                            Loading...
+                        </p>
+                    )}
+                    {error && (
+                        <p role="alert" className={styles.error}>
+                            {error}
+                        </p>
+                    )}
 
-            {!loading && !error && location && (
-                <>
-                    <section className={styles.card} aria-label="Location info">
-                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                            <div className={styles.field}>
-                                <label htmlFor="loc-title" className={styles.label}>
-                                    Title
-                                </label>
-                                <input
-                                    id="loc-title"
-                                    name="title"
-                                    type="text"
-                                    defaultValue={location.title ?? ''}
-                                    className={styles.input}
-                                    disabled={!editMode || disableAll}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles.field}>
-                                <label htmlFor="loc-desc" className={styles.label}>
-                                    Description
-                                </label>
-                                <textarea
-                                    id="loc-desc"
-                                    name="description"
-                                    rows={5}
-                                    defaultValue={location.description ?? ''}
-                                    className={`${styles.input} ${styles.textarea}`}
-                                    disabled={!editMode || disableAll}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles.field}>
-                                <label htmlFor="loc-parent" className={styles.label}>
-                                    Parent Location
-                                </label>
-                                <select
-                                    id="loc-parent"
-                                    name="parent_location_id"
-                                    defaultValue={location.parent?.id ? String(location.parent.id) : ''}
-                                    className={styles.input}
-                                    disabled={!editMode || disableAll}
+                    {!loading && !error && location && (
+                        <>
+                            <section className={styles.card} aria-label="Location info">
+                                <form
+                                    ref={formRef}
+                                    className={styles.form}
+                                    onSubmit={e => e.preventDefault()}
+                                    noValidate
                                 >
-                                    <option value="">— None —</option>
-                                    {parentOptions.map(opt => (
-                                        <option key={String(opt.id)} value={String(opt.id)}>
-                                            {opt.title ?? opt.content ?? `#${opt.id}`}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                                    <div className={styles.field}>
+                                        <label htmlFor="loc-title" className={styles.label}>
+                                            Title
+                                        </label>
+                                        <input
+                                            id="loc-title"
+                                            name="title"
+                                            type="text"
+                                            defaultValue={location.title ?? ''}
+                                            className={styles.input}
+                                            disabled={!editMode || disableAll}
+                                            required
+                                        />
+                                    </div>
 
-                            {updateError && (
-                                <p role="alert" className={styles.error}>
-                                    {String(updateError)}
-                                </p>
-                            )}
+                                    <div className={styles.field}>
+                                        <label htmlFor="loc-desc" className={styles.label}>
+                                            Description
+                                        </label>
+                                        <textarea
+                                            id="loc-desc"
+                                            name="description"
+                                            rows={5}
+                                            defaultValue={location.description ?? ''}
+                                            className={`${styles.input} ${styles.textarea}`}
+                                            disabled={!editMode || disableAll}
+                                            required
+                                        />
+                                    </div>
 
-                            {deleteError && (
-                                <p role="alert" className={styles.error}>
-                                    {String(deleteError)}
-                                </p>
-                            )}
-
-                            <div className={styles.actions}>
-                                {!editMode ? (
-                                    <>
-                                        <button
-                                            type="button"
-                                            className="primaryBtn"
-                                            onClick={handleEdit}
-                                            disabled={disableAll}
+                                    <div className={styles.field}>
+                                        <label htmlFor="loc-parent" className={styles.label}>
+                                            Parent Location
+                                        </label>
+                                        <select
+                                            id="loc-parent"
+                                            name="parent_location_id"
+                                            defaultValue={location.parent?.id ? String(location.parent.id) : ''}
+                                            className={styles.input}
+                                            disabled={!editMode || disableAll}
                                         >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="dangerBtn"
-                                            onClick={handleDelete}
-                                            disabled={disableAll}
-                                        >
-                                            {deleteLoading ? 'Deleting...' : 'Delete'}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button
-                                            type="button"
-                                            className="primaryBtn"
-                                            onClick={handleSave}
-                                            disabled={updateLoading}
-                                        >
-                                            Save
-                                        </button>
-                                        <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                            Cancel
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        </form>
-                    </section>
+                                            <option value="">— None —</option>
+                                            {parentOptions.map(opt => (
+                                                <option key={String(opt.id)} value={String(opt.id)}>
+                                                    {opt.title ?? opt.content ?? `#${opt.id}`}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
 
-                    <section className={styles.card} aria-label="Location placements">
-                        <div className={styles.subHeader}>
-                            <h2 className={styles.subTitle}>Placements</h2>
-                            <button
-                                type="button"
-                                className="primaryBtn"
-                                onClick={openAddModal}
-                                disabled={placementsLoading}
-                                aria-label="Add to work"
-                                title="Add to work"
-                            >
-                                Add to work
-                            </button>
-                        </div>
+                                    {updateError && (
+                                        <p role="alert" className={styles.error}>
+                                            {String(updateError)}
+                                        </p>
+                                    )}
 
-                        {placementsLoading && (
-                            <p aria-live="polite" className={styles.muted}>
-                                Loading...
-                            </p>
-                        )}
+                                    {deleteError && (
+                                        <p role="alert" className={styles.error}>
+                                            {String(deleteError)}
+                                        </p>
+                                    )}
 
-                        {!placementsLoading && placementsError && (
-                            <p role="alert" className={styles.error}>
-                                {String(placementsError)}
-                            </p>
-                        )}
-
-                        {!placementsLoading && !placementsError && (
-                            <>
-                                {placements.length > 0 ? (
-                                    <List
-                                        items={placements}
-                                        onRemove={({ id: locationInWorkId, work_id: workId }) => {
-                                            if (removingId) return;
-                                            handleRemovePlacement(workId, locationInWorkId);
-                                        }}
-                                    />
-                                ) : (
-                                    <p className={styles.muted}>No placements yet.</p>
-                                )}
-                            </>
-                        )}
-                    </section>
-
-                    {addOpen && (
-                        <dialog open className={styles.dialog} aria-labelledby="add-work-title" onClose={closeAddModal}>
-                            <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
-                                <h3 id="add-work-title" className={styles.modalTitle}>
-                                    Add to work
-                                </h3>
-
-                                {possibleLoading && (
-                                    <p className={styles.muted} aria-live="polite">
-                                        Loading works...
-                                    </p>
-                                )}
-                                {!possibleLoading && possibleError && (
-                                    <p className={styles.error} role="alert">
-                                        {String(possibleError)}
-                                    </p>
-                                )}
-
-                                {!possibleLoading && !possibleError && (
-                                    <>
-                                        {possibleWorks.length === 0 ? (
-                                            <p className={styles.muted}>No available works to add.</p>
+                                    <div className={styles.actions}>
+                                        {!editMode ? (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleEdit}
+                                                    disabled={disableAll}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="dangerBtn"
+                                                    onClick={handleDelete}
+                                                    disabled={disableAll}
+                                                >
+                                                    {deleteLoading ? 'Deleting...' : 'Delete'}
+                                                </button>
+                                            </>
                                         ) : (
-                                            <ul className={styles.radioList}>
-                                                {possibleWorks.map(w => (
-                                                    <li key={w.id}>
-                                                        <label className={styles.radioRow}>
-                                                            <input
-                                                                type="radio"
-                                                                name="work"
-                                                                value={w.id}
-                                                                checked={String(selectedWorkId) === String(w.id)}
-                                                                onChange={e => setSelectedWorkId(e.target.value)}
-                                                            />
-                                                            <span>{w.content}</span>
-                                                        </label>
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleSave}
+                                                    disabled={updateLoading}
+                                                >
+                                                    Save
+                                                </button>
+                                                <button type="button" onClick={handleCancel} disabled={updateLoading}>
+                                                    Cancel
+                                                </button>
+                                            </>
                                         )}
-                                    </>
-                                )}
+                                    </div>
+                                </form>
+                            </section>
 
-                                <div className={styles.modalActions}>
+                            <section className={styles.card} aria-label="Location placements">
+                                <div className={styles.subHeader}>
+                                    <h2 className={styles.subTitle}>Placements</h2>
                                     <button
                                         type="button"
                                         className="primaryBtn"
-                                        onClick={handleAddToWork}
-                                        disabled={adding || possibleLoading || !selectedWorkId}
+                                        onClick={openAddModal}
+                                        disabled={placementsLoading}
+                                        aria-label="Add to work"
+                                        title="Add to work"
                                     >
-                                        {adding ? 'Adding...' : 'Add'}
-                                    </button>
-                                    <button type="button" onClick={closeAddModal} disabled={adding}>
-                                        Cancel
+                                        Add to work
                                     </button>
                                 </div>
-                            </form>
-                        </dialog>
+
+                                {placementsLoading && (
+                                    <p aria-live="polite" className={styles.muted}>
+                                        Loading...
+                                    </p>
+                                )}
+
+                                {!placementsLoading && placementsError && (
+                                    <p role="alert" className={styles.error}>
+                                        {String(placementsError)}
+                                    </p>
+                                )}
+
+                                {!placementsLoading && !placementsError && (
+                                    <>
+                                        {placements.length > 0 ? (
+                                            <List
+                                                items={placements}
+                                                onRemove={({ id: locationInWorkId, work_id: workId }) => {
+                                                    if (removingId) return;
+                                                    handleRemovePlacement(workId, locationInWorkId);
+                                                }}
+                                            />
+                                        ) : (
+                                            <p className={styles.muted}>No placements yet.</p>
+                                        )}
+                                    </>
+                                )}
+                            </section>
+
+                            {addOpen && (
+                                <dialog
+                                    open
+                                    className={styles.dialog}
+                                    aria-labelledby="add-work-title"
+                                    onClose={closeAddModal}
+                                >
+                                    <form
+                                        method="dialog"
+                                        className={styles.modalBody}
+                                        onSubmit={e => e.preventDefault()}
+                                    >
+                                        <h3 id="add-work-title" className={styles.modalTitle}>
+                                            Add to work
+                                        </h3>
+
+                                        {possibleLoading && (
+                                            <p className={styles.muted} aria-live="polite">
+                                                Loading works...
+                                            </p>
+                                        )}
+                                        {!possibleLoading && possibleError && (
+                                            <p className={styles.error} role="alert">
+                                                {String(possibleError)}
+                                            </p>
+                                        )}
+
+                                        {!possibleLoading && !possibleError && (
+                                            <>
+                                                {possibleWorks.length === 0 ? (
+                                                    <p className={styles.muted}>No available works to add.</p>
+                                                ) : (
+                                                    <ul className={styles.radioList}>
+                                                        {possibleWorks.map(w => (
+                                                            <li key={w.id}>
+                                                                <label className={styles.radioRow}>
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="work"
+                                                                        value={w.id}
+                                                                        checked={
+                                                                            String(selectedWorkId) === String(w.id)
+                                                                        }
+                                                                        onChange={e =>
+                                                                            setSelectedWorkId(e.target.value)
+                                                                        }
+                                                                    />
+                                                                    <span>{w.content}</span>
+                                                                </label>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </>
+                                        )}
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleAddToWork}
+                                                disabled={adding || possibleLoading || !selectedWorkId}
+                                            >
+                                                {adding ? 'Adding...' : 'Add'}
+                                            </button>
+                                            <button type="button" onClick={closeAddModal} disabled={adding}>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            )}
+                        </>
                     )}
-                </>
+                </main>
             )}
-        </main>
+        </>
     );
 }
