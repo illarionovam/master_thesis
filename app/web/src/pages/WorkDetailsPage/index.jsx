@@ -89,7 +89,6 @@ export default function WorkDetailsPage() {
     const eventsError = useSelector(selectGetEventsError);
 
     const [editMode, setEditMode] = useState(false);
-    const formRef = useRef(null);
 
     const [castAddOpen, setCastAddOpen] = useState(false);
     const [selectedCharacterId, setSelectedCharacterId] = useState('');
@@ -111,7 +110,10 @@ export default function WorkDetailsPage() {
 
     const [prePageLoading, setPrePageLoading] = useState(true);
 
+    const formRef = useRef(null);
     const dragIndexRef = useRef(null);
+    const addCastRef = useRef(null);
+    const addLocRef = useRef(null);
 
     useEffect(() => {
         if (!id) {
@@ -134,11 +136,31 @@ export default function WorkDetailsPage() {
     }, [dispatch, id, work]);
 
     useEffect(() => {
-        if (castAddOpen && id) dispatch(getWorkPossibleCast(id));
+        if (!castAddOpen || !id) return;
+        dispatch(getWorkPossibleCast(id));
+
+        const dlg = addCastRef.current;
+        if (!dlg) return;
+
+        if (castAddOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
     }, [castAddOpen, dispatch, id]);
 
     useEffect(() => {
-        if (locAddOpen && id) dispatch(getWorkPossibleLocationLinks(id));
+        if (!locAddOpen || !id) return;
+        dispatch(getWorkPossibleLocationLinks(id));
+
+        const dlg = addLocRef.current;
+        if (!dlg) return;
+
+        if (locAddOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
     }, [locAddOpen, dispatch, id]);
 
     useEffect(() => {
@@ -559,8 +581,8 @@ export default function WorkDetailsPage() {
 
                             {castAddOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addCastRef}
+                                    className="dialog"
                                     aria-labelledby="add-cast-title"
                                     onClose={closeCastAdd}
                                 >
@@ -632,8 +654,8 @@ export default function WorkDetailsPage() {
 
                             {locAddOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addLocRef}
+                                    className="dialog"
                                     aria-labelledby="add-loc-title"
                                     onClose={closeLocAdd}
                                 >

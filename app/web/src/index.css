@@ -9,6 +9,8 @@
     --light-gray: rgba(0, 0, 0, 0.08);
     --shadow-gray: rgba(0, 0, 0, 0.16);
 
+    --box-shadow: 4px 4px 8px var(--light-gray);
+
     color: var(--black);
     background-color: var(--white);
 
@@ -76,7 +78,7 @@ button {
     padding: 0;
     width: 40px;
     border-radius: 9999px;
-    box-shadow: 4px 4px 8px var(--light-gray);
+    box-shadow: var(--box-shadow);
 
     display: grid;
     place-items: center;
@@ -98,4 +100,18 @@ button {
     display: block;
     pointer-events: none;
     fill: currentColor;
+}
+
+.dialog {
+    border: none;
+    border-radius: 12px;
+    padding: 0;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: var(--box-shadow);
+
+    &::backdrop {
+        background: var(--shadow-gray);
+        backdrop-filter: blur(2px);
+    }
 }

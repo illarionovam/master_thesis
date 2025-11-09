@@ -79,6 +79,8 @@ export default function CharacterDetailsPage() {
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
+    const addTagRef = useRef(null);
+    const addWorkRef = useRef(null);
 
     useEffect(() => {
         if (!id) {
@@ -101,6 +103,15 @@ export default function CharacterDetailsPage() {
     useEffect(() => {
         if (!addWorkOpen || !id) return;
         dispatch(getCharacterPossibleAppearances(id));
+
+        const dlg = addWorkRef.current;
+        if (!dlg) return;
+
+        if (addWorkOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
     }, [addWorkOpen, dispatch, id]);
 
     useEffect(() => {
@@ -108,6 +119,17 @@ export default function CharacterDetailsPage() {
             setAttrs(character.attributes && typeof character.attributes === 'object' ? character.attributes : {});
         }
     }, [character]);
+
+    useEffect(() => {
+        const dlg = addTagRef.current;
+        if (!dlg) return;
+
+        if (addTagOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
+    }, [addTagOpen]);
 
     useEffect(() => {
         return () => {
@@ -555,8 +577,8 @@ export default function CharacterDetailsPage() {
 
                             {addTagOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addTagRef}
+                                    className="dialog"
                                     aria-labelledby="add-tag-title"
                                     onClose={() => setAddTagOpen(false)}
                                 >
@@ -582,8 +604,8 @@ export default function CharacterDetailsPage() {
 
                             {addWorkOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addWorkRef}
+                                    className="dialog"
                                     aria-labelledby="add-work-title"
                                     onClose={closeAddWorkModal}
                                 >

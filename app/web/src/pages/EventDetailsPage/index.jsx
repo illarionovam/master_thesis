@@ -67,7 +67,6 @@ export default function EventDetailsPage() {
     const locLinksError = useSelector(selectGetWorkLocationLinksError);
 
     const [editMode, setEditMode] = useState(false);
-    const formRef = useRef(null);
 
     const [addCastOpen, setAddCastOpen] = useState(false);
     const [selectedCharacterId, setSelectedCharacterId] = useState('');
@@ -75,6 +74,9 @@ export default function EventDetailsPage() {
     const [removingCastId, setRemovingCastId] = useState(null);
 
     const [prePageLoading, setPrePageLoading] = useState(true);
+
+    const formRef = useRef(null);
+    const addCastRef = useRef(null);
 
     useEffect(() => {
         if (!id || !eventId) {
@@ -96,8 +98,17 @@ export default function EventDetailsPage() {
     }, [dispatch, id, eventId, event]);
 
     useEffect(() => {
-        if (addCastOpen && id && eventId) {
-            dispatch(getEventPossibleParticipants({ workId: id, eventId }));
+        if (!addCastOpen || !id || !eventId) return;
+
+        dispatch(getEventPossibleParticipants({ workId: id, eventId }));
+
+        const dlg = addCastRef.current;
+        if (!dlg) return;
+
+        if (addCastOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
         }
     }, [addCastOpen, dispatch, id, eventId]);
 
@@ -404,8 +415,8 @@ export default function EventDetailsPage() {
 
                             {addCastOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addCastRef}
+                                    className="dialog"
                                     aria-labelledby="add-cast-title"
                                     onClose={closeAddCast}
                                 >

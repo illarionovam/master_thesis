@@ -52,7 +52,7 @@ export default function CreateEventModal({
     };
 
     return (
-        <dialog ref={dialogRef} className={styles.dialog} aria-labelledby="create-event-title" onClose={onClose}>
+        <dialog ref={dialogRef} className="dialog" aria-labelledby="create-event-title" onClose={onClose}>
             <form onSubmit={handleSubmit} className={styles.form}>
                 <h2 id="create-event-title" className={styles.title}>
                     Create Event

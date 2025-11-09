@@ -69,6 +69,7 @@ export default function LocationDetailsPage() {
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
+    const addWorkRef = useRef(null);
 
     useEffect(() => {
         if (!id) {
@@ -92,6 +93,15 @@ export default function LocationDetailsPage() {
     useEffect(() => {
         if (!addOpen || !id) return;
         dispatch(getLocationPossiblePlacements(id));
+
+        const dlg = addWorkRef.current;
+        if (!dlg) return;
+
+        if (addOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
     }, [addOpen, dispatch, id]);
 
     const disableAll = loading || updateLoading || deleteLoading;
@@ -365,8 +375,8 @@ export default function LocationDetailsPage() {
 
                             {addOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addWorkRef}
+                                    className="dialog"
                                     aria-labelledby="add-work-title"
                                     onClose={closeAddModal}
                                 >

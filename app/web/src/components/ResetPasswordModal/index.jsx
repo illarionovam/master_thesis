@@ -37,7 +37,7 @@ export default function ResetPasswordModal({ onClose }) {
     };
 
     return (
-        <dialog ref={dialogRef} className={styles.dialog} aria-labelledby="reset-title" onCancel={handleCancel}>
+        <dialog ref={dialogRef} className="dialog" aria-labelledby="reset-title" onCancel={handleCancel}>
             <form onSubmit={handleSubmit} className={styles.form} noValidate>
                 <h2 id="reset-title" className={styles.title}>
                     Reset Password

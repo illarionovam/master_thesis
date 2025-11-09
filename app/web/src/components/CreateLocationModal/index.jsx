@@ -48,7 +48,7 @@ export default function CreateLocationModal({
     };
 
     return (
-        <dialog ref={dialogRef} className={styles.dialog} aria-labelledby="create-location-title" onClose={onClose}>
+        <dialog ref={dialogRef} className="dialog" aria-labelledby="create-location-title" onClose={onClose}>
             <form onSubmit={handleSubmit} className={styles.form}>
                 <h2 id="create-location-title" className={styles.title}>
                     Create Location

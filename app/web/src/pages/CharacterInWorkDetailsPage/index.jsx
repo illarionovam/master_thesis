@@ -76,6 +76,8 @@ export default function CharacterInWorkDetailsPage() {
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
+    const addTagRef = useRef(null);
+    const addRelRef = useRef(null);
 
     useEffect(() => {
         if (!id || !characterInWorkId) {
@@ -106,8 +108,27 @@ export default function CharacterInWorkDetailsPage() {
     }, [ciw]);
 
     useEffect(() => {
+        const dlg = addTagRef.current;
+        if (!dlg) return;
+
+        if (addTagOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
+    }, [addTagOpen]);
+
+    useEffect(() => {
         if (!addRelOpen || !id || !characterInWorkId) return;
         dispatch(getCharacterInWorkPossibleRelationships({ workId: id, characterInWorkId }));
+        const dlg = addRelRef.current;
+        if (!dlg) return;
+
+        if (addRelOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
     }, [addRelOpen, dispatch, id, characterInWorkId]);
 
     useEffect(() => {
@@ -542,8 +563,8 @@ export default function CharacterInWorkDetailsPage() {
 
                             {addTagOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addTagRef}
+                                    className="dialog"
                                     aria-labelledby="add-tag-title"
                                     onClose={() => setAddTagOpen(false)}
                                 >
@@ -610,8 +631,8 @@ export default function CharacterInWorkDetailsPage() {
 
                             {addRelOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addRelRef}
+                                    className="dialog"
                                     aria-labelledby="add-rel-title"
                                     onClose={closeAddRelModal}
                                 >

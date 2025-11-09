@@ -1,17 +1,3 @@
-.dialog {
-    padding: 0;
-    border: none;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
-}
-
-.dialog::backdrop {
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(1px);
-}
-
 .body {
     padding: 20px;
     background: #fff;

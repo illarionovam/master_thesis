@@ -44,6 +44,7 @@ export default function LocationInWorkDetailsPage() {
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
+    const addTagRef = useRef(null);
 
     useEffect(() => {
         if (!id || !locationInWorkId) {
@@ -75,10 +76,21 @@ export default function LocationInWorkDetailsPage() {
         }
     }, [liw]);
 
+    useEffect(() => {
+        const dlg = addTagRef.current;
+        if (!dlg) return;
+
+        if (addTagOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
+    }, [addTagOpen]);
+
     const workTitle = liw?.work?.title || '—';
     const workId = liw?.work_id;
     const location = liw?.location;
-    const parentTitle = location?.parent?.title ?? null;
+    const parentTitle = liw.location?.title ?? null;
 
     const disableAll = loading || updateLoading;
 
@@ -293,8 +305,8 @@ export default function LocationInWorkDetailsPage() {
 
                             {addTagOpen && (
                                 <dialog
-                                    open
-                                    className={styles.dialog}
+                                    ref={addTagRef}
+                                    className="dialog"
                                     aria-labelledby="add-tag-title"
                                     onClose={() => setAddTagOpen(false)}
                                 >
