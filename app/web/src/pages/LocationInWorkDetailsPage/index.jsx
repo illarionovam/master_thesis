@@ -306,7 +306,6 @@ export default function LocationInWorkDetailsPage() {
                             {addTagOpen && (
                                 <dialog
                                     ref={addTagRef}
-                                    className="dialog"
                                     aria-labelledby="add-tag-title"
                                     onClose={() => setAddTagOpen(false)}
                                 >

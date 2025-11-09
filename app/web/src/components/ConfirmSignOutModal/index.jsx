@@ -10,7 +10,7 @@ export default function ConfirmSignOutModal({ open, onClose, onCurrent, onAll })
     }, [open]);
 
     return (
-        <dialog ref={dialogRef} aria-labelledby="signout-title" onClose={onClose} className="dialog">
+        <dialog ref={dialogRef} aria-labelledby="signout-title" onClose={onClose}>
             <form method="dialog" className={styles.body}>
                 <h2 id="signout-title" className={styles.title}>
                     Terminate all sessions?

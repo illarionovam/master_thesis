@@ -580,12 +580,7 @@ export default function WorkDetailsPage() {
                             </section>
 
                             {castAddOpen && (
-                                <dialog
-                                    ref={addCastRef}
-                                    className="dialog"
-                                    aria-labelledby="add-cast-title"
-                                    onClose={closeCastAdd}
-                                >
+                                <dialog ref={addCastRef} aria-labelledby="add-cast-title" onClose={closeCastAdd}>
                                     <form
                                         method="dialog"
                                         className={styles.modalBody}
@@ -653,12 +648,7 @@ export default function WorkDetailsPage() {
                             )}
 
                             {locAddOpen && (
-                                <dialog
-                                    ref={addLocRef}
-                                    className="dialog"
-                                    aria-labelledby="add-loc-title"
-                                    onClose={closeLocAdd}
-                                >
+                                <dialog ref={addLocRef} aria-labelledby="add-loc-title" onClose={closeLocAdd}>
                                     <form
                                         method="dialog"
                                         className={styles.modalBody}

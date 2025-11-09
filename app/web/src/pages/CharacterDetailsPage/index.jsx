@@ -578,7 +578,6 @@ export default function CharacterDetailsPage() {
                             {addTagOpen && (
                                 <dialog
                                     ref={addTagRef}
-                                    className="dialog"
                                     aria-labelledby="add-tag-title"
                                     onClose={() => setAddTagOpen(false)}
                                 >
@@ -603,12 +602,7 @@ export default function CharacterDetailsPage() {
                             )}
 
                             {addWorkOpen && (
-                                <dialog
-                                    ref={addWorkRef}
-                                    className="dialog"
-                                    aria-labelledby="add-work-title"
-                                    onClose={closeAddWorkModal}
-                                >
+                                <dialog ref={addWorkRef} aria-labelledby="add-work-title" onClose={closeAddWorkModal}>
                                     <form
                                         method="dialog"
                                         className={styles.modalBody}

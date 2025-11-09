@@ -41,7 +41,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, submitting = 
     };
 
     return (
-        <dialog ref={dialogRef} className="dialog" aria-labelledby="create-work-title" onClose={onClose}>
+        <dialog ref={dialogRef} aria-labelledby="create-work-title" onClose={onClose}>
             <form onSubmit={handleSubmit} className={styles.form}>
                 <h2 id="create-work-title" className={styles.title}>
                     Create Work

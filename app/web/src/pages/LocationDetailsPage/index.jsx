@@ -374,12 +374,7 @@ export default function LocationDetailsPage() {
                             </section>
 
                             {addOpen && (
-                                <dialog
-                                    ref={addWorkRef}
-                                    className="dialog"
-                                    aria-labelledby="add-work-title"
-                                    onClose={closeAddModal}
-                                >
+                                <dialog ref={addWorkRef} aria-labelledby="add-work-title" onClose={closeAddModal}>
                                     <form
                                         method="dialog"
                                         className={styles.modalBody}

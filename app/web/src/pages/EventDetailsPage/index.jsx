@@ -414,12 +414,7 @@ export default function EventDetailsPage() {
                             </section>
 
                             {addCastOpen && (
-                                <dialog
-                                    ref={addCastRef}
-                                    className="dialog"
-                                    aria-labelledby="add-cast-title"
-                                    onClose={closeAddCast}
-                                >
+                                <dialog ref={addCastRef} aria-labelledby="add-cast-title" onClose={closeAddCast}>
                                     <form
                                         method="dialog"
                                         className={styles.modalBody}
