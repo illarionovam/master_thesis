@@ -79,4 +79,10 @@ const updateCharacterValidator = Joi.alternatives()
     .try(coreUpdate, imageOnly)
     .prefs({ abortEarly: false, stripUnknown: true });
 
-export default { createCharacterValidator, updateCharacterValidator };
+const generateImageUrlValidator = Joi.object({
+    attributes: Joi.object().unknown(true).default({}).messages({
+        'object.base': 'attributes must be a JSON object',
+    }),
+}).prefs({ abortEarly: false, stripUnknown: true });
+
+export default { createCharacterValidator, updateCharacterValidator, generateImageUrlValidator };

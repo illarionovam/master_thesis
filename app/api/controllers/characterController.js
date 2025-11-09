@@ -6,6 +6,24 @@ import {
     stripBulkCharacterInWorkResponse,
     stripBulkWorkResponse,
 } from '../helpers/strippers.js';
+import { generateAndUploadImage } from './generateController.js';
+
+const generateImageUrl = async (req, res) => {
+    const { attributes } = req.body;
+
+    const attributesStr = Object.entries(attributes)
+        .filter(([, v]) => v !== null && v !== undefined)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join('. ')
+        .trim();
+
+    const prompt = [req.character.appearance, attributesStr].filter(Boolean).join(' ');
+
+    const url = await generateAndUploadImage(prompt);
+    await characterService.updateCharacter(req.character, { image_url: url });
+
+    res.json(req.character);
+};
 
 const createCharacter = async (req, res) => {
     const character = await characterService.createCharacter({
@@ -51,6 +69,7 @@ const getCharacterPossibleAppearances = async (req, res) => {
 };
 
 export default {
+    generateImageUrl,
     createCharacter,
     getCharacter,
     getCharacters,
