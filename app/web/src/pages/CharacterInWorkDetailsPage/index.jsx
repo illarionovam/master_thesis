@@ -15,6 +15,7 @@ import {
     getCharacterInWorkPossibleRelationships,
     createRelationship,
     deleteRelationship,
+    generateCharacterInWorkImage,
 } from '../../redux/works/operations';
 import {
     selectCharacterInWork,
@@ -31,6 +32,8 @@ import {
     selectGetCharacterInWorkPossibleRelationshipsLoading,
     selectGetCharacterInWorkPossibleRelationshipsError,
     selectCharacterInWorkPossibleRelationships,
+    selectGenerateCharacterInWorkImageLoading,
+    selectGenerateCharacterInWorkImageError,
 } from '../../redux/works/selectors';
 
 import { resetCharacterInWork } from '../../redux/works/slice';
@@ -58,6 +61,9 @@ export default function CharacterInWorkDetailsPage() {
     const possibleRelLoading = useSelector(selectGetCharacterInWorkPossibleRelationshipsLoading);
     const possibleRelError = useSelector(selectGetCharacterInWorkPossibleRelationshipsError);
     const possibleRels = useSelector(selectCharacterInWorkPossibleRelationships) || [];
+
+    const generateLoading = useSelector(selectGenerateCharacterInWorkImageLoading);
+    const generateError = useSelector(selectGenerateCharacterInWorkImageError);
 
     const [editMode, setEditMode] = useState(false);
     const [currentAttrs, setCurrentAttrs] = useState({});
@@ -157,6 +163,17 @@ export default function CharacterInWorkDetailsPage() {
     const characterBio = character?.bio ?? '—';
 
     const disableAll = loading || updateLoading;
+
+    const handleGenerateImage = async () => {
+        if (!id || !characterInWorkId) return;
+
+        const action = await dispatch(generateCharacterInWorkImage({ workId: id, characterInWorkId }));
+        if (generateCharacterInWorkImage.fulfilled.match(action)) {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            setPreviewUrl('');
+            setUploadError('');
+        }
+    };
 
     const removeAttr = key => {
         setCurrentAttrs(prev => {
@@ -329,16 +346,34 @@ export default function CharacterInWorkDetailsPage() {
                                         </div>
 
                                         <div className={styles.uploader}>
+                                            {generateError && (
+                                                <p role="alert" className={styles.error}>
+                                                    {generateError}
+                                                </p>
+                                            )}
+
                                             <div className={styles.imageActions}>
                                                 <button
                                                     type="button"
                                                     className="primaryBtn"
                                                     onClick={() => setUploadOpen(true)}
-                                                    disabled={uploading || disableAll}
+                                                    disabled={uploading || disableAll || generateLoading}
                                                     aria-label="Upload and attach image"
                                                     title="Upload and attach image"
                                                 >
                                                     {uploading ? 'Uploading...' : 'Upload & Attach'}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleGenerateImage}
+                                                    disabled={generateLoading || disableAll || uploading}
+                                                    aria-label="Generate image"
+                                                    title="Generate image"
+                                                >
+                                                    <svg className="icon" aria-hidden="true" focusable="false">
+                                                        <use href="/icons.svg#wand" />
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </div>

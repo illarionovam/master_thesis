@@ -52,7 +52,7 @@ export const selectUpdateCharacterInWorkLoading = state => state.works.updateCha
 export const selectUpdateCharacterInWorkError = state => state.works.updateCharacterInWork.error;
 
 export const selectGenerateCharacterInWorkImageLoading = state => state.works.generateCharacterInWorkImage.loading;
-export const selectUpdateCharacterGenerateCharacterInWorkImageError = state =>
+export const selectGenerateCharacterInWorkImageError = state =>
     state.works.generateCharacterInWorkImage.error;
 
 export const selectDeleteCharacterInWorkLoading = state => state.works.deleteCharacterInWork.loading;

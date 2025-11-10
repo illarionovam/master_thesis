@@ -31,7 +31,7 @@ import {
     selectDeleteCharacterLoading,
     selectDeleteCharacterError,
     selectGenerateCharacterImageLoading,
-    selectUpdateCharacterGenerateCharacterImageError,
+    selectGenerateCharacterImageError,
 } from '../../redux/characters/selectors';
 
 import { resetCharacter } from '../../redux/characters/slice';
@@ -63,7 +63,7 @@ export default function CharacterDetailsPage() {
     const possibleError = useSelector(selectGetCharacterPossibleAppearancesError);
 
     const generateLoading = useSelector(selectGenerateCharacterImageLoading);
-    const generateError = useSelector(selectUpdateCharacterGenerateCharacterImageError);
+    const generateError = useSelector(selectGenerateCharacterImageError);
 
     const [editMode, setEditMode] = useState(false);
 

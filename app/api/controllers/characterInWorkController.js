@@ -15,8 +15,8 @@ const generateImageUrl = async (req, res) => {
     }
 
     const prompt = [
-        req.character.appearance,
-        formatAttributesString(req.character.attributes),
+        characterInWork.character.appearance,
+        formatAttributesString(characterInWork.character.attributes),
         formatAttributesString(characterInWork.attributes),
     ]
         .filter(Boolean)

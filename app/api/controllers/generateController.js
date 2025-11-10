@@ -22,8 +22,6 @@ export const generateAndUploadImage = async (prompt, options = {}) => {
     const b64 = gen.data?.[0]?.b64_json;
     if (!b64) throw createHttpError(500, 'Image generation failed');
 
-    console.log(b64);
-
     const tmpDir = os.tmpdir();
     const tempPath = path.join(tmpDir, `${randomUUID()}.${output_format}`);
     await fs.writeFile(tempPath, Buffer.from(b64, 'base64'));
