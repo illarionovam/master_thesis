@@ -12,9 +12,10 @@ import { formatAttributesString } from '../helpers/formatAttributesString.js';
 const generateImageUrl = async (req, res) => {
     const prompt = [req.character.appearance, formatAttributesString(req.character.attributes)]
         .filter(Boolean)
-        .join(' ');
+        .join('. ');
 
-    const url = await generateAndUploadImage(prompt);
+    //TODO: uncomment before presentation
+    //const url = await generateAndUploadImage(prompt);
     await characterService.updateCharacter(req.character, { image_url: url });
 
     res.json(req.character);

@@ -20,11 +20,10 @@ const generateImageUrl = async (req, res) => {
         formatAttributesString(characterInWork.attributes),
     ]
         .filter(Boolean)
-        .join(' ');
+        .join('. ');
 
-    console.log(prompt);
-
-    const url = await generateAndUploadImage(prompt);
+    //TODO: uncomment before presentation
+    //const url = await generateAndUploadImage(prompt);
     await characterInWorkService.updateCharacterInWork(characterInWork, { image_url: url });
 
     res.json(characterInWork);
