@@ -19,6 +19,9 @@ export const selectGetCharacterError = state => state.characters.getCharacter.er
 export const selectUpdateCharacterLoading = state => state.characters.updateCharacter.loading;
 export const selectUpdateCharacterError = state => state.characters.updateCharacter.error;
 
+export const selectGenerateCharacterImageLoading = state => state.characters.generateCharacterImage.loading;
+export const selectUpdateCharacterGenerateCharacterImageError = state => state.characters.generateCharacterImage.error;
+
 export const selectDeleteCharacterLoading = state => state.characters.deleteCharacter.loading;
 export const selectDeleteCharacterError = state => state.characters.deleteCharacter.error;
 export const selectDeleteCharacterSuccess = state => state.characters.deleteCharacter.success;

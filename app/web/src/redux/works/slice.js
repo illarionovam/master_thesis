@@ -35,6 +35,7 @@ import {
     getEventPossibleParticipants,
     linkEventParticipant,
     unlinkEventParticipant,
+    generateCharacterInWorkImage,
 } from './operations';
 
 const op = { loading: false, error: null };
@@ -55,6 +56,7 @@ const initialState = {
     getCharacterInWork: { ...op },
     updateCharacterInWork: { ...op },
     deleteCharacterInWork: { ...op, success: false },
+    generateCharacterInWorkImage: { ...op },
 
     getCharacterInWorkRelationships: { ...op, relationships: [] },
     getCharacterInWorkPossibleRelationships: { ...op, possibleRelationships: [] },
@@ -114,6 +116,7 @@ const worksSlice = createSlice({
             state.getEventsByCharacterInWorkId = { ...op, events: [] };
             state.getCharacterInWorkRelationships = { ...op, relationships: [] };
             state.getCharacterInWorkPossibleRelationships = { ...op, possibleRelationships: [] };
+            state.generateCharacterInWorkImage = { ...op };
         },
         resetLocationInWork(state) {
             state.locationInWork = null;
@@ -270,6 +273,19 @@ const worksSlice = createSlice({
             .addCase(updateCharacterInWork.rejected, (state, action) => {
                 state.updateCharacterInWork.loading = false;
                 state.updateCharacterInWork.error = action.payload;
+            });
+        builder
+            .addCase(generateCharacterInWorkImage.pending, state => {
+                state.generateCharacterInWorkImage.loading = true;
+                state.generateCharacterInWorkImage.error = null;
+            })
+            .addCase(generateCharacterInWorkImage.fulfilled, (state, action) => {
+                state.generateCharacterInWorkImage.loading = false;
+                state.characterInWork = action.payload;
+            })
+            .addCase(generateCharacterInWorkImage.rejected, (state, action) => {
+                state.generateCharacterInWorkImage.loading = false;
+                state.generateCharacterInWorkImage.error = action.payload;
             });
         builder
             .addCase(deleteCharacterInWork.pending, state => {

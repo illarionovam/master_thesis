@@ -51,6 +51,10 @@ export const selectGetCharacterInWorkError = state => state.works.getCharacterIn
 export const selectUpdateCharacterInWorkLoading = state => state.works.updateCharacterInWork.loading;
 export const selectUpdateCharacterInWorkError = state => state.works.updateCharacterInWork.error;
 
+export const selectGenerateCharacterInWorkImageLoading = state => state.works.generateCharacterInWorkImage.loading;
+export const selectUpdateCharacterGenerateCharacterInWorkImageError = state =>
+    state.works.generateCharacterInWorkImage.error;
+
 export const selectDeleteCharacterInWorkLoading = state => state.works.deleteCharacterInWork.loading;
 export const selectDeleteCharacterInWorkError = state => state.works.deleteCharacterInWork.error;
 export const selectDeleteCharacterInWorkSuccess = state => state.works.deleteCharacterInWork.success;

@@ -22,9 +22,9 @@ const generateImageUrl = async (req, res) => {
         .join(' ');
 
     const url = await generateAndUploadImage(prompt);
-    await characterService.updateCharacter(req.character, { image_url: url });
+    await characterInWorkService.updateCharacterInWork(characterInWork, { image_url: url });
 
-    res.json(req.character);
+    res.json(characterInWork);
 };
 
 const getCharacterInWork = async (req, res) => {

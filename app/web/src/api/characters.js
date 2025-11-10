@@ -6,6 +6,8 @@ export const createAppUserCharacter = async payload => await axiosInstance.post(
 
 export const getAppUserCharacter = async id => await axiosInstance.get(`/characters/${id}`);
 
+export const generateAppUserCharacterImage = async id => await axiosInstance.post(`/characters/${id}`);
+
 export const updateAppUserCharacter = async (id, payload) => await axiosInstance.patch(`/characters/${id}`, payload);
 
 export const destroyAppUserCharacter = async id => await axiosInstance.delete(`/characters/${id}`);

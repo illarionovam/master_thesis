@@ -36,6 +36,7 @@ import {
     linkAppUserEventParticipant,
     unlinkAppUserEventParticipant,
     getAppUserEventsByCharacterInWorkId,
+    generateAppUserCharacterInWorkImage,
 } from '../../api/works.js';
 
 export const getWorks = createAsyncThunk('works/getWorks', async (_, { rejectWithValue }) =>
@@ -75,6 +76,12 @@ export const getCharacterInWork = createAsyncThunk(
     'works/getCharacterInWork',
     async ({ workId, characterInWorkId }, { rejectWithValue }) =>
         wrapper(getAppUserCharacterInWork, rejectWithValue)(workId, characterInWorkId)
+);
+
+export const generateCharacterInWorkImage = createAsyncThunk(
+    'works/generateCharacterInWorkImage',
+    async ({ workId, characterInWorkId }, { rejectWithValue }) =>
+        wrapper(generateAppUserCharacterInWorkImage, rejectWithValue)(workId, characterInWorkId)
 );
 
 export const updateCharacterInWork = createAsyncThunk(

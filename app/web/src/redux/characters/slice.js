@@ -7,6 +7,7 @@ import {
     deleteCharacter,
     getCharacterAppearances,
     getCharacterPossibleAppearances,
+    generateCharacterImage,
 } from './operations';
 
 const op = { loading: false, error: null };
@@ -21,6 +22,7 @@ const initialState = {
     deleteCharacter: { ...op, success: false },
     getCharacterAppearances: { ...op, appearances: [] },
     getCharacterPossibleAppearances: { ...op, possibleAppearances: [] },
+    generateCharacterImage: { ...op },
 };
 
 const charactersSlice = createSlice({
@@ -35,6 +37,7 @@ const charactersSlice = createSlice({
             state.deleteCharacter = { ...op, success: false };
             state.getCharacterAppearances = { ...op, appearances: [] };
             state.getCharacterPossibleAppearances = { ...op, possibleAppearances: [] };
+            state.generateCharacterImage = { ...op };
         },
     },
     extraReducers: builder => {
@@ -88,6 +91,19 @@ const charactersSlice = createSlice({
             .addCase(updateCharacter.rejected, (state, action) => {
                 state.updateCharacter.loading = false;
                 state.updateCharacter.error = action.payload;
+            });
+        builder
+            .addCase(generateCharacterImage.pending, state => {
+                state.generateCharacterImage.loading = true;
+                state.generateCharacterImage.error = null;
+            })
+            .addCase(generateCharacterImage.fulfilled, (state, action) => {
+                state.generateCharacterImage.loading = false;
+                state.character = action.payload;
+            })
+            .addCase(generateCharacterImage.rejected, (state, action) => {
+                state.generateCharacterImage.loading = false;
+                state.generateCharacterImage.error = action.payload;
             });
         builder
             .addCase(deleteCharacter.pending, state => {

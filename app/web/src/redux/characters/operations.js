@@ -8,6 +8,7 @@ import {
     destroyAppUserCharacter,
     getAppUserCharacterAppearances,
     getAppUserCharacterPossibleAppearances,
+    generateAppUserCharacterImage,
 } from '../../api/characters.js';
 
 export const getCharacters = createAsyncThunk('characters/getCharacters', async (_, { rejectWithValue }) =>
@@ -20,6 +21,11 @@ export const createCharacter = createAsyncThunk('characters/createCharacter', as
 
 export const getCharacter = createAsyncThunk('characters/getCharacter', async (id, { rejectWithValue }) =>
     wrapper(getAppUserCharacter, rejectWithValue)(id)
+);
+
+export const generateCharacterImage = createAsyncThunk(
+    'works/generateCharacterImage',
+    async (id, { rejectWithValue }) => wrapper(generateAppUserCharacterImage, rejectWithValue)(id)
 );
 
 export const updateCharacter = createAsyncThunk(
