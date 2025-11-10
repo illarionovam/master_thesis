@@ -2,6 +2,7 @@ import characterInWorkService from '../services/characterInWorkService.js';
 import relationshipService from '../services/relationshipService.js';
 import createHttpError from 'http-errors';
 import { stripBulkCharacterInWorkResponse, stripBulkRelationshipResponse } from '../helpers/strippers.js';
+import { generateAndUploadImage } from './generateController.js';
 import { formatAttributesString } from '../helpers/formatAttributesString.js';
 
 const generateImageUrl = async (req, res) => {
