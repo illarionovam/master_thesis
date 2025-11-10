@@ -71,16 +71,17 @@ export default function CharacterDetailsPage() {
 
     const [removingId, setRemovingId] = useState(null);
 
-    const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState('');
+    const [uploadOpen, setUploadOpen] = useState(false);
 
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const addTagRef = useRef(null);
     const addWorkRef = useRef(null);
+    const uploadRef = useRef(null);
 
     useEffect(() => {
         if (!id) {
@@ -136,6 +137,16 @@ export default function CharacterDetailsPage() {
             if (previewUrl) URL.revokeObjectURL(previewUrl);
         };
     }, [previewUrl]);
+
+    useEffect(() => {
+        const dlg = uploadRef.current;
+        if (!dlg) return;
+        if (uploadOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
+    }, [uploadOpen]);
 
     const disableAll = loading || updateLoading || deleteLoading;
 
@@ -223,29 +234,14 @@ export default function CharacterDetailsPage() {
         }
     };
 
-    const onPickFile = e => {
-        setUploadError('');
-        const file = e.target.files?.[0];
-        if (!file) {
-            setSelectedFile(null);
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            setPreviewUrl('');
-            return;
-        }
-
-        setSelectedFile(file);
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        setPreviewUrl(URL.createObjectURL(file));
-    };
-
-    const handleUploadImage = async () => {
-        if (!selectedFile || !id) return;
+    const handleUploadImage = async file => {
+        if (!file || !id) return;
         try {
             setUploading(true);
             setUploadError('');
 
             const fd = new FormData();
-            fd.append('file', selectedFile);
+            fd.append('file', file);
 
             const res = await uploadImage(fd);
             const url = res?.url;
@@ -256,7 +252,6 @@ export default function CharacterDetailsPage() {
 
             const action = await dispatch(updateCharacter({ id, data: { image_url: url } }));
             if (updateCharacter.fulfilled.match(action)) {
-                setSelectedFile(null);
                 if (previewUrl) URL.revokeObjectURL(previewUrl);
                 setPreviewUrl('');
             }
@@ -322,49 +317,17 @@ export default function CharacterDetailsPage() {
                                         </div>
 
                                         <div className={styles.uploader}>
-                                            <label className={styles.label} htmlFor="ch-image-picker">
-                                                Upload new image
-                                            </label>
-                                            <input
-                                                id="ch-image-picker"
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={onPickFile}
-                                                disabled={uploading || disableAll}
-                                                aria-describedby="ch-image-help"
-                                            />
-
-                                            {uploadError && (
-                                                <p role="alert" className={styles.error}>
-                                                    {uploadError}
-                                                </p>
-                                            )}
-
                                             <div className={styles.imageActions}>
                                                 <button
                                                     type="button"
                                                     className="primaryBtn"
-                                                    onClick={handleUploadImage}
-                                                    disabled={!selectedFile || uploading || disableAll}
+                                                    onClick={() => setUploadOpen(true)}
+                                                    disabled={uploading || disableAll}
                                                     aria-label="Upload and attach image"
                                                     title="Upload and attach image"
                                                 >
-                                                    {uploading ? 'Uploading…' : 'Upload & Attach'}
+                                                    {uploading ? 'Uploading...' : 'Upload & Attach'}
                                                 </button>
-                                                {selectedFile && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setSelectedFile(null);
-                                                            if (previewUrl) URL.revokeObjectURL(previewUrl);
-                                                            setPreviewUrl('');
-                                                            setUploadError('');
-                                                        }}
-                                                        disabled={uploading}
-                                                    >
-                                                        Clear
-                                                    </button>
-                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -574,6 +537,72 @@ export default function CharacterDetailsPage() {
                                         <p className={styles.muted}>No appearances yet.</p>
                                     ))}
                             </section>
+
+                            {uploadOpen && (
+                                <dialog
+                                    ref={uploadRef}
+                                    className="dialog"
+                                    aria-labelledby="upload-title"
+                                    onClose={() => {
+                                        setUploadOpen(false);
+                                    }}
+                                >
+                                    <form
+                                        method="dialog"
+                                        className={styles.modalBody}
+                                        onSubmit={e => e.preventDefault()}
+                                    >
+                                        <h3 id="upload-title" className={styles.modalTitle}>
+                                            Upload image
+                                        </h3>
+
+                                        <div className={styles.field}>
+                                            <label className={styles.label}>
+                                                Choose file
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={async e => {
+                                                        setUploadError('');
+                                                        const inputEl = e.currentTarget;
+                                                        const file = inputEl.files?.[0];
+                                                        if (!file) return;
+
+                                                        if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                                        setPreviewUrl(URL.createObjectURL(file));
+
+                                                        await handleUploadImage(file);
+                                                        setUploadOpen(false);
+                                                        inputEl.value = '';
+                                                    }}
+                                                    disabled={uploading || disableAll}
+                                                />
+                                            </label>
+                                        </div>
+
+                                        {uploadError && (
+                                            <p role="alert" className={styles.error}>
+                                                {uploadError}
+                                            </p>
+                                        )}
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setUploadError('');
+                                                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                                    setPreviewUrl('');
+                                                    setUploadOpen(false);
+                                                }}
+                                                disabled={uploading}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            )}
 
                             {addTagOpen && (
                                 <dialog
