@@ -21,6 +21,8 @@ const generateImageUrl = async (req, res) => {
         .filter(Boolean)
         .join(' ');
 
+    console.log(prompt);
+
     const url = await generateAndUploadImage(prompt);
     await characterInWorkService.updateCharacterInWork(characterInWork, { image_url: url });
 

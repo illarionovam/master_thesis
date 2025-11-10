@@ -21,7 +21,7 @@ export const getAppUserCharacterInWork = async (workId, characterInWorkId) =>
     await axiosInstance.get(`/works/${workId}/cast/${characterInWorkId}`);
 
 export const generateAppUserCharacterInWorkImage = async (workId, characterInWorkId) =>
-    await axiosInstance.post(`/works/${workId}/cast/${characterInWorkId}`);
+    await axiosInstance.post(`/works/${workId}/cast/${characterInWorkId}/generate`);
 
 export const updateAppUserCharacterInWork = async (workId, characterInWorkId, payload) =>
     await axiosInstance.patch(`/works/${workId}/cast/${characterInWorkId}`, payload);

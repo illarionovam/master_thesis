@@ -12,6 +12,7 @@ import {
     getCharacterAppearances,
     getCharacterPossibleAppearances,
     deleteCharacter,
+    generateCharacterImage,
 } from '../../redux/characters/operations';
 import { linkWorkCharacter, deleteCharacterInWork } from '../../redux/works/operations';
 
@@ -29,6 +30,8 @@ import {
     selectGetCharacterPossibleAppearancesError,
     selectDeleteCharacterLoading,
     selectDeleteCharacterError,
+    selectGenerateCharacterImageLoading,
+    selectUpdateCharacterGenerateCharacterImageError,
 } from '../../redux/characters/selectors';
 
 import { resetCharacter } from '../../redux/characters/slice';
@@ -58,6 +61,9 @@ export default function CharacterDetailsPage() {
     const possibleWorks = useSelector(selectCharacterPossibleAppearances) || [];
     const possibleLoading = useSelector(selectGetCharacterPossibleAppearancesLoading);
     const possibleError = useSelector(selectGetCharacterPossibleAppearancesError);
+
+    const generateLoading = useSelector(selectGenerateCharacterImageLoading);
+    const generateError = useSelector(selectUpdateCharacterGenerateCharacterImageError);
 
     const [editMode, setEditMode] = useState(false);
 
@@ -149,6 +155,17 @@ export default function CharacterDetailsPage() {
     }, [uploadOpen]);
 
     const disableAll = loading || updateLoading || deleteLoading;
+
+    const handleGenerateImage = async () => {
+        if (!id) return;
+
+        const action = await dispatch(generateCharacterImage(id));
+        if (generateCharacterImage.fulfilled.match(action)) {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            setPreviewUrl('');
+            setUploadError('');
+        }
+    };
 
     const handleEdit = () => setEditMode(true);
 
@@ -317,16 +334,33 @@ export default function CharacterDetailsPage() {
                                         </div>
 
                                         <div className={styles.uploader}>
+                                            {generateError && (
+                                                <p role="alert" className={styles.error}>
+                                                    {generateError}
+                                                </p>
+                                            )}
                                             <div className={styles.imageActions}>
                                                 <button
                                                     type="button"
                                                     className="primaryBtn"
                                                     onClick={() => setUploadOpen(true)}
-                                                    disabled={uploading || disableAll}
+                                                    disabled={uploading || disableAll || generateLoading}
                                                     aria-label="Upload and attach image"
                                                     title="Upload and attach image"
                                                 >
                                                     {uploading ? 'Uploading...' : 'Upload & Attach'}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleGenerateImage}
+                                                    disabled={generateLoading || disableAll || uploading}
+                                                    aria-label="Generate image"
+                                                    title="Generate image"
+                                                >
+                                                    <svg className="icon" aria-hidden="true" focusable="false">
+                                                        <use href="/icons.svg#wand" />
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </div>

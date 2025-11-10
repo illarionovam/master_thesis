@@ -14,6 +14,8 @@ const generateImageUrl = async (req, res) => {
         .filter(Boolean)
         .join(' ');
 
+    console.log(prompt);
+
     const url = await generateAndUploadImage(prompt);
     await characterService.updateCharacter(req.character, { image_url: url });
 
