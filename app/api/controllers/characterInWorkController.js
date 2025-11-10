@@ -2,6 +2,30 @@ import characterInWorkService from '../services/characterInWorkService.js';
 import relationshipService from '../services/relationshipService.js';
 import createHttpError from 'http-errors';
 import { stripBulkCharacterInWorkResponse, stripBulkRelationshipResponse } from '../helpers/strippers.js';
+import { formatAttributesString } from '../helpers/formatAttributesString.js';
+
+const generateImageUrl = async (req, res) => {
+    const { characterInWorkId } = req.params;
+
+    const characterInWork = await characterInWorkService.getCharacterInWork(characterInWorkId);
+
+    if (characterInWork == null || characterInWork.work_id !== req.work.id) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    const prompt = [
+        req.character.appearance,
+        formatAttributesString(req.character.attributes),
+        formatAttributesString(characterInWork.attributes),
+    ]
+        .filter(Boolean)
+        .join(' ');
+
+    const url = await generateAndUploadImage(prompt);
+    await characterService.updateCharacter(req.character, { image_url: url });
+
+    res.json(req.character);
+};
 
 const getCharacterInWork = async (req, res) => {
     const { characterInWorkId } = req.params;
@@ -83,6 +107,7 @@ const destroyCharacterInWork = async (req, res) => {
 };
 
 export default {
+    generateImageUrl,
     getCharacterInWork,
     getCharacterInWorkRelationships,
     getCharacterInWorkPossibleRelationships,

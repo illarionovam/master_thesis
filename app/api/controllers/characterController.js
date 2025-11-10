@@ -7,17 +7,12 @@ import {
     stripBulkWorkResponse,
 } from '../helpers/strippers.js';
 import { generateAndUploadImage } from './generateController.js';
+import { formatAttributesString } from '../helpers/formatAttributesString.js';
 
 const generateImageUrl = async (req, res) => {
-    const { attributes } = req.body;
-
-    const attributesStr = Object.entries(attributes)
-        .filter(([, v]) => v !== null && v !== undefined)
-        .map(([k, v]) => `${k}: ${v}`)
-        .join('. ')
-        .trim();
-
-    const prompt = [req.character.appearance, attributesStr].filter(Boolean).join(' ');
+    const prompt = [req.character.appearance, formatAttributesString(req.character.attributes)]
+        .filter(Boolean)
+        .join(' ');
 
     const url = await generateAndUploadImage(prompt);
     await characterService.updateCharacter(req.character, { image_url: url });

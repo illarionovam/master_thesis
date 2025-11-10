@@ -25,7 +25,6 @@ characterRoute.get(
 characterRoute.post(
     '/:id/generate',
     controllerWrapper(validateCharacterId()),
-    controllerWrapper(validateBody(characterValidator.generateImageUrlValidator)),
     controllerWrapper(characterController.generateImageUrl)
 );
 characterRoute.patch(

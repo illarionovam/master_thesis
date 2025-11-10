@@ -2,10 +2,6 @@ import createHttpError from 'http-errors';
 import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
-import characterInWorkController from './characterInWorkController.js';
-import locationInWorkController from './locationInWorkController.js';
-import characterController from './characterController.js';
-import locationController from './locationController.js';
 import locationService from '../services/locationService.js';
 import locationInWorkService from '../services/locationInWorkService.js';
 import {
