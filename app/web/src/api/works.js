@@ -32,6 +32,8 @@ export const destroyAppUserCharacterInWork = async (workId, characterInWorkId) =
 export const getAppUserCharacterInWorkRelationships = async (workId, characterInWorkId) =>
     await axiosInstance.get(`/works/${workId}/cast/${characterInWorkId}/relationships`);
 
+export const getAppUserWorkRelationships = async workId => await axiosInstance.get(`/works/${workId}/relationships`);
+
 export const getAppUserCharacterInWorkPossibleRelationships = async (workId, characterInWorkId) =>
     await axiosInstance.get(`/works/${workId}/cast/${characterInWorkId}/relationships/available`);
 

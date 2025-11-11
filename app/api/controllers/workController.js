@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import workService from '../services/workService.js';
 import characterService from '../services/characterService.js';
+import relationshipService from '../services/relationshipService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
 import locationService from '../services/locationService.js';
 import locationInWorkService from '../services/locationInWorkService.js';
@@ -10,6 +11,7 @@ import {
     stripBulkCharacterResponse,
     stripBulkLocationInWorkResponse,
     stripBulkLocationResponse,
+    stripBulkRelationshipResponse,
 } from '../helpers/strippers.js';
 
 const createWork = async (req, res) => {
@@ -101,6 +103,12 @@ const getWorkPossibleLocationLinks = async (req, res) => {
     res.json(possibleLocationLinks.map(stripBulkLocationResponse));
 };
 
+const getWorkRelationships = async (req, res) => {
+    const relationships = await relationshipService.getRelationshipsByWorkId(req.work.id);
+
+    res.json(relationships.map(stripBulkRelationshipResponse));
+};
+
 export default {
     createWork,
     getWork,
@@ -113,4 +121,5 @@ export default {
     linkLocation,
     getWorkLocationLinks,
     getWorkPossibleLocationLinks,
+    getWorkRelationships,
 };

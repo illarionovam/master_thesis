@@ -56,6 +56,11 @@ workRoute.post(
     controllerWrapper(characterInWorkController.generateImageUrl)
 );
 workRoute.get(
+    '/:id/relationships',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(workController.getWorkRelationships)
+);
+workRoute.get(
     '/:id/cast/:characterInWorkId/relationships',
     controllerWrapper(validateWorkId()),
     controllerWrapper(characterInWorkController.getCharacterInWorkRelationships)

@@ -65,6 +65,35 @@ const getRelationships = async (characterInWorkId, workId, { transaction } = {})
     });
 };
 
+const getRelationshipsByWorkId = async (workId, { transaction } = {}) => {
+    return Relationship.findAll({
+        include: [
+            {
+                model: CharacterInWork,
+                as: 'from',
+                required: true,
+                where: { work_id: workId },
+                include: [
+                    { model: Work, as: 'work', required: true },
+                    { model: Character, as: 'character', required: true },
+                ],
+            },
+            {
+                model: CharacterInWork,
+                as: 'to',
+                required: true,
+                where: { work_id: workId },
+                include: [
+                    { model: Work, as: 'work', required: true },
+                    { model: Character, as: 'character', required: true },
+                ],
+            },
+        ],
+        transaction,
+        subQuery: false,
+    });
+};
+
 const getPossibleRelationships = async (characterInWorkId, workId, { transaction } = {}) => {
     return CharacterInWork.findAll({
         where: {
@@ -104,4 +133,5 @@ export default {
     getPossibleRelationships,
     updateRelationship,
     destroyRelationship,
+    getRelationshipsByWorkId,
 };
