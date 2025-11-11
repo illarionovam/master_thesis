@@ -88,6 +88,14 @@ const Navigation = () => {
                     }
                 />
                 <Route
+                    path={ROUTES.CHARACTER_IN_WORK_DASHBOARD_PAGE}
+                    element={
+                        <RequireAuth>
+                            <DashboardPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
                     path={ROUTES.LOCATION_IN_WORK_DETAILS_PAGE}
                     element={
                         <RequireAuth>

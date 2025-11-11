@@ -15,8 +15,15 @@ function mapCastToNodes(cast = []) {
     }));
 }
 
-function mapRelationshipsToEdges(rels = []) {
-    return rels.map(r => ({
+function mapRelationshipsToEdges(rels = [], focusId) {
+    const filtered =
+        focusId == null
+            ? rels
+            : rels.filter(
+                  r => String(r.from_character_in_work_id) === focusId || String(r.to_character_in_work_id) === focusId
+              );
+
+    return filtered.map(r => ({
         data: {
             id: r.id,
             source: r.from_character_in_work_id,
@@ -28,7 +35,7 @@ function mapRelationshipsToEdges(rels = []) {
 
 export default function DashboardPage() {
     const dispatch = useDispatch();
-    const { id } = useParams();
+    const { id, characterInWorkId } = useParams();
 
     const cyRef = useRef(null);
 
@@ -78,13 +85,19 @@ export default function DashboardPage() {
             dispatch(getWorkRelationships(id)).unwrap(),
         ]);
 
-        const nodes = mapCastToNodes(castRes);
-        const edges = mapRelationshipsToEdges(relsRes);
+        const edges = mapRelationshipsToEdges(relsRes, characterInWorkId);
+        const nodesAll = mapCastToNodes(castRes);
+
+        let nodes = nodesAll;
+        if (characterInWorkId != null) {
+            const connectedIds = new Set(edges.flatMap(e => [e.data.source, e.data.target].map(String)));
+            nodes = nodesAll.filter(n => connectedIds.has(n.data.id));
+        }
 
         setElements([...nodes, ...edges]);
 
         setLoading(false);
-    }, [dispatch, id]);
+    }, [dispatch, id, characterInWorkId]);
 
     useEffect(() => {
         refresh();
