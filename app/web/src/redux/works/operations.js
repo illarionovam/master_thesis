@@ -105,7 +105,7 @@ export const getCharacterInWorkRelationships = createAsyncThunk(
 
 export const getWorkRelationships = createAsyncThunk(
     'works/getWorkRelationships',
-    async ({ workId }, { rejectWithValue }) => wrapper(getAppUserWorkRelationships, rejectWithValue)(workId)
+    async (workId, { rejectWithValue }) => wrapper(getAppUserWorkRelationships, rejectWithValue)(workId)
 );
 
 export const getCharacterInWorkPossibleRelationships = createAsyncThunk(

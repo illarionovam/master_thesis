@@ -19,6 +19,7 @@ const LocationInWorkDetailsPage = lazy(() => import('../pages/LocationInWorkDeta
 const CharacterInWorkDetailsPage = lazy(() => import('../pages/CharacterInWorkDetailsPage'));
 const EventDetailsPage = lazy(() => import('../pages/EventDetailsPage'));
 const RelationshipDetailsPage = lazy(() => import('../pages/RelationshipDetailsPage'));
+const DashboardPage = lazy(() => import('../pages/DashboardPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 const Navigation = () => {
@@ -75,6 +76,14 @@ const Navigation = () => {
                     element={
                         <RequireAuth>
                             <WorkDetailsPage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path={ROUTES.WORK_DASHBOARD_PAGE}
+                    element={
+                        <RequireAuth>
+                            <DashboardPage />
                         </RequireAuth>
                     }
                 />
