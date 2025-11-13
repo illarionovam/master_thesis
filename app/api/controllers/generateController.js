@@ -46,7 +46,6 @@ Events: ${JSON.stringify(events)}
                 content: prompt,
             },
         ],
-        temperature: 0.6,
         max_completion_tokens: 500,
     });
 
