@@ -500,7 +500,9 @@ export default function WorkDetailsPage() {
                                                     type="button"
                                                     className="primaryBtn"
                                                     onClick={handleOpenGenerateModal}
-                                                    disabled={eventsLoading || events.length === 0 || genLoading}
+                                                    disabled={
+                                                        eventsLoading || events.length === 0 || genLoading || disableAll
+                                                    }
                                                     aria-label="Generate description from events"
                                                     title="Generate description from events"
                                                 >

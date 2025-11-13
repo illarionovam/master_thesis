@@ -27,6 +27,10 @@ export const selectGenerateWorkDescriptionLoading = state => state.works.generat
 export const selectGenerateWorkDescriptionError = state => state.works.generateWorkDescription.error;
 export const selectGenerateWorkDescriptionResult = state => state.works.generateWorkDescription.result;
 
+export const selectGenerateEventCheckLoading = state => state.works.generateEventCheck.loading;
+export const selectGenerateEventCheckError = state => state.works.generateEventCheck.error;
+export const selectGenerateEventCheckResult = state => state.works.generateEventCheck.result;
+
 export const selectDeleteWorkLoading = state => state.works.deleteWork.loading;
 export const selectDeleteWorkError = state => state.works.deleteWork.error;
 export const selectDeleteWorkSuccess = state => state.works.deleteWork.success;

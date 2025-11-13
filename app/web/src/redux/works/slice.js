@@ -38,6 +38,7 @@ import {
     generateCharacterInWorkImage,
     getWorkRelationships,
     generateWorkDescription,
+    generateEventCheck,
 } from './operations';
 
 const op = { loading: false, error: null };
@@ -53,6 +54,7 @@ const initialState = {
     getWorkRelationships: { ...op, relationships: [] },
 
     generateWorkDescription: { ...op, result: null },
+    generateEventCheck: { ...op, result: null },
 
     getWorkCast: { ...op, cast: [] },
     linkWorkCharacter: { ...op },
@@ -113,6 +115,7 @@ const worksSlice = createSlice({
             state.reorderEvents = { ...op, success: false };
             state.getWorkRelationships = { ...op, relationships: [] };
             state.generateWorkDescription = { ...op, result: null };
+            state.generateEventCheck = { ...op, result: null };
         },
         resetCharacterInWork(state) {
             state.characterInWork = null;
@@ -188,6 +191,19 @@ const worksSlice = createSlice({
             .addCase(generateWorkDescription.rejected, (state, action) => {
                 state.generateWorkDescription.loading = false;
                 state.generateWorkDescription.error = action.payload;
+            });
+        builder
+            .addCase(generateEventCheck.pending, state => {
+                state.generateEventCheck.loading = true;
+                state.generateEventCheck.error = null;
+            })
+            .addCase(generateEventCheck.fulfilled, (state, action) => {
+                state.generateEventCheck.loading = false;
+                state.generateEventCheck.result = action.payload;
+            })
+            .addCase(generateEventCheck.rejected, (state, action) => {
+                state.generateEventCheck.loading = false;
+                state.generateEventCheck.error = action.payload;
             });
         builder
             .addCase(getWork.pending, state => {

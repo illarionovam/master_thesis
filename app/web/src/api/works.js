@@ -84,6 +84,9 @@ export const createAppUserEvent = async (workId, payload) =>
 
 export const getAppUserEvent = async (workId, eventId) => await axiosInstance.get(`/works/${workId}/events/${eventId}`);
 
+export const generateAppUserEventCheck = async (workId, eventId) =>
+    await axiosInstance.get(`/works/${workId}/events/${eventId}/generate`);
+
 export const updateAppUserEvent = async (workId, eventId, payload) =>
     await axiosInstance.patch(`/works/${workId}/events/${eventId}`, payload);
 

@@ -165,6 +165,11 @@ workRoute.post(
     controllerWrapper(eventController.createEvent)
 );
 workRoute.get('/:id/events/:eventId', controllerWrapper(validateWorkId()), controllerWrapper(eventController.getEvent));
+workRoute.get(
+    '/:id/events/:eventId/generate',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(eventController.generateFactCheck)
+);
 workRoute.patch(
     '/:id/events/:eventId',
     controllerWrapper(validateWorkId()),

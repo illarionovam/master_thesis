@@ -14,6 +14,7 @@ import {
     linkEventParticipant,
     unlinkEventParticipant,
     getWorkLocationLinks,
+    generateEventCheck,
 } from '../../redux/works/operations';
 
 import {
@@ -33,6 +34,9 @@ import {
     selectWorkLocationLinks,
     selectGetWorkLocationLinksLoading,
     selectGetWorkLocationLinksError,
+    selectGenerateEventCheckError,
+    selectGenerateEventCheckLoading,
+    selectGenerateEventCheckResult,
 } from '../../redux/works/selectors';
 
 import { resetEvent } from '../../redux/works/slice';
@@ -66,6 +70,10 @@ export default function EventDetailsPage() {
     const locLinksLoading = useSelector(selectGetWorkLocationLinksLoading);
     const locLinksError = useSelector(selectGetWorkLocationLinksError);
 
+    const genLoading = useSelector(selectGenerateEventCheckLoading);
+    const genError = useSelector(selectGenerateEventCheckError);
+    const genResult = useSelector(selectGenerateEventCheckResult);
+
     const [editMode, setEditMode] = useState(false);
 
     const [addCastOpen, setAddCastOpen] = useState(false);
@@ -73,10 +81,13 @@ export default function EventDetailsPage() {
     const [addingCast, setAddingCast] = useState(false);
     const [removingCastId, setRemovingCastId] = useState(null);
 
+    const [genModalOpen, setGenModalOpen] = useState(false);
+
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const addCastRef = useRef(null);
+    const genDialogRef = useRef(null);
 
     useEffect(() => {
         if (!id || !eventId) {
@@ -111,6 +122,17 @@ export default function EventDetailsPage() {
             if (dlg.open) dlg.close();
         }
     }, [addCastOpen, dispatch, id, eventId]);
+
+    useEffect(() => {
+        const dlg = genDialogRef.current;
+        if (!dlg) return;
+
+        if (genModalOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
+    }, [genModalOpen]);
 
     const disableAll = loading || updateLoading || deleteLoading;
 
@@ -202,6 +224,17 @@ export default function EventDetailsPage() {
         } finally {
             setRemovingCastId(null);
         }
+    };
+
+    const handleOpenGenerateModal = async () => {
+        if (!id || !eventId) return;
+        setGenModalOpen(true);
+        await dispatch(generateEventCheck({ workId: id, eventId }));
+    };
+
+    const handleCloseGenerateModal = () => {
+        if (genLoading) return;
+        setGenModalOpen(false);
     };
 
     const workTitle = event?.work?.title ?? '—';
@@ -339,6 +372,18 @@ export default function EventDetailsPage() {
                                                 <button
                                                     type="button"
                                                     className="primaryBtn"
+                                                    onClick={handleOpenGenerateModal}
+                                                    disabled={disableAll || genLoading}
+                                                    aria-label="Generate event's fact check"
+                                                    title="Generate event's fact check"
+                                                >
+                                                    <svg className="icon" aria-hidden="true" focusable="false">
+                                                        <use href="/icons.svg#wand" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
                                                     onClick={handleEdit}
                                                     disabled={disableAll}
                                                 >
@@ -412,6 +457,53 @@ export default function EventDetailsPage() {
                                         <p className={styles.muted}>No participants yet.</p>
                                     ))}
                             </section>
+
+                            {genModalOpen && (
+                                <dialog
+                                    ref={genDialogRef}
+                                    aria-labelledby="generate-description-title"
+                                    onClose={handleCloseGenerateModal}
+                                >
+                                    <form
+                                        method="dialog"
+                                        className={styles.modalBody}
+                                        onSubmit={e => e.preventDefault()}
+                                    >
+                                        <h3 id="generate-description-title" className={styles.modalTitle}>
+                                            Generated description
+                                        </h3>
+
+                                        {genError && (
+                                            <p className={styles.error} role="alert">
+                                                {String(genError)}
+                                            </p>
+                                        )}
+
+                                        <div className={styles.field}>
+                                            <label htmlFor="generated-description" className={styles.label}>
+                                                Text
+                                            </label>
+                                            <textarea
+                                                id="generated-description"
+                                                className={`${styles.input} ${styles.textarea}`}
+                                                rows={10}
+                                                readOnly
+                                                value={genResult?.result ?? (genLoading ? 'Generating...' : '')}
+                                            />
+                                        </div>
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                type="button"
+                                                onClick={handleCloseGenerateModal}
+                                                disabled={genLoading}
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            )}
 
                             {addCastOpen && (
                                 <dialog ref={addCastRef} aria-labelledby="add-cast-title" onClose={closeAddCast}>
