@@ -47,7 +47,7 @@ Events: ${JSON.stringify(events)}
             },
         ],
         temperature: 0.6,
-        max_tokens: 500,
+        max_completion_tokens: 500,
     });
 
     console.log(gen);
