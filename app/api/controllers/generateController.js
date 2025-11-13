@@ -41,13 +41,12 @@ Events: ${JSON.stringify(events)}
     const response = await openai.responses.create({
         model: 'gpt-5-nano',
         input: prompt,
-        max_output_tokens: 500,
     });
 
     console.log(response.output[0]?.content);
     console.log(response.output);
 
-    const text = response.output[0]?.content;
+    const text = response.output[0]?.content?.text;
     if (!text) throw createHttpError(500, 'Synopsis generation failed');
 
     return text;
