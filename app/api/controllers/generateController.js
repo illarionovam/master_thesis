@@ -41,7 +41,7 @@ Events: ${JSON.stringify(events)}
     const response = await openai.responses.create({
         model: 'gpt-5-nano',
         input: prompt,
-        max_completion_tokens: 500,
+        max_output_tokens: 500,
     });
 
     console.log(response.output[0]?.content);
