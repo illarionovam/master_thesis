@@ -43,10 +43,12 @@ Events: ${JSON.stringify(events)}
         input: prompt,
     });
 
-    console.log(response.output[0]?.content);
-    console.log(response.output);
+    console.log(response.output[1]?.content);
 
-    const text = response.output[0]?.content?.text;
+    const messageItem = response.output.find(item => item.type === 'message');
+    const textBlock = messageItem?.content?.find(c => c.type === 'output_text');
+    const text = typeof textBlock?.text === 'string' ? textBlock.text : null;
+
     if (!text) throw createHttpError(500, 'Synopsis generation failed');
 
     return text;
