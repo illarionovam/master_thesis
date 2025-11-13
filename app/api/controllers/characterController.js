@@ -15,7 +15,7 @@ const generateImageUrl = async (req, res) => {
         .join('. ');
 
     //TODO: uncomment before presentation
-    const url = await generateAndUploadImage(prompt);
+    //const url = await generateAndUploadImage(prompt);
     await characterService.updateCharacter(req.character, { image_url: url });
 
     res.json(req.character);
