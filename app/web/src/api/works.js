@@ -4,6 +4,8 @@ export const getAppUserWorks = async () => await axiosInstance.get('/works');
 
 export const createAppUserWork = async payload => await axiosInstance.post('/works', payload);
 
+export const generateAppUserWorkDescription = async id => await axiosInstance.get(`/works/${id}/generate`);
+
 export const getAppUserWork = async id => await axiosInstance.get(`/works/${id}`);
 
 export const updateAppUserWork = async (id, payload) => await axiosInstance.patch(`/works/${id}`, payload);

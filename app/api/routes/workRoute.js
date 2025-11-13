@@ -26,6 +26,11 @@ workRoute.post(
     controllerWrapper(workController.createWork)
 );
 workRoute.get('/:id', controllerWrapper(validateWorkId()), controllerWrapper(workController.getWork));
+workRoute.get(
+    '/:id/generate',
+    controllerWrapper(validateWorkId()),
+    controllerWrapper(workController.generateDescription)
+);
 workRoute.patch(
     '/:id',
     controllerWrapper(validateWorkId()),

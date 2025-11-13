@@ -29,3 +29,31 @@ export const generateAndUploadImage = async (prompt, options = {}) => {
     const url = await saveFile({ path: tempPath });
     return url;
 };
+
+export const generateDescription = async events => {
+    const prompt = `You are a literary editor. Based on the following list of events, generate:
+1) A short annotation (2-4 sentences)
+2) A short synopsis (5-8 sentences)
+Language: English.
+Events: ${JSON.stringify(events)}
+`;
+
+    const gen = await openai.chat.completions.create({
+        model: 'gpt-5-nano',
+        messages: [
+            {
+                role: 'user',
+                content: prompt,
+            },
+        ],
+        temperature: 0.6,
+        max_tokens: 500,
+    });
+
+    console.log(gen);
+
+    const text = gen.choices?.[0]?.message?.content;
+    if (!text) throw createHttpError(500, 'Synopsis generation failed');
+
+    return text;
+};

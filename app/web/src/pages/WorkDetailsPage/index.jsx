@@ -20,6 +20,7 @@ import {
     getEvents,
     createEvent,
     reorderEvents,
+    generateWorkDescription,
 } from '../../redux/works/operations';
 
 import {
@@ -45,6 +46,9 @@ import {
     selectGetEventsLoading,
     selectGetEventsError,
     selectEvents,
+    selectGenerateWorkDescriptionLoading,
+    selectGenerateWorkDescriptionError,
+    selectGenerateWorkDescriptionResult,
 } from '../../redux/works/selectors';
 
 import { resetWork } from '../../redux/works/slice';
@@ -88,6 +92,10 @@ export default function WorkDetailsPage() {
     const eventsLoading = useSelector(selectGetEventsLoading);
     const eventsError = useSelector(selectGetEventsError);
 
+    const genLoading = useSelector(selectGenerateWorkDescriptionLoading);
+    const genError = useSelector(selectGenerateWorkDescriptionError);
+    const genResult = useSelector(selectGenerateWorkDescriptionResult);
+
     const [editMode, setEditMode] = useState(false);
 
     const [castAddOpen, setCastAddOpen] = useState(false);
@@ -108,12 +116,15 @@ export default function WorkDetailsPage() {
     const [savingReorder, setSavingReorder] = useState(false);
     const [localEvents, setLocalEvents] = useState([]);
 
+    const [genModalOpen, setGenModalOpen] = useState(false);
+
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const dragIndexRef = useRef(null);
     const addCastRef = useRef(null);
     const addLocRef = useRef(null);
+    const genDialogRef = useRef(null);
 
     useEffect(() => {
         if (!id) {
@@ -148,6 +159,17 @@ export default function WorkDetailsPage() {
             if (dlg.open) dlg.close();
         }
     }, [castAddOpen, dispatch, id]);
+
+    useEffect(() => {
+        const dlg = genDialogRef.current;
+        if (!dlg) return;
+
+        if (genModalOpen) {
+            if (!dlg.open) dlg.showModal();
+        } else {
+            if (dlg.open) dlg.close();
+        }
+    }, [genModalOpen]);
 
     useEffect(() => {
         if (!locAddOpen || !id) return;
@@ -357,6 +379,23 @@ export default function WorkDetailsPage() {
         dragIndexRef.current = null;
     };
 
+    const handleOpenGenerateModal = async () => {
+        if (!id) return;
+        setGenModalOpen(true);
+        await dispatch(generateWorkDescription(id)).unwrap();
+    };
+
+    const handleCloseGenerateModal = () => {
+        if (genLoading) return;
+        setGenModalOpen(false);
+    };
+
+    const handleCopyGenerated = async () => {
+        const text = genResult?.description;
+        if (!text) return;
+        await navigator.clipboard.writeText(text);
+    };
+
     return (
         <>
             {!prePageLoading && (
@@ -457,6 +496,18 @@ export default function WorkDetailsPage() {
                                     <div className={styles.actions}>
                                         {!editMode ? (
                                             <>
+                                                <button
+                                                    type="button"
+                                                    className="primaryBtn"
+                                                    onClick={handleOpenGenerateModal}
+                                                    disabled={eventsLoading || events.length === 0 || genLoading}
+                                                    aria-label="Generate description from events"
+                                                    title="Generate description from events"
+                                                >
+                                                    <svg className="icon" aria-hidden="true" focusable="false">
+                                                        <use href="/icons.svg#wand" />
+                                                    </svg>
+                                                </button>
                                                 <button
                                                     type="button"
                                                     className="primaryBtn"
@@ -578,6 +629,61 @@ export default function WorkDetailsPage() {
                                     </>
                                 )}
                             </section>
+
+                            {genModalOpen && (
+                                <dialog
+                                    ref={genDialogRef}
+                                    aria-labelledby="generate-description-title"
+                                    onClose={handleCloseGenerateModal}
+                                >
+                                    <form
+                                        method="dialog"
+                                        className={styles.modalBody}
+                                        onSubmit={e => e.preventDefault()}
+                                    >
+                                        <h3 id="generate-description-title" className={styles.modalTitle}>
+                                            Generated description
+                                        </h3>
+
+                                        {genError && (
+                                            <p className={styles.error} role="alert">
+                                                {String(genError)}
+                                            </p>
+                                        )}
+
+                                        <div className={styles.field}>
+                                            <label htmlFor="generated-description" className={styles.label}>
+                                                Text
+                                            </label>
+                                            <textarea
+                                                id="generated-description"
+                                                className={`${styles.input} ${styles.textarea}`}
+                                                rows={10}
+                                                readOnly
+                                                value={genResult?.description ?? (genLoading ? 'Generating...' : '')}
+                                            />
+                                        </div>
+
+                                        <div className={styles.modalActions}>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleCopyGenerated}
+                                                disabled={!genResult?.description}
+                                            >
+                                                Copy
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={handleCloseGenerateModal}
+                                                disabled={genLoading}
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            )}
 
                             {castAddOpen && (
                                 <dialog ref={addCastRef} aria-labelledby="add-cast-title" onClose={closeCastAdd}>

@@ -13,6 +13,19 @@ import {
     stripBulkLocationResponse,
     stripBulkRelationshipResponse,
 } from '../helpers/strippers.js';
+import { generateDescription } from './generateController.js';
+
+const generateDescription = async (req, res) => {
+    const rawEvents = await eventService.getEventsByWorkId(req.work.id);
+
+    const events = rawEvents.map(e => ({
+        title: e.title,
+        description: e.description,
+    }));
+
+    const text = await generateDescription(events);
+    res.json({ description: text });
+};
 
 const createWork = async (req, res) => {
     const work = await workService.createWork({
@@ -110,6 +123,7 @@ const getWorkRelationships = async (req, res) => {
 };
 
 export default {
+    generateDescription,
     createWork,
     getWork,
     getWorks,
