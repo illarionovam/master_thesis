@@ -38,22 +38,16 @@ Language: English.
 Events: ${JSON.stringify(events)}
 `;
 
-    const gen = await openai.chat.completions.create({
+    const response = await openai.chat.responses.create({
         model: 'gpt-5-nano',
-        messages: [
-            {
-                role: 'user',
-                content: prompt,
-            },
-        ],
+        input: prompt,
         max_completion_tokens: 500,
     });
 
-    console.log(gen.choices);
-    console.log(gen.choices?.[0]);
-    console.log(gen.choices?.[0]?.message);
+    console.log(response.output[0]?.content);
+    console.log(response.output);
 
-    const text = gen.choices?.[0]?.message?.content;
+    const text = response.output[0]?.content;
     if (!text) throw createHttpError(500, 'Synopsis generation failed');
 
     return text;
