@@ -22,6 +22,10 @@ const generateFactCheck = async (req, res) => {
     const eventParticipants = await eventParticipantService.getEventParticipantsByEventId(eventId);
     const events = await eventService.getEventsByWorkId(req.work.id);
 
+    console.log(event);
+    console.log(eventParticipants);
+    console.log(events);
+
     const text = await generateEventFactCheck(
         {
             description: event.description,
