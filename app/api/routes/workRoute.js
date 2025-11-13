@@ -29,7 +29,7 @@ workRoute.get('/:id', controllerWrapper(validateWorkId()), controllerWrapper(wor
 workRoute.get(
     '/:id/generate',
     controllerWrapper(validateWorkId()),
-    controllerWrapper(workController.generateDescription)
+    controllerWrapper(workController.generateWorkDescription)
 );
 workRoute.patch(
     '/:id',

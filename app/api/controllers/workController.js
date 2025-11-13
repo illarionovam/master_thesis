@@ -15,7 +15,7 @@ import {
 } from '../helpers/strippers.js';
 import { generateDescription } from './generateController.js';
 
-const generateDescription = async (req, res) => {
+const generateWorkDescription = async (req, res) => {
     const rawEvents = await eventService.getEventsByWorkId(req.work.id);
 
     const events = rawEvents.map(e => ({
@@ -123,7 +123,7 @@ const getWorkRelationships = async (req, res) => {
 };
 
 export default {
-    generateDescription,
+    generateWorkDescription,
     createWork,
     getWork,
     getWorks,
