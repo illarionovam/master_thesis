@@ -38,7 +38,7 @@ Language: English.
 Events: ${JSON.stringify(events)}
 `;
 
-    const response = await openai.chat.responses.create({
+    const response = await openai.responses.create({
         model: 'gpt-5-nano',
         input: prompt,
         max_completion_tokens: 500,
