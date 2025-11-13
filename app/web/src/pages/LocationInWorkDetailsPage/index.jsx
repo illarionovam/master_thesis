@@ -90,7 +90,7 @@ export default function LocationInWorkDetailsPage() {
     const workTitle = liw?.work?.title || '—';
     const workId = liw?.work_id;
     const location = liw?.location;
-    const parentTitle = liw.location?.title ?? null;
+    const parentTitle = liw?.location?.title ?? null;
 
     const disableAll = loading || updateLoading;
 

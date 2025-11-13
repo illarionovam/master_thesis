@@ -265,7 +265,7 @@ export default function LocationDetailsPage() {
                                         <select
                                             id="loc-parent"
                                             name="parent_location_id"
-                                            defaultValue={location.parent?.id ? String(location.parent.id) : ''}
+                                            defaultValue={location.parent?.id ?? ''}
                                             className={styles.input}
                                             disabled={!editMode || disableAll}
                                         >
