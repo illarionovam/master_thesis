@@ -5,6 +5,7 @@ import relationshipService from '../services/relationshipService.js';
 import characterInWorkService from '../services/characterInWorkService.js';
 import locationService from '../services/locationService.js';
 import locationInWorkService from '../services/locationInWorkService.js';
+import eventService from '../services/eventService.js';
 import {
     stripBulkWorkResponse,
     stripBulkCharacterInWorkResponse,
