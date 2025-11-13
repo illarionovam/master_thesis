@@ -25,7 +25,7 @@ const generateWorkDescription = async (req, res) => {
     }));
 
     const text = await generateDescription(events);
-    res.json({ description: text });
+    res.json({ result: text });
 };
 
 const createWork = async (req, res) => {

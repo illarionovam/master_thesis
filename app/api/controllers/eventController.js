@@ -8,6 +8,19 @@ import {
     stripBulkEventParticipantResponse,
     stripBulkCharacterInWorkResponse,
 } from '../helpers/strippers.js';
+import { generateEventFactCheck } from './generateController.js';
+
+const generateFactCheck = async (req, res) => {
+    const { eventId } = req.params;
+
+    const event = await eventService.getEvent(eventId);
+
+    if (event == null || event.work_id !== req.work.id) {
+        throw createHttpError(403, 'Forbidden');
+    }
+
+    res.json({ result });
+};
 
 const reorderEvents = async (req, res) => {
     const events = await eventService.getEventsByWorkId(req.work.id);
@@ -213,4 +226,5 @@ export default {
     linkParticipant,
     unlinkParticipant,
     getEventParticipantsByWorkIdAndCharacterInWorkId,
+    generateFactCheck,
 };

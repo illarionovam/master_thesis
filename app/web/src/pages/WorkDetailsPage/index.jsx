@@ -88,7 +88,7 @@ export default function WorkDetailsPage() {
     const possibleLocLinksLoading = useSelector(selectGetWorkPossibleLocationLinksLoading);
     const possibleLocLinksError = useSelector(selectGetWorkPossibleLocationLinksError);
 
-    const events = useSelector(selectEvents) || [];
+    const events = useSelector(selectEvents);
     const eventsLoading = useSelector(selectGetEventsLoading);
     const eventsError = useSelector(selectGetEventsError);
 
@@ -391,7 +391,7 @@ export default function WorkDetailsPage() {
     };
 
     const handleCopyGenerated = async () => {
-        const text = genResult?.description;
+        const text = genResult?.result;
         if (!text) return;
         await navigator.clipboard.writeText(text);
     };
@@ -660,7 +660,7 @@ export default function WorkDetailsPage() {
                                                 className={`${styles.input} ${styles.textarea}`}
                                                 rows={10}
                                                 readOnly
-                                                value={genResult?.description ?? (genLoading ? 'Generating...' : '')}
+                                                value={genResult?.result ?? (genLoading ? 'Generating...' : '')}
                                             />
                                         </div>
 
@@ -669,7 +669,7 @@ export default function WorkDetailsPage() {
                                                 type="button"
                                                 className="primaryBtn"
                                                 onClick={handleCopyGenerated}
-                                                disabled={!genResult?.description}
+                                                disabled={!genResult?.result}
                                             >
                                                 Copy
                                             </button>

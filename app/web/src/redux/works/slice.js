@@ -178,7 +178,7 @@ const worksSlice = createSlice({
             });
         builder
             .addCase(generateWorkDescription.pending, state => {
-                state.getWork.loading = true;
+                state.generateWorkDescription.loading = true;
                 state.generateWorkDescription.error = null;
             })
             .addCase(generateWorkDescription.fulfilled, (state, action) => {

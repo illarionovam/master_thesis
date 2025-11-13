@@ -30,20 +30,11 @@ export const generateAndUploadImage = async (prompt, options = {}) => {
     return url;
 };
 
-export const generateDescription = async events => {
-    const prompt = `You are a literary editor. Based on the following list of events, generate:
-1) A short annotation (2-4 sentences)
-2) A short synopsis (5-8 sentences)
-Language: English.
-Events: ${JSON.stringify(events)}
-`;
-
+const generateTextResponse = async prompt => {
     const response = await openai.responses.create({
         model: 'gpt-5-nano',
         input: prompt,
     });
-
-    return 'Annotation:\nOn a university campus, Max’s orbit strands around Viktor and Anton as they navigate fear, memory, and growing trust. A nightmarish trip, a rescue, and a cascade of intimate conversations push their bond beyond friendship into something deeper. The seven-year ending offers a quiet, hopeful reconciliation with the past.\n\nSynopsis:\nMax arrives on the Ruhr campus and quickly becomes entwined with Anton and Viktor. A storm during a class triggers Viktor’s anxiety, and Max stays by him, laying the foundation for trust. At a club, Anton drags Max there where a girl discreetly hands him LSD, sending him into a harrowing trip that Viktor rescues him from. The morning after, they speak openly in the kitchen, and a winter night deepens their connection as Max helps Viktor through a panicked episode. A campus concert becomes a shared moment of vulnerability, but Sonya’s rumor about Tina and Max sparks a fight that tests their loyalties. Then comes the tragedy: Max learns his mother has died, and Viktor helps him leave Brodston to start living together. The danger escalates when Slava, Igor’s nephew, attempts to rape Max, but Viktor arrives in time to stop him, forcing them to confront their pasts and their bond. Seven years later, in a rainy, quiet Ruhrish, Max and Viktor walk side by side under an umbrella, a steadfast sign of peace.';
 
     const messageItem = response.output.find(item => item.type === 'message');
     const textBlock = messageItem?.content?.find(c => c.type === 'output_text');
@@ -52,4 +43,65 @@ Events: ${JSON.stringify(events)}
     if (!text) throw createHttpError(500, 'Synopsis generation failed');
 
     return text;
+};
+
+export const generateDescription = async events => {
+    const prompt = `You are a literary editor. Based on the following list of events, generate:
+1) A short annotation (2-4 sentences)
+2) A short synopsis (5-8 sentences)
+Language: English.
+Events: ${JSON.stringify(events)}
+`;
+
+    return 'Annotation:\nOn a university campus, Max’s orbit strands around Viktor and Anton as they navigate fear, memory, and growing trust. A nightmarish trip, a rescue, and a cascade of intimate conversations push their bond beyond friendship into something deeper. The seven-year ending offers a quiet, hopeful reconciliation with the past.\n\nSynopsis:\nMax arrives on the Ruhr campus and quickly becomes entwined with Anton and Viktor. A storm during a class triggers Viktor’s anxiety, and Max stays by him, laying the foundation for trust. At a club, Anton drags Max there where a girl discreetly hands him LSD, sending him into a harrowing trip that Viktor rescues him from. The morning after, they speak openly in the kitchen, and a winter night deepens their connection as Max helps Viktor through a panicked episode. A campus concert becomes a shared moment of vulnerability, but Sonya’s rumor about Tina and Max sparks a fight that tests their loyalties. Then comes the tragedy: Max learns his mother has died, and Viktor helps him leave Brodston to start living together. The danger escalates when Slava, Igor’s nephew, attempts to rape Max, but Viktor arrives in time to stop him, forcing them to confront their pasts and their bond. Seven years later, in a rainy, quiet Ruhrish, Max and Viktor walk side by side under an umbrella, a steadfast sign of peace.';
+
+    return generateTextResponse(prompt);
+};
+
+export const generateEventFactCheck = async (currentEvent, participants, previousEvents) => {
+    const prompt = `
+You are a fiction development editor analyzing story consistency.
+
+I will provide:
+1) The CURRENT EVENT (title, description, and location description).
+2) PARTICIPANTS (each with name, personality/character, and bio/background).
+3) PREVIOUS EVENTS (key events that happened earlier in the story, in chronological order).
+
+Using ONLY this information, do the following:
+
+1) OOC CHECK (Out of Character):
+- For each participant, say whether their actions, emotions, or implied behavior in the CURRENT EVENT are in-character or out-of-character (OOC).
+- If something feels OOC, explain briefly why, referring to their described character and bio, as well as the PREVIOUS EVENTS.
+
+2) LOGICAL CONTINUITY:
+- Explain whether the CURRENT EVENT logically follows from the PREVIOUS EVENTS.
+- Comment on whether the characters’ decisions and the situation feel like a natural consequence of what happened before, or if any steps feel rushed, missing, or unjustified.
+
+3) INCONSISTENCIES:
+- Point out any obvious contradictions or continuity errors (timeline, physical details, relationships, character motivations, or what characters should/should not know).
+- Mention anything that feels like a clear mismatch between CURRENT EVENT, PARTICIPANTS, and PREVIOUS EVENTS.
+
+Answer in English and be concise but specific.
+Use this structure:
+
+OOC analysis:
+- ...
+
+Logical continuity:
+- ...
+
+Inconsistencies:
+- ...
+
+CURRENT EVENT:
+${JSON.stringify(currentEvent)}
+
+PARTICIPANTS:
+${JSON.stringify(participants)}
+
+PREVIOUS EVENTS:
+${JSON.stringify(previousEvents)}
+`;
+
+    return generateTextResponse(prompt);
 };
