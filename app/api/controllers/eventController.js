@@ -22,22 +22,15 @@ const generateFactCheck = async (req, res) => {
     const eventParticipants = await eventParticipantService.getEventParticipantsByEventId(eventId);
     const events = await eventService.getEventsByWorkId(req.work.id);
 
-    console.log({
-        description: event.description,
-        location_description: event.locationLink?.location?.description ?? null,
-    });
-    console.log(eventParticipants[0]);
-    console.log(events[0]);
-
     const text = await generateEventFactCheck(
         {
             description: event.description,
             location_description: event.locationLink?.location?.description ?? null,
         },
         eventParticipants.map(p => ({
-            name: p.character.name,
-            character: p.character.personality,
-            bio: p.character.bio,
+            name: p.characterLink.character.name,
+            character: p.characterLink.character.personality,
+            bio: p.characterLink.character.bio,
         })),
         events.filter(ev => ev.order_in_work < event.order_in_work).map(ev => ev.description)
     );
