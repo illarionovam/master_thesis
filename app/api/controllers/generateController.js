@@ -49,7 +49,7 @@ Events: ${JSON.stringify(events)}
         max_completion_tokens: 500,
     });
 
-    console.log(gen);
+    console.log(gen.choices?.[0]?.message);
 
     const text = gen.choices?.[0]?.message?.content;
     if (!text) throw createHttpError(500, 'Synopsis generation failed');

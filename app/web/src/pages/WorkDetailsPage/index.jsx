@@ -349,7 +349,7 @@ export default function WorkDetailsPage() {
                 })),
             };
 
-            await dispatch(reorderEvents({ workId: id, data: payload })).unwrap();
+            await dispatch(reorderEvents({ workId: id, data: payload }));
             await dispatch(getEvents(id));
 
             setReorderMode(false);
@@ -382,7 +382,7 @@ export default function WorkDetailsPage() {
     const handleOpenGenerateModal = async () => {
         if (!id) return;
         setGenModalOpen(true);
-        await dispatch(generateWorkDescription(id)).unwrap();
+        await dispatch(generateWorkDescription(id));
     };
 
     const handleCloseGenerateModal = () => {
