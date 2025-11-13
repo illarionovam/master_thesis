@@ -55,7 +55,7 @@ Events: ${JSON.stringify(events)}
 
     return 'Annotation:\nOn a university campus, Max’s orbit strands around Viktor and Anton as they navigate fear, memory, and growing trust. A nightmarish trip, a rescue, and a cascade of intimate conversations push their bond beyond friendship into something deeper. The seven-year ending offers a quiet, hopeful reconciliation with the past.\n\nSynopsis:\nMax arrives on the Ruhr campus and quickly becomes entwined with Anton and Viktor. A storm during a class triggers Viktor’s anxiety, and Max stays by him, laying the foundation for trust. At a club, Anton drags Max there where a girl discreetly hands him LSD, sending him into a harrowing trip that Viktor rescues him from. The morning after, they speak openly in the kitchen, and a winter night deepens their connection as Max helps Viktor through a panicked episode. A campus concert becomes a shared moment of vulnerability, but Sonya’s rumor about Tina and Max sparks a fight that tests their loyalties. Then comes the tragedy: Max learns his mother has died, and Viktor helps him leave Brodston to start living together. The danger escalates when Slava, Igor’s nephew, attempts to rape Max, but Viktor arrives in time to stop him, forcing them to confront their pasts and their bond. Seven years later, in a rainy, quiet Ruhrish, Max and Viktor walk side by side under an umbrella, a steadfast sign of peace.';
 
-    return generateTextResponse(prompt);
+    //return generateTextResponse(prompt);
 };
 
 export const generateEventFactCheck = async (currentEvent, participants, previousEvents) => {
@@ -63,7 +63,7 @@ export const generateEventFactCheck = async (currentEvent, participants, previou
 You are a fiction development editor analyzing story consistency.
 
 I will provide:
-1) The CURRENT EVENT (title, description, and location description).
+1) The CURRENT EVENT (description and location_description).
 2) PARTICIPANTS (each with name, personality/character, and bio/background).
 3) PREVIOUS EVENTS (key events that happened earlier in the story, in chronological order).
 
@@ -103,5 +103,7 @@ PREVIOUS EVENTS:
 ${JSON.stringify(previousEvents)}
 `;
 
-    return generateTextResponse(prompt);
+    console.log(prompt);
+    return 'test';
+    //return generateTextResponse(prompt);
 };

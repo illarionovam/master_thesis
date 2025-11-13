@@ -19,7 +19,22 @@ const generateFactCheck = async (req, res) => {
         throw createHttpError(403, 'Forbidden');
     }
 
-    res.json({ result });
+    const eventParticipants = await eventParticipantService.getEventParticipantsByEventId(eventId);
+    const events = await eventService.getEventsByWorkId(req.work.id);
+
+    const text = await generateEventFactCheck(
+        {
+            description: event.description,
+            location_description: event.locationLink?.location?.description ?? null,
+        },
+        eventParticipants.map(p => ({
+            name: p.character.name,
+            character: p.character.personality,
+            bio: p.character.bio,
+        })),
+        events.filter(ev => ev.order_in_work < event.order_in_work).map(ev => ev.description)
+    );
+    res.json({ result: text });
 };
 
 const reorderEvents = async (req, res) => {
