@@ -106,6 +106,6 @@ ${JSON.stringify(previousEvents)}
 `;
 
     console.log(prompt);
-    //return 'test';
-    return generateTextResponse(prompt);
+    return 'test';
+    //return generateTextResponse(prompt);
 };
