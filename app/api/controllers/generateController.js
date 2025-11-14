@@ -93,6 +93,8 @@ Logical continuity:
 Inconsistencies:
 - ...
 
+Your answer should end here. Don't duplicate any data from CURRENT EVENT, PARTICIPANTS, or PREVIOUS EVENTS.
+
 CURRENT EVENT:
 ${JSON.stringify(currentEvent)}
 
