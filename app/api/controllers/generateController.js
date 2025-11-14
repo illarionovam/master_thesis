@@ -49,11 +49,11 @@ export const generateDescription = async events => {
     const prompt = `You are a literary editor. Based on the following list of events, generate:
 1) A short annotation (2-4 sentences)
 2) A short synopsis (5-8 sentences)
-Language: English.
+Answer in language of the provided data.
 Events: ${JSON.stringify(events)}
 `;
 
-    return 'Annotation:\nOn a university campus, Max’s orbit strands around Viktor and Anton as they navigate fear, memory, and growing trust. A nightmarish trip, a rescue, and a cascade of intimate conversations push their bond beyond friendship into something deeper. The seven-year ending offers a quiet, hopeful reconciliation with the past.\n\nSynopsis:\nMax arrives on the Ruhr campus and quickly becomes entwined with Anton and Viktor. A storm during a class triggers Viktor’s anxiety, and Max stays by him, laying the foundation for trust. At a club, Anton drags Max there where a girl discreetly hands him LSD, sending him into a harrowing trip that Viktor rescues him from. The morning after, they speak openly in the kitchen, and a winter night deepens their connection as Max helps Viktor through a panicked episode. A campus concert becomes a shared moment of vulnerability, but Sonya’s rumor about Tina and Max sparks a fight that tests their loyalties. Then comes the tragedy: Max learns his mother has died, and Viktor helps him leave Brodston to start living together. The danger escalates when Slava, Igor’s nephew, attempts to rape Max, but Viktor arrives in time to stop him, forcing them to confront their pasts and their bond. Seven years later, in a rainy, quiet Ruhrish, Max and Viktor walk side by side under an umbrella, a steadfast sign of peace.';
+    return 'test';
 
     //return generateTextResponse(prompt);
 };
@@ -81,7 +81,7 @@ Using ONLY this information, do the following:
 - Point out any obvious contradictions or continuity errors (timeline, physical details, relationships, character motivations, or what characters should/should not know).
 - Mention anything that feels like a clear mismatch between CURRENT EVENT, PARTICIPANTS, and PREVIOUS EVENTS.
 
-Answer in English and be concise but specific.
+Answer in language of the provided data and be concise but specific.
 Use this structure:
 
 OOC analysis:
@@ -104,6 +104,6 @@ ${JSON.stringify(previousEvents)}
 `;
 
     console.log(prompt);
-    return 'test';
-    //return generateTextResponse(prompt);
+    //return 'test';
+    return generateTextResponse(prompt);
 };
