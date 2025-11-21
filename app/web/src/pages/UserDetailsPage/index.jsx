@@ -106,17 +106,11 @@ export default function UserDetailPage() {
     };
 
     return (
-        <main aria-labelledby={titleId} className={styles.page}>
+        <main aria-labelledby={titleId} className="page centered">
             <section className={styles.card} aria-busy={disableAll ? 'true' : 'false'}>
                 <h1 id={titleId} className={styles.title}>
                     User
                 </h1>
-
-                {loading && (
-                    <p className={styles.muted} aria-live="polite">
-                        Loading...
-                    </p>
-                )}
                 {error && (
                     <p role="alert" className={styles.error}>
                         {error.message ?? String(error)}

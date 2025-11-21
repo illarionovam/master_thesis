@@ -104,7 +104,7 @@ export default function RelationshipDetailsPage() {
     return (
         <>
             {!prePageLoading && (
-                <main aria-labelledby={titleId} className={styles.page}>
+                <main aria-labelledby={titleId} className="page">
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
                             <ol>

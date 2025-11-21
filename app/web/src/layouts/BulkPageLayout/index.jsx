@@ -58,12 +58,11 @@ export default function BulkPageLayout({
     const modalProps = { ...createModalProps, parentOptions: data };
 
     return (
-        <main aria-labelledby={titleId} className={styles.page}>
+        <main aria-labelledby={titleId} className="page">
             <div className={styles.header}>
                 <Title id={titleId}>{title}</Title>
             </div>
 
-            {loading && <p aria-live="polite">Loading...</p>}
             {error && <p role="alert">{error}</p>}
             {!loading && !error && render?.(data)}
 

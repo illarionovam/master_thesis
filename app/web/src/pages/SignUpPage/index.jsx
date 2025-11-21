@@ -43,7 +43,7 @@ export default function SignUpPage() {
     };
 
     return (
-        <main aria-labelledby={titleId} className={styles.page}>
+        <main aria-labelledby={titleId} className="page centered">
             <section className={styles.card} aria-busy={loading ? 'true' : 'false'}>
                 <h1 id={titleId} className={styles.title}>
                     Sign Up

@@ -1,9 +1,3 @@
-.page {
-    padding: 16px;
-    display: grid;
-    gap: 12px;
-}
-
 .header {
     display: grid;
     gap: 8px;

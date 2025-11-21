@@ -26,8 +26,3 @@
     color: inherit;
     font-weight: 600;
 }
-
-.userLink:hover,
-.brand:hover {
-    text-decoration: underline;
-}

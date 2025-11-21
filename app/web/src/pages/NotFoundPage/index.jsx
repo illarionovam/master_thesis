@@ -6,7 +6,7 @@ export default function NotFoundPage() {
     const titleId = useId();
 
     return (
-        <main aria-labelledby={titleId} className={styles.page}>
+        <main aria-labelledby={titleId} className="page">
             <Title id={titleId}>Page not found.</Title>
         </main>
     );

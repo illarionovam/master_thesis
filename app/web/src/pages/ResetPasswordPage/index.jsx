@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
     };
 
     return (
-        <main aria-labelledby={titleId}>
+        <main aria-labelledby={titleId} className="page centered">
             <h1 id={titleId} className={styles.title}>
                 Reset Password
             </h1>
