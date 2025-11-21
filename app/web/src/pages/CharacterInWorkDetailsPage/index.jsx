@@ -32,12 +32,9 @@ import {
     selectGetCharacterInWorkPossibleRelationshipsLoading,
     selectGetCharacterInWorkPossibleRelationshipsError,
     selectCharacterInWorkPossibleRelationships,
-    selectGenerateCharacterInWorkImageLoading,
-    selectGenerateCharacterInWorkImageError,
 } from '../../redux/works/selectors';
 
 import { resetCharacterInWork } from '../../redux/works/slice';
-import CharacterImageSection from '../../components/ImageSection';
 
 export default function CharacterInWorkDetailsPage() {
     const { id, characterInWorkId } = useParams();

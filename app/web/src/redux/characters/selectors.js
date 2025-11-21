@@ -46,3 +46,17 @@ export const selectCharacterPossibleAppearancesRaw = state =>
 export const selectCharacterPossibleAppearances = createSelector(selectCharacterPossibleAppearancesRaw, list =>
     list.map(item => ({ ...item, content: item.title, to: `/works/${item.id}` }))
 );
+
+export const selectAnyCharactersLoading = createSelector(
+    [
+        selectGetCharactersLoading,
+        selectCreateCharacterLoading,
+        selectGetCharacterLoading,
+        selectUpdateCharacterLoading,
+        selectGenerateCharacterImageLoading,
+        selectDeleteCharacterLoading,
+        selectGetCharacterAppearancesLoading,
+        selectGetCharacterPossibleAppearancesLoading,
+    ],
+    (...loadings) => loadings.some(Boolean)
+);

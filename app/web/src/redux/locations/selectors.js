@@ -44,3 +44,16 @@ export const selectLocationPossiblePlacementsRaw = state =>
 export const selectLocationPossiblePlacements = createSelector(selectLocationPossiblePlacementsRaw, list =>
     list.map(item => ({ ...item, content: item.title, to: `/works/${item.id}` }))
 );
+
+export const selectAnyLocationsLoading = createSelector(
+    [
+        selectGetLocationsLoading,
+        selectCreateLocationLoading,
+        selectGetLocationLoading,
+        selectUpdateLocationLoading,
+        selectDeleteLocationLoading,
+        selectGetLocationPlacementsLoading,
+        selectGetLocationPossiblePlacementsLoading,
+    ],
+    (...loadings) => loadings.some(Boolean)
+);

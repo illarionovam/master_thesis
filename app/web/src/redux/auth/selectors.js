@@ -1,3 +1,5 @@
+import { createSelector } from '@reduxjs/toolkit';
+
 export const selectToken = state => state.auth.token;
 export const selectUser = state => state.auth.user;
 
@@ -34,3 +36,18 @@ export const selectConfirmEmailSuccess = state => state.auth.confirmEmail.succes
 export const selectConfirmPasswordLoading = state => state.auth.confirmPassword.loading;
 export const selectConfirmPasswordError = state => state.auth.confirmPassword.error;
 export const selectConfirmPasswordSuccess = state => state.auth.confirmPassword.success;
+
+export const selectAnyAuthLoading = createSelector(
+    [
+        selectSignUpLoading,
+        selectSignInLoading,
+        selectVerifyEmailLoading,
+        selectResetPasswordLoading,
+        selectGetUserInfoLoading,
+        selectUpdateUserLoading,
+        selectUpdateUserEmailLoading,
+        selectConfirmEmailLoading,
+        selectConfirmPasswordLoading,
+    ],
+    (...loadings) => loadings.some(Boolean)
+);

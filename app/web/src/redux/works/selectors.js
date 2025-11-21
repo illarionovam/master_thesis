@@ -214,3 +214,53 @@ export const selectLinkEventParticipantSuccess = state => state.works.linkEventP
 export const selectUnlinkEventParticipantLoading = state => state.works.unlinkEventParticipant.loading;
 export const selectUnlinkEventParticipantError = state => state.works.unlinkEventParticipant.error;
 export const selectUnlinkEventParticipantSuccess = state => state.works.unlinkEventParticipant.success;
+
+export const selectAnyWorksLoading = createSelector(
+    [
+        selectGetWorksLoading,
+        selectCreateWorkLoading,
+        selectGetWorkLoading,
+        selectUpdateWorkLoading,
+        selectGenerateWorkDescriptionLoading,
+        selectGenerateEventCheckLoading,
+        selectDeleteWorkLoading,
+
+        selectGetWorkCastLoading,
+        selectGetWorkPossibleCastLoading,
+        selectGetCharacterInWorkLoading,
+        selectUpdateCharacterInWorkLoading,
+        selectGenerateCharacterInWorkImageLoading,
+        selectDeleteCharacterInWorkLoading,
+
+        selectGetCharacterInWorkRelationshipsLoading,
+        selectGetWorkRelationshipsLoading,
+        selectGetCharacterInWorkPossibleRelationshipsLoading,
+
+        selectCreateRelationshipLoading,
+        selectGetRelationshipLoading,
+        selectUpdateRelationshipLoading,
+        selectDeleteRelationshipLoading,
+
+        selectGetWorkLocationLinksLoading,
+        selectGetWorkPossibleLocationLinksLoading,
+        selectLinkWorkLocationLoading,
+        selectGetLocationInWorkLoading,
+        selectUpdateLocationInWorkLoading,
+        selectDeleteLocationInWorkLoading,
+
+        selectGetEventsLoading,
+        selectGetEventsByLocationInWorkIdLoading,
+        selectGetEventsByCharacterInWorkIdLoading,
+        selectCreateEventLoading,
+        selectGetEventLoading,
+        selectUpdateEventLoading,
+        selectDeleteEventLoading,
+        selectReorderEventsLoading,
+
+        selectGetEventParticipantsLoading,
+        selectGetEventPossibleParticipantsLoading,
+        selectLinkEventParticipantLoading,
+        selectUnlinkEventParticipantLoading,
+    ],
+    (...loadings) => loadings.some(Boolean)
+);

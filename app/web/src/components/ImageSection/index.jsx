@@ -63,7 +63,7 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
     };
 
     const handleUploadImage = async file => {
-        if (!file || !characterId) return;
+        if (!file) return;
         try {
             setUploading(true);
             setUploadError('');
