@@ -632,6 +632,18 @@ export default function WorkDetailsPage() {
                                 )}
                             </section>
 
+                            <button
+                                type="button"
+                                className={`roundBtn ${styles.fab}`}
+                                onClick={() => navigate('dashboard')}
+                                aria-label={'Open work dashboard'}
+                                title={'Open work dashboard'}
+                            >
+                                <svg className="icon" aria-hidden="true" focusable="false">
+                                    <use href="/icons.svg#chart" />
+                                </svg>
+                            </button>
+
                             {genModalOpen && (
                                 <dialog
                                     ref={genDialogRef}

@@ -291,3 +291,10 @@
 .card {
     box-sizing: border-box;
 }
+
+.fab {
+    position: fixed;
+    right: 30px;
+    bottom: 70px;
+    transform: scale(1.4);
+}

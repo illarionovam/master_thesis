@@ -164,34 +164,6 @@
     justify-content: flex-end;
 }
 
-.fab {
-    position: fixed;
-    right: 30px;
-    bottom: 70px;
-    width: 56px;
-    height: 56px;
-    border-radius: 9999px;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    z-index: 50;
-
-    color: #111827;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
-}
-
-.fab:active {
-    transform: translateY(1px) scale(0.98);
-}
-
-.fab:focus-visible {
-    outline: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 0 0 3px rgba(17, 24, 39, 0.15);
-}
-
 .actionsRow {
     display: flex;
     gap: 8px;
@@ -238,4 +210,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.fab {
+    position: fixed;
+    right: 30px;
+    bottom: 70px;
+    transform: scale(1.4);
 }

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 
 import Title from '../../components/Title';
 import List from '../../components/List';
@@ -40,6 +40,7 @@ export default function CharacterInWorkDetailsPage() {
     const { id, characterInWorkId } = useParams();
     const titleId = useId();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const ciw = useSelector(selectCharacterInWork);
     const loading = useSelector(selectGetCharacterInWorkLoading);
@@ -442,6 +443,18 @@ export default function CharacterInWorkDetailsPage() {
                                         <p className={styles.muted}>No events yet.</p>
                                     ))}
                             </section>
+
+                            <button
+                                type="button"
+                                className={`roundBtn ${styles.fab}`}
+                                onClick={() => navigate('dashboard')}
+                                aria-label={'Open per-character dashboard'}
+                                title={'Open per-character dashboard'}
+                            >
+                                <svg className="icon" aria-hidden="true" focusable="false">
+                                    <use href="/icons.svg#chart" />
+                                </svg>
+                            </button>
 
                             {addTagOpen && (
                                 <dialog
