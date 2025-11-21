@@ -1,10 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { uploadImage } from '../../api/upload';
 
 import Title from '../../components/Title';
 import List from '../../components/List';
+import ImageSection from '../../components/ImageSection';
 
 import {
     getCharacter,
@@ -12,7 +12,6 @@ import {
     getCharacterAppearances,
     getCharacterPossibleAppearances,
     deleteCharacter,
-    generateCharacterImage,
 } from '../../redux/characters/operations';
 import { linkWorkCharacter, deleteCharacterInWork } from '../../redux/works/operations';
 
@@ -30,8 +29,6 @@ import {
     selectGetCharacterPossibleAppearancesError,
     selectDeleteCharacterLoading,
     selectDeleteCharacterError,
-    selectGenerateCharacterImageLoading,
-    selectGenerateCharacterImageError,
 } from '../../redux/characters/selectors';
 
 import { resetCharacter } from '../../redux/characters/slice';
@@ -62,9 +59,6 @@ export default function CharacterDetailsPage() {
     const possibleLoading = useSelector(selectGetCharacterPossibleAppearancesLoading);
     const possibleError = useSelector(selectGetCharacterPossibleAppearancesError);
 
-    const generateLoading = useSelector(selectGenerateCharacterImageLoading);
-    const generateError = useSelector(selectGenerateCharacterImageError);
-
     const [editMode, setEditMode] = useState(false);
 
     const [attrs, setAttrs] = useState({});
@@ -77,17 +71,11 @@ export default function CharacterDetailsPage() {
 
     const [removingId, setRemovingId] = useState(null);
 
-    const [previewUrl, setPreviewUrl] = useState('');
-    const [uploading, setUploading] = useState(false);
-    const [uploadError, setUploadError] = useState('');
-    const [uploadOpen, setUploadOpen] = useState(false);
-
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const addTagRef = useRef(null);
     const addWorkRef = useRef(null);
-    const uploadRef = useRef(null);
 
     useEffect(() => {
         if (!id) {
@@ -138,34 +126,7 @@ export default function CharacterDetailsPage() {
         }
     }, [addTagOpen]);
 
-    useEffect(() => {
-        return () => {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-        };
-    }, [previewUrl]);
-
-    useEffect(() => {
-        const dlg = uploadRef.current;
-        if (!dlg) return;
-        if (uploadOpen) {
-            if (!dlg.open) dlg.showModal();
-        } else {
-            if (dlg.open) dlg.close();
-        }
-    }, [uploadOpen]);
-
     const disableAll = loading || updateLoading || deleteLoading;
-
-    const handleGenerateImage = async () => {
-        if (!id) return;
-
-        const action = await dispatch(generateCharacterImage(id));
-        if (generateCharacterImage.fulfilled.match(action)) {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            setPreviewUrl('');
-            setUploadError('');
-        }
-    };
 
     const handleEdit = () => setEditMode(true);
 
@@ -251,34 +212,6 @@ export default function CharacterDetailsPage() {
         }
     };
 
-    const handleUploadImage = async file => {
-        if (!file || !id) return;
-        try {
-            setUploading(true);
-            setUploadError('');
-
-            const fd = new FormData();
-            fd.append('file', file);
-
-            const res = await uploadImage(fd);
-            const url = res?.url;
-
-            if (!url || typeof url !== 'string') {
-                throw new Error('Upload succeeded but no URL was returned');
-            }
-
-            const action = await dispatch(updateCharacter({ id, data: { image_url: url } }));
-            if (updateCharacter.fulfilled.match(action)) {
-                if (previewUrl) URL.revokeObjectURL(previewUrl);
-                setPreviewUrl('');
-            }
-        } catch (err) {
-            setUploadError(err?.message || 'Failed to upload image');
-        } finally {
-            setUploading(false);
-        }
-    };
-
     return (
         <>
             {!prePageLoading && (
@@ -316,55 +249,20 @@ export default function CharacterDetailsPage() {
                         <>
                             <div className={styles.split}>
                                 <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
-                                    <div className={styles.imageColumn}>
-                                        <span className={styles.label}>Image</span>
-
-                                        <div className={styles.portraitWrap}>
-                                            {previewUrl ? (
-                                                <img className={styles.portraitImg} src={previewUrl} alt="Preview" />
-                                            ) : character?.image_url ? (
-                                                <img
-                                                    className={styles.portraitImg}
-                                                    src={character.image_url}
-                                                    alt={`${character?.name ?? 'Character'} image`}
-                                                />
-                                            ) : (
-                                                <div className={styles.portraitEmpty}>No image</div>
-                                            )}
-                                        </div>
-
-                                        <div className={styles.uploader}>
-                                            {generateError && (
-                                                <p role="alert" className={styles.error}>
-                                                    {generateError}
-                                                </p>
-                                            )}
-                                            <div className={styles.imageActions}>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={() => setUploadOpen(true)}
-                                                    disabled={uploading || disableAll || generateLoading}
-                                                    aria-label="Upload and attach image"
-                                                    title="Upload and attach image"
-                                                >
-                                                    {uploading ? 'Uploading...' : 'Upload & Attach'}
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleGenerateImage}
-                                                    disabled={generateLoading || disableAll || uploading}
-                                                    aria-label="Generate image"
-                                                    title="Generate image"
-                                                >
-                                                    <svg className="icon" aria-hidden="true" focusable="false">
-                                                        <use href="/icons.svg#wand" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <ImageSection
+                                        characterId={id}
+                                        name={character.name}
+                                        imageUrl={character.image_url}
+                                        disableAll={disableAll}
+                                        onSaveImageUrl={async url => {
+                                            await dispatch(
+                                                updateCharacter({
+                                                    id,
+                                                    data: { image_url: url },
+                                                })
+                                            );
+                                        }}
+                                    />
                                 </section>
 
                                 <section className={styles.card} aria-label="Character info">
@@ -571,72 +469,6 @@ export default function CharacterDetailsPage() {
                                         <p className={styles.muted}>No appearances yet.</p>
                                     ))}
                             </section>
-
-                            {uploadOpen && (
-                                <dialog
-                                    ref={uploadRef}
-                                    className="dialog"
-                                    aria-labelledby="upload-title"
-                                    onClose={() => {
-                                        setUploadOpen(false);
-                                    }}
-                                >
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
-                                    >
-                                        <h3 id="upload-title" className={styles.modalTitle}>
-                                            Upload image
-                                        </h3>
-
-                                        <div className={styles.field}>
-                                            <label className={styles.label}>
-                                                Choose file
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={async e => {
-                                                        setUploadError('');
-                                                        const inputEl = e.currentTarget;
-                                                        const file = inputEl.files?.[0];
-                                                        if (!file) return;
-
-                                                        if (previewUrl) URL.revokeObjectURL(previewUrl);
-                                                        setPreviewUrl(URL.createObjectURL(file));
-
-                                                        await handleUploadImage(file);
-                                                        setUploadOpen(false);
-                                                        inputEl.value = '';
-                                                    }}
-                                                    disabled={uploading || disableAll}
-                                                />
-                                            </label>
-                                        </div>
-
-                                        {uploadError && (
-                                            <p role="alert" className={styles.error}>
-                                                {uploadError}
-                                            </p>
-                                        )}
-
-                                        <div className={styles.modalActions}>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setUploadError('');
-                                                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                                                    setPreviewUrl('');
-                                                    setUploadOpen(false);
-                                                }}
-                                                disabled={uploading}
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                </dialog>
-                            )}
 
                             {addTagOpen && (
                                 <dialog

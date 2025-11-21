@@ -1,10 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
-import { uploadImage } from '../../api/upload';
 
 import Title from '../../components/Title';
 import List from '../../components/List';
+import ImageSection from '../../components/ImageSection';
+
 import styles from './CharacterInWorkDetailsPage.module.css';
 
 import {
@@ -15,7 +16,6 @@ import {
     getCharacterInWorkPossibleRelationships,
     createRelationship,
     deleteRelationship,
-    generateCharacterInWorkImage,
 } from '../../redux/works/operations';
 import {
     selectCharacterInWork,
@@ -37,6 +37,7 @@ import {
 } from '../../redux/works/selectors';
 
 import { resetCharacterInWork } from '../../redux/works/slice';
+import CharacterImageSection from '../../components/ImageSection';
 
 export default function CharacterInWorkDetailsPage() {
     const { id, characterInWorkId } = useParams();
@@ -62,9 +63,6 @@ export default function CharacterInWorkDetailsPage() {
     const possibleRelError = useSelector(selectGetCharacterInWorkPossibleRelationshipsError);
     const possibleRels = useSelector(selectCharacterInWorkPossibleRelationships) || [];
 
-    const generateLoading = useSelector(selectGenerateCharacterInWorkImageLoading);
-    const generateError = useSelector(selectGenerateCharacterInWorkImageError);
-
     const [editMode, setEditMode] = useState(false);
     const [currentAttrs, setCurrentAttrs] = useState({});
     const [initialAttrs, setInitialAttrs] = useState({});
@@ -74,17 +72,12 @@ export default function CharacterInWorkDetailsPage() {
     const [addingRel, setAddingRel] = useState(false);
     const [removingRelId, setRemovingRelId] = useState(null);
     const [relType, setRelType] = useState('');
-    const [previewUrl, setPreviewUrl] = useState('');
-    const [uploading, setUploading] = useState(false);
-    const [uploadError, setUploadError] = useState('');
-    const [uploadOpen, setUploadOpen] = useState(false);
 
     const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const addTagRef = useRef(null);
     const addRelRef = useRef(null);
-    const uploadRef = useRef(null);
 
     useEffect(() => {
         if (!id || !characterInWorkId) {
@@ -138,22 +131,6 @@ export default function CharacterInWorkDetailsPage() {
         }
     }, [addRelOpen, dispatch, id, characterInWorkId]);
 
-    useEffect(() => {
-        return () => {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-        };
-    }, [previewUrl]);
-
-    useEffect(() => {
-        const dlg = uploadRef.current;
-        if (!dlg) return;
-        if (uploadOpen) {
-            if (!dlg.open) dlg.showModal();
-        } else {
-            if (dlg.open) dlg.close();
-        }
-    }, [uploadOpen]);
-
     const workTitle = ciw?.work?.title || '—';
     const workId = ciw?.work_id;
     const character = ciw?.character;
@@ -163,17 +140,6 @@ export default function CharacterInWorkDetailsPage() {
     const characterBio = character?.bio ?? '—';
 
     const disableAll = loading || updateLoading;
-
-    const handleGenerateImage = async () => {
-        if (!id || !characterInWorkId) return;
-
-        const action = await dispatch(generateCharacterInWorkImage({ workId: id, characterInWorkId }));
-        if (generateCharacterInWorkImage.fulfilled.match(action)) {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            setPreviewUrl('');
-            setUploadError('');
-        }
-    };
 
     const removeAttr = key => {
         setCurrentAttrs(prev => {
@@ -242,36 +208,6 @@ export default function CharacterInWorkDetailsPage() {
         }
     };
 
-    const handleUploadImage = async file => {
-        if (!file || !id || !characterInWorkId) return;
-        try {
-            setUploading(true);
-            setUploadError('');
-
-            const fd = new FormData();
-            fd.append('file', file);
-
-            const res = await uploadImage(fd);
-            const url = res?.url;
-
-            if (!url || typeof url !== 'string') {
-                throw new Error('Upload succeeded but no URL was returned');
-            }
-
-            const action = await dispatch(
-                updateCharacterInWork({ workId: id, characterInWorkId, data: { image_url: url } })
-            );
-            if (updateCharacterInWork.fulfilled.match(action)) {
-                if (previewUrl) URL.revokeObjectURL(previewUrl);
-                setPreviewUrl('');
-            }
-        } catch (err) {
-            setUploadError(err?.message || 'Failed to upload image');
-        } finally {
-            setUploading(false);
-        }
-    };
-
     return (
         <>
             {!prePageLoading && (
@@ -322,62 +258,21 @@ export default function CharacterInWorkDetailsPage() {
                         <>
                             <div className={styles.split}>
                                 <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
-                                    <div className={styles.imageColumn}>
-                                        <span className={styles.label}>Image</span>
-
-                                        <div className={styles.portraitWrap}>
-                                            {previewUrl ? (
-                                                <img className={styles.portraitImg} src={previewUrl} alt="Preview" />
-                                            ) : ciw?.image_url ? (
-                                                <img
-                                                    className={styles.portraitImg}
-                                                    src={ciw.image_url}
-                                                    alt={`${ciw?.character?.name ?? 'Character'} image`}
-                                                />
-                                            ) : ciw?.character?.image_url ? (
-                                                <img
-                                                    className={styles.portraitImg}
-                                                    src={ciw.character.image_url}
-                                                    alt={`${ciw?.character?.name ?? 'Character'} image`}
-                                                />
-                                            ) : (
-                                                <div className={styles.portraitEmpty}>No image</div>
-                                            )}
-                                        </div>
-
-                                        <div className={styles.uploader}>
-                                            {generateError && (
-                                                <p role="alert" className={styles.error}>
-                                                    {generateError}
-                                                </p>
-                                            )}
-
-                                            <div className={styles.imageActions}>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={() => setUploadOpen(true)}
-                                                    disabled={uploading || disableAll || generateLoading}
-                                                    aria-label="Upload and attach image"
-                                                    title="Upload and attach image"
-                                                >
-                                                    {uploading ? 'Uploading...' : 'Upload & Attach'}
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleGenerateImage}
-                                                    disabled={generateLoading || disableAll || uploading}
-                                                    aria-label="Generate image"
-                                                    title="Generate image"
-                                                >
-                                                    <svg className="icon" aria-hidden="true" focusable="false">
-                                                        <use href="/icons.svg#wand" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <ImageSection
+                                        characterId={characterInWorkId}
+                                        name={ciw.name}
+                                        imageUrl={ciw.image_url ?? ciw.character.image_url}
+                                        disableAll={disableAll}
+                                        onSaveImageUrl={async url => {
+                                            await dispatch(
+                                                updateCharacterInWork({
+                                                    workId,
+                                                    characterInWorkId,
+                                                    data: { image_url: url },
+                                                })
+                                            );
+                                        }}
+                                    />
                                 </section>
                                 <section className={styles.card} aria-label="Character in work">
                                     <form
@@ -558,72 +453,6 @@ export default function CharacterInWorkDetailsPage() {
                                         <p className={styles.muted}>No events yet.</p>
                                     ))}
                             </section>
-
-                            {uploadOpen && (
-                                <dialog
-                                    ref={uploadRef}
-                                    className="dialog"
-                                    aria-labelledby="upload-title"
-                                    onClose={() => {
-                                        setUploadOpen(false);
-                                    }}
-                                >
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
-                                    >
-                                        <h3 id="upload-title" className={styles.modalTitle}>
-                                            Upload image
-                                        </h3>
-
-                                        <div className={styles.field}>
-                                            <label className={styles.label}>
-                                                Choose file
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={async e => {
-                                                        setUploadError('');
-                                                        const inputEl = e.currentTarget;
-                                                        const file = inputEl.files?.[0];
-                                                        if (!file) return;
-
-                                                        if (previewUrl) URL.revokeObjectURL(previewUrl);
-                                                        setPreviewUrl(URL.createObjectURL(file));
-
-                                                        await handleUploadImage(file);
-                                                        setUploadOpen(false);
-                                                        inputEl.value = '';
-                                                    }}
-                                                    disabled={uploading || disableAll}
-                                                />
-                                            </label>
-                                        </div>
-
-                                        {uploadError && (
-                                            <p role="alert" className={styles.error}>
-                                                {uploadError}
-                                            </p>
-                                        )}
-
-                                        <div className={styles.modalActions}>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setUploadError('');
-                                                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                                                    setPreviewUrl('');
-                                                    setUploadOpen(false);
-                                                }}
-                                                disabled={uploading}
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                </dialog>
-                            )}
 
                             {addTagOpen && (
                                 <dialog

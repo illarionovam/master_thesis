@@ -27,6 +27,7 @@ export const generateAndUploadImage = async (prompt, options = {}) => {
     await fs.writeFile(tempPath, Buffer.from(b64, 'base64'));
 
     const url = await saveFile({ path: tempPath });
+    console.log(url);
     return url;
 };
 
