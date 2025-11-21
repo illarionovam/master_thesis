@@ -74,7 +74,7 @@ export const selectCharacterInWorkRelationshipsRaw = state =>
 export const selectCharacterInWorkRelationships = createSelector(selectCharacterInWorkRelationshipsRaw, list =>
     list.map(item => ({
         ...item,
-        content: item.to.name,
+        content: `${item.to.name} [${item.type}]`,
         to: `/works/${item.work_id}/cast/${item.from_character_in_work_id}/relationships/${item.id}`,
     }))
 );
