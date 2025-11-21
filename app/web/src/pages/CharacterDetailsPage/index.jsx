@@ -254,14 +254,6 @@ export default function CharacterDetailsPage() {
                                         name={character.name}
                                         imageUrl={character.image_url}
                                         disableAll={disableAll}
-                                        onSaveImageUrl={async url => {
-                                            await dispatch(
-                                                updateCharacter({
-                                                    id,
-                                                    data: { image_url: url },
-                                                })
-                                            );
-                                        }}
                                     />
                                 </section>
 

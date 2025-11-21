@@ -259,19 +259,11 @@ export default function CharacterInWorkDetailsPage() {
                             <div className={styles.split}>
                                 <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
                                     <ImageSection
-                                        characterId={characterInWorkId}
+                                        workId={workId}
+                                        ciwId={characterInWorkId}
                                         name={ciw.name}
                                         imageUrl={ciw.image_url ?? ciw.character.image_url}
                                         disableAll={disableAll}
-                                        onSaveImageUrl={async url => {
-                                            await dispatch(
-                                                updateCharacterInWork({
-                                                    workId,
-                                                    characterInWorkId,
-                                                    data: { image_url: url },
-                                                })
-                                            );
-                                        }}
                                     />
                                 </section>
                                 <section className={styles.card} aria-label="Character in work">

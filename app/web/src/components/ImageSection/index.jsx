@@ -1,24 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { generateCharacterImage, updateCharacter } from '../../redux/characters/operations';
+import { generateCharacterInWorkImage, updateCharacterInWork } from '../../redux/works/operations';
 import {
     selectGenerateCharacterImageLoading,
     selectGenerateCharacterImageError,
 } from '../../redux/characters/selectors';
+import {
+    selectGenerateCharacterInWorkImageError,
+    selectGenerateCharacterInWorkImageLoading,
+} from '../../redux/works/selectors';
 import { uploadImage } from '../../api/upload';
 import styles from './ImageSection.module.css';
 
-export default function ImageSection({
-    characterId,
-    name,
-    imageUrl,
-    disableAll,
-    onSaveImageUrl, // 🔹 новий проп
-}) {
+export default function CharacterImageSection({ characterId, workId, ciwId, name, imageUrl, disableAll }) {
     const dispatch = useDispatch();
 
     const generateLoading = useSelector(selectGenerateCharacterImageLoading);
+    const generateLoadingCIW = useSelector(selectGenerateCharacterInWorkImageLoading);
     const generateError = useSelector(selectGenerateCharacterImageError);
+    const generateErrorCIW = useSelector(selectGenerateCharacterInWorkImageError);
 
     const [previewUrl, setPreviewUrl] = useState('');
     const [uploading, setUploading] = useState(false);
@@ -44,13 +45,20 @@ export default function ImageSection({
     }, [previewUrl]);
 
     const handleGenerateImage = async () => {
-        if (!characterId) return;
-
-        const action = await dispatch(generateCharacterImage(characterId));
-        if (generateCharacterImage.fulfilled.match(action)) {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            setPreviewUrl('');
-            setUploadError('');
+        if (ciwId && workId) {
+            const action = await dispatch(generateCharacterInWorkImage({ workId, characterInWorkId: ciwId }));
+            if (generateCharacterInWorkImage.fulfilled.match(action)) {
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                setPreviewUrl('');
+                setUploadError('');
+            }
+        } else if (characterId) {
+            const action = await dispatch(generateCharacterImage(characterId));
+            if (generateCharacterImage.fulfilled.match(action)) {
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                setPreviewUrl('');
+                setUploadError('');
+            }
         }
     };
 
@@ -70,16 +78,28 @@ export default function ImageSection({
                 throw new Error('Upload succeeded but no URL was returned');
             }
 
-            if (onSaveImageUrl) {
-                await onSaveImageUrl(url);
-            } else {
-                await dispatch(updateCharacter({ id: characterId, data: { image_url: url } }));
+            if (ciwId && workId) {
+                const action = await dispatch(
+                    updateCharacterInWork({
+                        workId,
+                        characterInWorkId: ciwId,
+                        data: { image_url: url },
+                    })
+                );
+                if (updateCharacterInWork.fulfilled.match(action)) {
+                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                    setPreviewUrl('');
+                }
+            } else if (characterId) {
+                const action = await dispatch(updateCharacter({ id: characterId, data: { image_url: url } }));
+                if (updateCharacter.fulfilled.match(action)) {
+                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                    setPreviewUrl('');
+                }
             }
         } catch (err) {
             setUploadError(err?.message || 'Failed to upload image');
         } finally {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            setPreviewUrl('');
             setUploading(false);
         }
     };
@@ -104,12 +124,17 @@ export default function ImageSection({
                         {String(generateError)}
                     </p>
                 )}
+                {generateErrorCIW && (
+                    <p role="alert" className={styles.error}>
+                        {String(generateErrorCIW)}
+                    </p>
+                )}
                 <div className={styles.imageActions}>
                     <button
                         type="button"
                         className="primaryBtn"
                         onClick={() => setUploadOpen(true)}
-                        disabled={uploading || disableAll || generateLoading}
+                        disabled={uploading || disableAll || generateLoading || generateLoadingCIW}
                         aria-label="Upload and attach image"
                         title="Upload and attach image"
                     >
@@ -119,7 +144,7 @@ export default function ImageSection({
                         type="button"
                         className="primaryBtn"
                         onClick={handleGenerateImage}
-                        disabled={generateLoading || disableAll || uploading}
+                        disabled={generateLoading || disableAll || uploading || generateLoadingCIW}
                         aria-label="Generate image"
                         title="Generate image"
                     >
