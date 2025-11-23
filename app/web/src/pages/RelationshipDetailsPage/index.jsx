@@ -9,13 +9,11 @@ import { getRelationship, updateRelationship, deleteRelationship } from '../../r
 
 import {
     selectRelationship,
-    selectGetRelationshipLoading,
     selectGetRelationshipError,
-    selectUpdateRelationshipLoading,
     selectUpdateRelationshipError,
-    selectDeleteRelationshipLoading,
     selectDeleteRelationshipError,
 } from '../../redux/works/selectors';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 import { resetRelationship } from '../../redux/works/slice';
 
@@ -24,38 +22,32 @@ export default function RelationshipDetailsPage() {
     const titleId = useId();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const globalLoading = useSelector(selectGlobalLoading);
     const formRef = useRef(null);
 
     const rel = useSelector(selectRelationship);
-    const loading = useSelector(selectGetRelationshipLoading);
     const error = useSelector(selectGetRelationshipError);
 
-    const updateLoading = useSelector(selectUpdateRelationshipLoading);
     const updateError = useSelector(selectUpdateRelationshipError);
 
-    const deleteLoading = useSelector(selectDeleteRelationshipLoading);
     const deleteError = useSelector(selectDeleteRelationshipError);
 
     const [editMode, setEditMode] = useState(false);
     const [typeVal, setTypeVal] = useState('');
     const [notesVal, setNotesVal] = useState('');
 
-    const [prePageLoading, setPrePageLoading] = useState(true);
-
     useEffect(() => {
         if (!workId || !characterInWorkId || !relationshipId) {
-            setPrePageLoading(false);
             return;
         }
         if (rel != null) {
             if (rel.id === relationshipId) {
-                setPrePageLoading(false);
                 return;
             } else {
                 dispatch(resetRelationship());
             }
         }
-        setPrePageLoading(false);
         dispatch(getRelationship({ workId, characterInWorkId, relationshipId }));
     }, [dispatch, workId, characterInWorkId, relationshipId, rel]);
 
@@ -64,8 +56,6 @@ export default function RelationshipDetailsPage() {
         setTypeVal(rel.type ?? '');
         setNotesVal(rel.notes ?? '');
     }, [rel]);
-
-    const disableAll = loading || updateLoading || deleteLoading;
 
     const handleEdit = () => setEditMode(true);
 
@@ -102,9 +92,15 @@ export default function RelationshipDetailsPage() {
     const toName = rel?.to?.character?.name ?? rel?.to?.name ?? rel?.to_name ?? '—';
 
     return (
-        <>
-            {!prePageLoading && (
-                <main aria-labelledby={titleId} className="page">
+        <main aria-labelledby={titleId} className="page">
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {String(error)}
+                </p>
+            )}
+
+            {!globalLoading && !error && rel && (
+                <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
                             <ol>
@@ -150,116 +146,102 @@ export default function RelationshipDetailsPage() {
                         </nav>
                         <Title id={titleId}>Relationship</Title>
                     </div>
+                    <section className={styles.card} aria-label="Relationship details">
+                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                            <div className={styles.field}>
+                                <label className={styles.label}>From</label>
+                                <input type="text" className={styles.input} value={fromName} disabled readOnly />
+                            </div>
 
-                    {loading && (
-                        <p aria-live="polite" className={styles.muted}>
-                            Loading...
-                        </p>
-                    )}
-                    {error && (
-                        <p role="alert" className={styles.error}>
-                            {String(error)}
-                        </p>
-                    )}
+                            <div className={styles.field}>
+                                <label className={styles.label}>To</label>
+                                <input type="text" className={styles.input} value={toName} disabled readOnly />
+                            </div>
 
-                    {!loading && !error && rel && (
-                        <section className={styles.card} aria-label="Relationship details">
-                            <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                                <div className={styles.field}>
-                                    <label className={styles.label}>From</label>
-                                    <input type="text" className={styles.input} value={fromName} disabled readOnly />
-                                </div>
+                            <div className={styles.field}>
+                                <label className={styles.label} htmlFor="rel-type">
+                                    Type
+                                </label>
+                                <input
+                                    id="rel-type"
+                                    name="type"
+                                    type="text"
+                                    className={styles.input}
+                                    value={typeVal}
+                                    onChange={e => setTypeVal(e.target.value)}
+                                    disabled={!editMode || globalLoading}
+                                    required
+                                    placeholder="e.g. ally, enemy, mentor"
+                                />
+                            </div>
 
-                                <div className={styles.field}>
-                                    <label className={styles.label}>To</label>
-                                    <input type="text" className={styles.input} value={toName} disabled readOnly />
-                                </div>
+                            <div className={styles.field}>
+                                <label className={styles.label} htmlFor="rel-notes">
+                                    Notes
+                                </label>
+                                <textarea
+                                    id="rel-notes"
+                                    name="notes"
+                                    rows={5}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    value={notesVal}
+                                    onChange={e => setNotesVal(e.target.value)}
+                                    disabled={!editMode || globalLoading}
+                                    placeholder="Optional notes..."
+                                />
+                            </div>
 
-                                <div className={styles.field}>
-                                    <label className={styles.label} htmlFor="rel-type">
-                                        Type
-                                    </label>
-                                    <input
-                                        id="rel-type"
-                                        name="type"
-                                        type="text"
-                                        className={styles.input}
-                                        value={typeVal}
-                                        onChange={e => setTypeVal(e.target.value)}
-                                        disabled={!editMode || disableAll}
-                                        required
-                                        placeholder="e.g. ally, enemy, mentor"
-                                    />
-                                </div>
+                            {updateError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(updateError)}
+                                </p>
+                            )}
+                            {deleteError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(deleteError)}
+                                </p>
+                            )}
 
-                                <div className={styles.field}>
-                                    <label className={styles.label} htmlFor="rel-notes">
-                                        Notes
-                                    </label>
-                                    <textarea
-                                        id="rel-notes"
-                                        name="notes"
-                                        rows={5}
-                                        className={`${styles.input} ${styles.textarea}`}
-                                        value={notesVal}
-                                        onChange={e => setNotesVal(e.target.value)}
-                                        disabled={!editMode || disableAll}
-                                        placeholder="Optional notes..."
-                                    />
-                                </div>
-
-                                {updateError && (
-                                    <p role="alert" className={styles.error}>
-                                        {String(updateError)}
-                                    </p>
+                            <div className={styles.actions}>
+                                {!editMode ? (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleEdit}
+                                            disabled={globalLoading}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="dangerBtn"
+                                            onClick={handleDelete}
+                                            disabled={globalLoading}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleSave}
+                                            disabled={globalLoading || !typeVal.trim()}
+                                        >
+                                            Save
+                                        </button>
+                                        <button type="button" onClick={handleCancel} disabled={globalLoading}>
+                                            Cancel
+                                        </button>
+                                    </>
                                 )}
-                                {deleteError && (
-                                    <p role="alert" className={styles.error}>
-                                        {String(deleteError)}
-                                    </p>
-                                )}
-
-                                <div className={styles.actions}>
-                                    {!editMode ? (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleEdit}
-                                                disabled={disableAll}
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="dangerBtn"
-                                                onClick={handleDelete}
-                                                disabled={disableAll}
-                                            >
-                                                {deleteLoading ? 'Deleting...' : 'Delete'}
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleSave}
-                                                disabled={updateLoading || !typeVal.trim()}
-                                            >
-                                                Save
-                                            </button>
-                                            <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                                Cancel
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            </form>
-                        </section>
-                    )}
-                </main>
+                            </div>
+                        </form>
+                    </section>
+                </>
             )}
-        </>
+        </main>
     );
 }

@@ -24,7 +24,6 @@ export const selectGenerateCharacterImageError = state => state.characters.gener
 
 export const selectDeleteCharacterLoading = state => state.characters.deleteCharacter.loading;
 export const selectDeleteCharacterError = state => state.characters.deleteCharacter.error;
-export const selectDeleteCharacterSuccess = state => state.characters.deleteCharacter.success;
 
 export const selectGetCharacterAppearancesLoading = state => state.characters.getCharacterAppearances.loading;
 export const selectGetCharacterAppearancesError = state => state.characters.getCharacterAppearances.error;

@@ -2,12 +2,12 @@ import { useEffect, useId, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Title from '../../components/Title';
 import styles from './BulkPageLayout.module.css';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 export default function BulkPageLayout({
     title,
     fetchAction,
     selectData,
-    selectLoading,
     selectError,
     render,
     CreateModal,
@@ -18,41 +18,29 @@ export default function BulkPageLayout({
     const titleId = useId();
     const dispatch = useDispatch();
 
+    const globalLoading = useSelector(selectGlobalLoading);
+
     const data = useSelector(selectData);
-    const loading = useSelector(selectLoading);
     const error = useSelector(selectError);
 
     const [openCreate, setOpenCreate] = useState(false);
-    const [creating, setCreating] = useState(false);
-    const [createError, setCreateError] = useState(null);
 
     useEffect(() => {
         dispatch(fetchAction());
     }, [dispatch, fetchAction]);
 
     const handleOpenCreate = () => {
-        setCreateError(null);
         setOpenCreate(true);
     };
 
     const handleCloseCreate = () => {
-        if (creating) return;
         setOpenCreate(false);
-        setCreateError(null);
     };
 
     const handleSubmitCreate = async formData => {
-        setCreating(true);
-        setCreateError(null);
-        try {
-            const res = await dispatch(createAction(formData)).unwrap();
-            onCreated?.(res);
-            setOpenCreate(false);
-        } catch (e) {
-            setCreateError(e?.message || 'Failed to create');
-        } finally {
-            setCreating(false);
-        }
+        const res = await dispatch(createAction(formData)).unwrap();
+        onCreated?.(res);
+        setOpenCreate(false);
     };
 
     const modalProps = { ...createModalProps, parentOptions: data };
@@ -64,7 +52,7 @@ export default function BulkPageLayout({
             </div>
 
             {error && <p role="alert">{error}</p>}
-            {!loading && !error && render?.(data)}
+            {!globalLoading && !error && render?.(data)}
 
             {CreateModal && createAction && (
                 <>
@@ -87,8 +75,8 @@ export default function BulkPageLayout({
                             mode="create"
                             onClose={handleCloseCreate}
                             onSubmit={handleSubmitCreate}
-                            submitting={creating}
-                            error={createError}
+                            submitting={globalLoading}
+                            error={error}
                         />
                     )}
                 </>

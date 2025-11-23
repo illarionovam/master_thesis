@@ -73,7 +73,7 @@ const linkCharacter = async (req, res) => {
         character_id,
     });
 
-    res.status(201).json(characterInWork);
+    res.status(201).json({ ...characterInWork.toJSON(), work: req.work, character });
 };
 
 const getWorkCast = async (req, res) => {
@@ -102,7 +102,7 @@ const linkLocation = async (req, res) => {
         location_id,
     });
 
-    res.status(201).json(locationInWork);
+    res.status(201).json({ ...locationInWork.toJSON(), work: req.work, location });
 };
 
 const getWorkLocationLinks = async (req, res) => {

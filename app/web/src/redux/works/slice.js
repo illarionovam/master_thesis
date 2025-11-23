@@ -40,6 +40,13 @@ import {
     generateWorkDescription,
     generateEventCheck,
 } from './operations';
+import {
+    stripBulkCharacterInWorkResponse,
+    stripBulkEventParticipantResponse,
+    stripBulkEventResponse,
+    stripBulkLocationInWorkResponse,
+    stripBulkRelationshipResponse,
+} from '../../../../api/helpers/strippers';
 
 const op = { loading: false, error: null };
 
@@ -50,7 +57,7 @@ const initialState = {
     createWork: { ...op },
     getWork: { ...op },
     updateWork: { ...op },
-    deleteWork: { ...op, success: false },
+    deleteWork: { ...op },
     getWorkRelationships: { ...op, relationships: [] },
 
     generateWorkDescription: { ...op, result: null },
@@ -62,7 +69,7 @@ const initialState = {
     characterInWork: null,
     getCharacterInWork: { ...op },
     updateCharacterInWork: { ...op },
-    deleteCharacterInWork: { ...op, success: false },
+    deleteCharacterInWork: { ...op },
     generateCharacterInWorkImage: { ...op },
 
     getCharacterInWorkRelationships: { ...op, relationships: [] },
@@ -71,7 +78,7 @@ const initialState = {
     relationship: null,
     getRelationship: { ...op },
     updateRelationship: { ...op },
-    deleteRelationship: { ...op, success: false },
+    deleteRelationship: { ...op },
 
     getWorkLocationLinks: { ...op, locationLinks: [] },
     getWorkPossibleLocationLinks: { ...op, possibleLocationLinks: [] },
@@ -79,7 +86,7 @@ const initialState = {
     locationInWork: null,
     getLocationInWork: { ...op },
     updateLocationInWork: { ...op },
-    deleteLocationInWork: { ...op, success: false },
+    deleteLocationInWork: { ...op },
 
     getEvents: { ...op, events: [] },
     getEventsByLocationInWorkId: { ...op, events: [] },
@@ -88,13 +95,13 @@ const initialState = {
     event: null,
     getEvent: { ...op },
     updateEvent: { ...op },
-    deleteEvent: { ...op, success: false },
-    reorderEvents: { ...op, success: false },
+    deleteEvent: { ...op },
+    reorderEvents: { ...op },
 
     getEventParticipants: { ...op, participants: [] },
     getEventPossibleParticipants: { ...op, possibleParticipants: [] },
-    linkEventParticipant: { ...op, success: false },
-    unlinkEventParticipant: { ...op, success: false },
+    linkEventParticipant: { ...op },
+    unlinkEventParticipant: { ...op },
 };
 
 const worksSlice = createSlice({
@@ -106,13 +113,13 @@ const worksSlice = createSlice({
             state.getWork = { ...op };
             state.createWork = { ...op };
             state.updateWork = { ...op };
-            state.deleteWork = { ...op, success: false };
+            state.deleteWork = { ...op };
             state.getWorkCast = { ...op, cast: [] };
             state.getWorkPossibleCast = { ...op, possibleCast: [] };
             state.getWorkLocationLinks = { ...op, locationLinks: [] };
             state.getWorkPossibleLocationLinks = { ...op, possibleLocationLinks: [] };
             state.getEvents = { ...op, events: [] };
-            state.reorderEvents = { ...op, success: false };
+            state.reorderEvents = { ...op };
             state.getWorkRelationships = { ...op, relationships: [] };
             state.generateWorkDescription = { ...op, result: null };
             state.generateEventCheck = { ...op, result: null };
@@ -122,7 +129,7 @@ const worksSlice = createSlice({
             state.getCharacterInWork = { ...op };
             state.linkWorkCharacter = { ...op };
             state.updateCharacterInWork = { ...op };
-            state.deleteCharacterInWork = { ...op, success: false };
+            state.deleteCharacterInWork = { ...op };
             state.getEventsByCharacterInWorkId = { ...op, events: [] };
             state.getCharacterInWorkRelationships = { ...op, relationships: [] };
             state.getCharacterInWorkPossibleRelationships = { ...op, possibleRelationships: [] };
@@ -133,7 +140,7 @@ const worksSlice = createSlice({
             state.getLocationInWork = { ...op };
             state.linkWorkLocation = { ...op };
             state.updateLocationInWork = { ...op };
-            state.deleteLocationInWork = { ...op, success: false };
+            state.deleteLocationInWork = { ...op };
             state.getEventsByLocationInWorkId = { ...op, events: [] };
         },
         resetEvent(state) {
@@ -141,7 +148,7 @@ const worksSlice = createSlice({
             state.getEvent = { ...op };
             state.createEvent = { ...op };
             state.updateEvent = { ...op };
-            state.deleteEvent = { ...op, success: false };
+            state.deleteEvent = { ...op };
             state.getEventParticipants = { ...op, participants: [] };
             state.getEventPossibleParticipants = { ...op, possibleParticipants: [] };
         },
@@ -150,7 +157,7 @@ const worksSlice = createSlice({
             state.getRelationship = { ...op };
             state.createRelationship = { ...op };
             state.updateRelationship = { ...op };
-            state.deleteRelationship = { ...op, success: false };
+            state.deleteRelationship = { ...op };
         },
     },
     extraReducers: builder => {
@@ -235,11 +242,9 @@ const worksSlice = createSlice({
             .addCase(deleteWork.pending, state => {
                 state.deleteWork.loading = true;
                 state.deleteWork.error = null;
-                state.deleteWork.success = false;
             })
             .addCase(deleteWork.fulfilled, state => {
                 state.deleteWork.loading = false;
-                state.deleteWork.success = true;
                 state.work = null;
             })
             .addCase(deleteWork.rejected, (state, action) => {
@@ -264,8 +269,17 @@ const worksSlice = createSlice({
                 state.linkWorkCharacter.loading = true;
                 state.linkWorkCharacter.error = null;
             })
-            .addCase(linkWorkCharacter.fulfilled, state => {
+            .addCase(linkWorkCharacter.fulfilled, (state, action) => {
+                const { from } = action.meta.arg;
+
                 state.linkWorkCharacter.loading = false;
+
+                if (from !== 'work') return;
+
+                state.getWorkCast.cast = [...state.getWorkCast.cast, stripBulkCharacterInWorkResponse(action.payload)];
+                state.getWorkPossibleCast.possibleCast = state.getWorkPossibleCast.possibleCast.filter(
+                    item => item.id !== action.payload.character_id
+                );
             })
             .addCase(linkWorkCharacter.rejected, (state, action) => {
                 state.linkWorkCharacter.loading = false;
@@ -327,12 +341,28 @@ const worksSlice = createSlice({
             .addCase(deleteCharacterInWork.pending, state => {
                 state.deleteCharacterInWork.loading = true;
                 state.deleteCharacterInWork.error = null;
-                state.deleteCharacterInWork.success = false;
             })
-            .addCase(deleteCharacterInWork.fulfilled, state => {
+            .addCase(deleteCharacterInWork.fulfilled, (state, action) => {
+                const { characterInWorkId, from } = action.meta.arg;
+
                 state.deleteCharacterInWork.loading = false;
-                state.deleteCharacterInWork.success = true;
                 state.characterInWork = null;
+
+                if (from !== 'work') return;
+
+                let removedCast = null;
+                state.getWorkCast.cast = state.getWorkCast.cast.filter(item => {
+                    if (item.id === characterInWorkId) {
+                        removedCast = item;
+                        return false;
+                    }
+                    return true;
+                });
+
+                state.getWorkPossibleCast.possibleCast = [
+                    ...state.getWorkPossibleCast.possibleCast,
+                    removedCast.character,
+                ];
             })
             .addCase(deleteCharacterInWork.rejected, (state, action) => {
                 state.deleteCharacterInWork.loading = false;
@@ -382,8 +412,17 @@ const worksSlice = createSlice({
                 state.createRelationship.loading = true;
                 state.createRelationship.error = null;
             })
-            .addCase(createRelationship.fulfilled, state => {
+            .addCase(createRelationship.fulfilled, (state, action) => {
                 state.createRelationship.loading = false;
+
+                state.getCharacterInWorkRelationships.relationships = [
+                    ...state.getCharacterInWorkRelationships.relationships,
+                    stripBulkRelationshipResponse(action.payload),
+                ];
+                state.getCharacterInWorkPossibleRelationships.possibleRelationships =
+                    state.getCharacterInWorkPossibleRelationships.possibleRelationships.filter(
+                        item => item.id !== action.payload.to_character_in_work_id
+                    );
             })
             .addCase(createRelationship.rejected, (state, action) => {
                 state.createRelationship.loading = false;
@@ -419,12 +458,25 @@ const worksSlice = createSlice({
             .addCase(deleteRelationship.pending, state => {
                 state.deleteRelationship.loading = true;
                 state.deleteRelationship.error = null;
-                state.deleteRelationship.success = false;
             })
-            .addCase(deleteRelationship.fulfilled, state => {
+            .addCase(deleteRelationship.fulfilled, (state, action) => {
+                const { relationshipId } = action.meta.arg;
                 state.deleteRelationship.loading = false;
-                state.deleteRelationship.success = true;
                 state.relationship = null;
+
+                let removedRelationship = null;
+                state.getCharacterInWorkRelationships.relationships =
+                    state.getCharacterInWorkRelationships.relationships.filter(item => {
+                        if (item.id === relationshipId) {
+                            removedRelationship = item;
+                            return false;
+                        }
+                        return true;
+                    });
+                state.getCharacterInWorkPossibleRelationships.possibleRelationships = [
+                    ...state.getCharacterInWorkPossibleRelationships.possibleRelationships,
+                    { id: removedRelationship.to_character_in_work_id, character: removedRelationship.to },
+                ];
             })
             .addCase(deleteRelationship.rejected, (state, action) => {
                 state.deleteRelationship.loading = false;
@@ -461,8 +513,21 @@ const worksSlice = createSlice({
                 state.linkWorkLocation.loading = true;
                 state.linkWorkLocation.error = null;
             })
-            .addCase(linkWorkLocation.fulfilled, state => {
+            .addCase(linkWorkLocation.fulfilled, (state, action) => {
+                const { from } = action.meta.arg;
+
                 state.linkWorkLocation.loading = false;
+
+                if (from !== 'work') return;
+
+                state.getWorkLocationLinks.locationLinks = [
+                    ...state.getWorkLocationLinks.locationLinks,
+                    stripBulkLocationInWorkResponse(action.payload),
+                ];
+                state.getWorkPossibleLocationLinks.possibleLocationLinks =
+                    state.getWorkPossibleLocationLinks.possibleLocationLinks.filter(
+                        item => item.id !== action.payload.location_id
+                    );
             })
             .addCase(linkWorkLocation.rejected, (state, action) => {
                 state.linkWorkLocation.loading = false;
@@ -498,12 +563,28 @@ const worksSlice = createSlice({
             .addCase(deleteLocationInWork.pending, state => {
                 state.deleteLocationInWork.loading = true;
                 state.deleteLocationInWork.error = null;
-                state.deleteLocationInWork.success = false;
             })
-            .addCase(deleteLocationInWork.fulfilled, state => {
+            .addCase(deleteLocationInWork.fulfilled, (state, action) => {
+                const { locationInWorkId, from } = action.meta.arg;
+
                 state.deleteLocationInWork.loading = false;
-                state.deleteLocationInWork.success = true;
                 state.locationInWork = null;
+
+                if (from !== 'work') return;
+
+                let removedLocationLink = null;
+                state.getWorkLocationLinks.locationLinks = state.getWorkLocationLinks.locationLinks.filter(item => {
+                    if (item.id === locationInWorkId) {
+                        removedLocationLink = item;
+                        return false;
+                    }
+                    return true;
+                });
+
+                state.getWorkPossibleLocationLinks.possibleLocationLinks = [
+                    ...state.getWorkPossibleLocationLinks.possibleLocationLinks,
+                    removedLocationLink.location,
+                ];
             })
             .addCase(deleteLocationInWork.rejected, (state, action) => {
                 state.deleteLocationInWork.loading = false;
@@ -553,8 +634,9 @@ const worksSlice = createSlice({
                 state.createEvent.loading = true;
                 state.createEvent.error = null;
             })
-            .addCase(createEvent.fulfilled, state => {
+            .addCase(createEvent.fulfilled, (state, action) => {
                 state.createEvent.loading = false;
+                state.getEvents.events = [...state.getEvents.events, stripBulkEventResponse(action.payload)];
             })
             .addCase(createEvent.rejected, (state, action) => {
                 state.createEvent.loading = false;
@@ -590,11 +672,12 @@ const worksSlice = createSlice({
             .addCase(deleteEvent.pending, state => {
                 state.deleteEvent.loading = true;
                 state.deleteEvent.error = null;
-                state.deleteEvent.success = false;
             })
-            .addCase(deleteEvent.fulfilled, state => {
+            .addCase(deleteEvent.fulfilled, (state, action) => {
+                const { eventId } = action.meta.arg;
+
                 state.deleteEvent.loading = false;
-                state.deleteEvent.success = true;
+                state.getEvents.events = state.getEvents.events.filter(item => item.id !== eventId);
                 state.event = null;
             })
             .addCase(deleteEvent.rejected, (state, action) => {
@@ -605,11 +688,10 @@ const worksSlice = createSlice({
             .addCase(reorderEvents.pending, state => {
                 state.reorderEvents.loading = true;
                 state.reorderEvents.error = null;
-                state.reorderEvents.success = false;
             })
-            .addCase(reorderEvents.fulfilled, state => {
+            .addCase(reorderEvents.fulfilled, (state, action) => {
                 state.reorderEvents.loading = false;
-                state.reorderEvents.success = true;
+                state.getEvents.events = action.payload;
             })
             .addCase(reorderEvents.rejected, (state, action) => {
                 state.reorderEvents.loading = false;
@@ -645,26 +727,48 @@ const worksSlice = createSlice({
             .addCase(linkEventParticipant.pending, state => {
                 state.linkEventParticipant.loading = true;
                 state.linkEventParticipant.error = null;
-                state.linkEventParticipant.success = false;
             })
-            .addCase(linkEventParticipant.fulfilled, state => {
+            .addCase(linkEventParticipant.fulfilled, (state, action) => {
                 state.linkEventParticipant.loading = false;
-                state.linkEventParticipant.success = true;
+                state.getEventParticipants.participants = [
+                    ...state.getEventParticipants.participants,
+                    stripBulkEventParticipantResponse(action.payload),
+                ];
+                state.getEventPossibleParticipants.possibleParticipants =
+                    state.getEventPossibleParticipants.possibleParticipants.filter(
+                        item => item.id !== action.payload.character_in_work_id
+                    );
             })
             .addCase(linkEventParticipant.rejected, (state, action) => {
                 state.linkEventParticipant.loading = false;
                 state.linkEventParticipant.error = action.payload;
             });
-
         builder
             .addCase(unlinkEventParticipant.pending, state => {
                 state.unlinkEventParticipant.loading = true;
                 state.unlinkEventParticipant.error = null;
-                state.unlinkEventParticipant.success = false;
             })
-            .addCase(unlinkEventParticipant.fulfilled, state => {
+            .addCase(unlinkEventParticipant.fulfilled, (state, action) => {
+                const { eventParticipantId } = action.meta.arg;
+
                 state.unlinkEventParticipant.loading = false;
-                state.unlinkEventParticipant.success = true;
+
+                let removedEventParticipant = null;
+                state.getEventParticipants.participants = state.getEventParticipants.participants.filter(item => {
+                    if (item.id === eventParticipantId) {
+                        removedEventParticipant = item;
+                        return false;
+                    }
+                    return true;
+                });
+
+                state.getEventPossibleParticipants.possibleParticipants = [
+                    ...state.getEventPossibleParticipants.possibleParticipants,
+                    {
+                        id: removedEventParticipant.character_in_work_id,
+                        character: removedEventParticipant.character,
+                    },
+                ];
             })
             .addCase(unlinkEventParticipant.rejected, (state, action) => {
                 state.unlinkEventParticipant.loading = false;

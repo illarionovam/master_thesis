@@ -9,6 +9,8 @@ import {
     getCharacterPossibleAppearances,
     generateCharacterImage,
 } from './operations';
+import { linkWorkCharacter, deleteCharacterInWork } from '../works/operations';
+import { stripBulkCharacterInWorkResponse } from '../../../../api/helpers/strippers';
 
 const op = { loading: false, error: null };
 
@@ -19,7 +21,7 @@ const initialState = {
     createCharacter: { ...op },
     getCharacter: { ...op },
     updateCharacter: { ...op },
-    deleteCharacter: { ...op, success: false },
+    deleteCharacter: { ...op },
     getCharacterAppearances: { ...op, appearances: [] },
     getCharacterPossibleAppearances: { ...op, possibleAppearances: [] },
     generateCharacterImage: { ...op },
@@ -34,7 +36,7 @@ const charactersSlice = createSlice({
             state.getCharacter = { ...op };
             state.createCharacter = { ...op };
             state.updateCharacter = { ...op };
-            state.deleteCharacter = { ...op, success: false };
+            state.deleteCharacter = { ...op };
             state.getCharacterAppearances = { ...op, appearances: [] };
             state.getCharacterPossibleAppearances = { ...op, possibleAppearances: [] };
             state.generateCharacterImage = { ...op };
@@ -109,11 +111,9 @@ const charactersSlice = createSlice({
             .addCase(deleteCharacter.pending, state => {
                 state.deleteCharacter.loading = true;
                 state.deleteCharacter.error = null;
-                state.deleteCharacter.success = false;
             })
             .addCase(deleteCharacter.fulfilled, state => {
                 state.deleteCharacter.loading = false;
-                state.deleteCharacter.success = true;
                 state.character = null;
             })
             .addCase(deleteCharacter.rejected, (state, action) => {
@@ -146,6 +146,39 @@ const charactersSlice = createSlice({
                 state.getCharacterPossibleAppearances.loading = false;
                 state.getCharacterPossibleAppearances.error = action.payload;
             });
+        builder.addCase(linkWorkCharacter.fulfilled, (state, action) => {
+            const { from } = action.meta.arg;
+
+            if (from !== 'character') return;
+
+            state.getCharacterAppearances.appearances = [
+                ...state.getCharacterAppearances.appearances,
+                stripBulkCharacterInWorkResponse(action.payload),
+            ];
+            state.getCharacterPossibleAppearances.possibleAppearances =
+                state.getCharacterPossibleAppearances.possibleAppearances.filter(
+                    item => item.id !== action.payload.work_id
+                );
+        });
+        builder.addCase(deleteCharacterInWork.fulfilled, (state, action) => {
+            const { characterInWorkId, from } = action.meta.arg;
+
+            if (from !== 'character') return;
+
+            let removedAppearance = null;
+            state.getCharacterAppearances.appearances = state.getCharacterAppearances.appearances.filter(item => {
+                if (item.id === characterInWorkId) {
+                    removedAppearance = item;
+                    return false;
+                }
+                return true;
+            });
+
+            state.getCharacterPossibleAppearances.possibleAppearances = [
+                ...state.getCharacterPossibleAppearances.possibleAppearances,
+                removedAppearance.work,
+            ];
+        });
     },
 });
 

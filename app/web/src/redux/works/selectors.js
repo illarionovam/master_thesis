@@ -33,7 +33,6 @@ export const selectGenerateEventCheckResult = state => state.works.generateEvent
 
 export const selectDeleteWorkLoading = state => state.works.deleteWork.loading;
 export const selectDeleteWorkError = state => state.works.deleteWork.error;
-export const selectDeleteWorkSuccess = state => state.works.deleteWork.success;
 
 export const selectGetWorkCastLoading = state => state.works.getWorkCast.loading;
 export const selectGetWorkCastError = state => state.works.getWorkCast.error;
@@ -53,6 +52,9 @@ export const selectWorkPossibleCast = createSelector(selectWorkPossibleCastRaw, 
     list.map(item => ({ ...item, content: item.name, to: `/characters/${item.id}` }))
 );
 
+export const selectLinkWorkCharacterLoading = state => state.works.linkWorkCharacter.loading;
+export const selectLinkWorkCharacterError = state => state.works.linkWorkCharacter.error;
+
 export const selectGetCharacterInWorkLoading = state => state.works.getCharacterInWork.loading;
 export const selectGetCharacterInWorkError = state => state.works.getCharacterInWork.error;
 
@@ -64,7 +66,6 @@ export const selectGenerateCharacterInWorkImageError = state => state.works.gene
 
 export const selectDeleteCharacterInWorkLoading = state => state.works.deleteCharacterInWork.loading;
 export const selectDeleteCharacterInWorkError = state => state.works.deleteCharacterInWork.error;
-export const selectDeleteCharacterInWorkSuccess = state => state.works.deleteCharacterInWork.success;
 
 export const selectGetCharacterInWorkRelationshipsLoading = state =>
     state.works.getCharacterInWorkRelationships.loading;
@@ -112,7 +113,6 @@ export const selectUpdateRelationshipError = state => state.works.updateRelation
 
 export const selectDeleteRelationshipLoading = state => state.works.deleteRelationship.loading;
 export const selectDeleteRelationshipError = state => state.works.deleteRelationship.error;
-export const selectDeleteRelationshipSuccess = state => state.works.deleteRelationship.success;
 
 export const selectGetWorkLocationLinksLoading = state => state.works.getWorkLocationLinks.loading;
 export const selectGetWorkLocationLinksError = state => state.works.getWorkLocationLinks.error;
@@ -144,7 +144,6 @@ export const selectUpdateLocationInWorkError = state => state.works.updateLocati
 
 export const selectDeleteLocationInWorkLoading = state => state.works.deleteLocationInWork.loading;
 export const selectDeleteLocationInWorkError = state => state.works.deleteLocationInWork.error;
-export const selectDeleteLocationInWorkSuccess = state => state.works.deleteLocationInWork.success;
 
 export const selectGetEventsLoading = state => state.works.getEvents.loading;
 export const selectGetEventsError = state => state.works.getEvents.error;
@@ -182,11 +181,9 @@ export const selectUpdateEventError = state => state.works.updateEvent.error;
 
 export const selectDeleteEventLoading = state => state.works.deleteEvent.loading;
 export const selectDeleteEventError = state => state.works.deleteEvent.error;
-export const selectDeleteEventSuccess = state => state.works.deleteEvent.success;
 
 export const selectReorderEventsLoading = state => state.works.reorderEvents.loading;
 export const selectReorderEventsError = state => state.works.reorderEvents.error;
-export const selectReorderEventsSuccess = state => state.works.reorderEvents.success;
 
 export const selectGetEventParticipantsLoading = state => state.works.getEventParticipants.loading;
 export const selectGetEventParticipantsError = state => state.works.getEventParticipants.error;
@@ -209,11 +206,9 @@ export const selectEventPossibleParticipants = createSelector(selectEventPossibl
 
 export const selectLinkEventParticipantLoading = state => state.works.linkEventParticipant.loading;
 export const selectLinkEventParticipantError = state => state.works.linkEventParticipant.error;
-export const selectLinkEventParticipantSuccess = state => state.works.linkEventParticipant.success;
 
 export const selectUnlinkEventParticipantLoading = state => state.works.unlinkEventParticipant.loading;
 export const selectUnlinkEventParticipantError = state => state.works.unlinkEventParticipant.error;
-export const selectUnlinkEventParticipantSuccess = state => state.works.unlinkEventParticipant.success;
 
 export const selectAnyWorksLoading = createSelector(
     [
@@ -227,6 +222,7 @@ export const selectAnyWorksLoading = createSelector(
 
         selectGetWorkCastLoading,
         selectGetWorkPossibleCastLoading,
+        selectLinkWorkCharacterLoading,
         selectGetCharacterInWorkLoading,
         selectUpdateCharacterInWorkLoading,
         selectGenerateCharacterInWorkImageLoading,

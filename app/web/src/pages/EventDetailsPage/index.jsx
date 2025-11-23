@@ -19,25 +19,19 @@ import {
 
 import {
     selectEvent,
-    selectGetEventLoading,
     selectGetEventError,
-    selectUpdateEventLoading,
     selectUpdateEventError,
-    selectDeleteEventLoading,
     selectDeleteEventError,
     selectEventParticipants,
-    selectGetEventParticipantsLoading,
     selectGetEventParticipantsError,
     selectEventPossibleParticipants,
-    selectGetEventPossibleParticipantsLoading,
     selectGetEventPossibleParticipantsError,
     selectWorkLocationLinks,
-    selectGetWorkLocationLinksLoading,
     selectGetWorkLocationLinksError,
     selectGenerateEventCheckError,
-    selectGenerateEventCheckLoading,
     selectGenerateEventCheckResult,
 } from '../../redux/works/selectors';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 import { resetEvent } from '../../redux/works/slice';
 
@@ -49,28 +43,23 @@ export default function EventDetailsPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const globalLoading = useSelector(selectGlobalLoading);
+
     const event = useSelector(selectEvent);
-    const loading = useSelector(selectGetEventLoading);
     const error = useSelector(selectGetEventError);
 
-    const updateLoading = useSelector(selectUpdateEventLoading);
     const updateError = useSelector(selectUpdateEventError);
-    const deleteLoading = useSelector(selectDeleteEventLoading);
     const deleteError = useSelector(selectDeleteEventError);
 
-    const participants = useSelector(selectEventParticipants) || [];
-    const participantsLoading = useSelector(selectGetEventParticipantsLoading);
+    const participants = useSelector(selectEventParticipants);
     const participantsError = useSelector(selectGetEventParticipantsError);
 
-    const possibleParticipants = useSelector(selectEventPossibleParticipants) || [];
-    const possibleParticipantsLoading = useSelector(selectGetEventPossibleParticipantsLoading);
+    const possibleParticipants = useSelector(selectEventPossibleParticipants);
     const possibleParticipantsError = useSelector(selectGetEventPossibleParticipantsError);
 
-    const locationLinks = useSelector(selectWorkLocationLinks) || [];
-    const locLinksLoading = useSelector(selectGetWorkLocationLinksLoading);
+    const locationLinks = useSelector(selectWorkLocationLinks);
     const locLinksError = useSelector(selectGetWorkLocationLinksError);
 
-    const genLoading = useSelector(selectGenerateEventCheckLoading);
     const genError = useSelector(selectGenerateEventCheckError);
     const genResult = useSelector(selectGenerateEventCheckResult);
 
@@ -78,12 +67,8 @@ export default function EventDetailsPage() {
 
     const [addCastOpen, setAddCastOpen] = useState(false);
     const [selectedCharacterId, setSelectedCharacterId] = useState('');
-    const [addingCast, setAddingCast] = useState(false);
-    const [removingCastId, setRemovingCastId] = useState(null);
 
     const [genModalOpen, setGenModalOpen] = useState(false);
-
-    const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const addCastRef = useRef(null);
@@ -91,28 +76,22 @@ export default function EventDetailsPage() {
 
     useEffect(() => {
         if (!id || !eventId) {
-            setPrePageLoading(false);
             return;
         }
         if (event != null) {
             if (event.id === eventId) {
-                setPrePageLoading(false);
                 return;
             } else {
                 dispatch(resetEvent());
             }
         }
-        setPrePageLoading(false);
         dispatch(getEvent({ workId: id, eventId }));
         dispatch(getEventParticipants({ workId: id, eventId }));
         dispatch(getWorkLocationLinks(id));
+        dispatch(getEventPossibleParticipants({ workId: id, eventId }));
     }, [dispatch, id, eventId, event]);
 
     useEffect(() => {
-        if (!addCastOpen || !id || !eventId) return;
-
-        dispatch(getEventPossibleParticipants({ workId: id, eventId }));
-
         const dlg = addCastRef.current;
         if (!dlg) return;
 
@@ -121,7 +100,7 @@ export default function EventDetailsPage() {
         } else {
             if (dlg.open) dlg.close();
         }
-    }, [addCastOpen, dispatch, id, eventId]);
+    }, [addCastOpen]);
 
     useEffect(() => {
         const dlg = genDialogRef.current;
@@ -133,8 +112,6 @@ export default function EventDetailsPage() {
             if (dlg.open) dlg.close();
         }
     }, [genModalOpen]);
-
-    const disableAll = loading || updateLoading || deleteLoading;
 
     const handleEdit = () => setEditMode(true);
 
@@ -189,41 +166,17 @@ export default function EventDetailsPage() {
         setAddCastOpen(true);
     };
     const closeAddCast = () => {
-        if (addingCast) return;
         setAddCastOpen(false);
         setSelectedCharacterId('');
     };
 
     const handleAddCast = async () => {
-        if (!id || !eventId || !selectedCharacterId) return;
-        try {
-            setAddingCast(true);
-            const action = await dispatch(
-                linkEventParticipant({ workId: id, eventId, data: { character_in_work_id: selectedCharacterId } })
-            );
-            if (linkEventParticipant.fulfilled.match(action)) {
-                setAddCastOpen(false);
-                setSelectedCharacterId('');
-                dispatch(getEventParticipants({ workId: id, eventId }));
-            }
-        } finally {
-            setAddingCast(false);
-        }
+        closeAddCast();
+        dispatch(linkEventParticipant({ workId: id, eventId, data: { character_in_work_id: selectedCharacterId } }));
     };
 
     const handleRemoveCast = async (_workId, participantId) => {
-        if (!id || !eventId) return;
-        try {
-            setRemovingCastId(participantId);
-            const action = await dispatch(
-                unlinkEventParticipant({ workId: id, eventId, eventParticipantId: participantId })
-            );
-            if (unlinkEventParticipant.fulfilled.match(action)) {
-                dispatch(getEventParticipants({ workId: id, eventId }));
-            }
-        } finally {
-            setRemovingCastId(null);
-        }
+        dispatch(unlinkEventParticipant({ workId: id, eventId, eventParticipantId: participantId }));
     };
 
     const handleOpenGenerateModal = async () => {
@@ -233,7 +186,6 @@ export default function EventDetailsPage() {
     };
 
     const handleCloseGenerateModal = () => {
-        if (genLoading) return;
         setGenModalOpen(false);
     };
 
@@ -243,9 +195,15 @@ export default function EventDetailsPage() {
     const defaultLocationInWorkId = event?.location_in_work_id;
 
     return (
-        <>
-            {!prePageLoading && (
-                <main aria-labelledby={titleId} className="page">
+        <main aria-labelledby={titleId} className="page">
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {String(error)}
+                </p>
+            )}
+
+            {!globalLoading && !error && event && (
+                <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
                             <ol>
@@ -273,309 +231,252 @@ export default function EventDetailsPage() {
 
                         <Title id={titleId}>{pageTitle}</Title>
                     </div>
+                    <section className={styles.card} aria-label="Event info">
+                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                            <div className={styles.field}>
+                                <label htmlFor="ev-title" className={styles.label}>
+                                    Title
+                                </label>
+                                <input
+                                    id="ev-title"
+                                    name="title"
+                                    type="text"
+                                    defaultValue={event.title ?? ''}
+                                    className={styles.input}
+                                    disabled={!editMode || globalLoading}
+                                    required
+                                    maxLength={100}
+                                />
+                            </div>
 
-                    {loading && (
-                        <p aria-live="polite" className={styles.muted}>
-                            Loading...
-                        </p>
-                    )}
-                    {error && (
-                        <p role="alert" className={styles.error}>
-                            {String(error)}
-                        </p>
-                    )}
+                            <div className={styles.field}>
+                                <label htmlFor="ev-desc" className={styles.label}>
+                                    Description
+                                </label>
+                                <textarea
+                                    id="ev-desc"
+                                    name="description"
+                                    rows={6}
+                                    defaultValue={event.description ?? ''}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    disabled={!editMode || globalLoading}
+                                    required
+                                />
+                            </div>
 
-                    {!loading && !error && event && (
-                        <>
-                            <section className={styles.card} aria-label="Event info">
-                                <form
-                                    ref={formRef}
-                                    className={styles.form}
-                                    onSubmit={e => e.preventDefault()}
-                                    noValidate
+                            <div className={styles.field}>
+                                <label htmlFor="ev-location" className={styles.label}>
+                                    Location (in this work)
+                                </label>
+                                <select
+                                    id="ev-location"
+                                    name="location_in_work_id"
+                                    defaultValue={defaultLocationInWorkId}
+                                    className={styles.input}
+                                    disabled={!editMode || globalLoading}
                                 >
-                                    <div className={styles.field}>
-                                        <label htmlFor="ev-title" className={styles.label}>
-                                            Title
-                                        </label>
-                                        <input
-                                            id="ev-title"
-                                            name="title"
-                                            type="text"
-                                            defaultValue={event.title ?? ''}
-                                            className={styles.input}
-                                            disabled={!editMode || disableAll}
-                                            required
-                                            maxLength={100}
-                                        />
-                                    </div>
-
-                                    <div className={styles.field}>
-                                        <label htmlFor="ev-desc" className={styles.label}>
-                                            Description
-                                        </label>
-                                        <textarea
-                                            id="ev-desc"
-                                            name="description"
-                                            rows={6}
-                                            defaultValue={event.description ?? ''}
-                                            className={`${styles.input} ${styles.textarea}`}
-                                            disabled={!editMode || disableAll}
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className={styles.field}>
-                                        <label htmlFor="ev-location" className={styles.label}>
-                                            Location (in this work)
-                                        </label>
-                                        <select
-                                            id="ev-location"
-                                            name="location_in_work_id"
-                                            defaultValue={defaultLocationInWorkId}
-                                            className={styles.input}
-                                            disabled={!editMode || disableAll || locLinksLoading}
-                                        >
-                                            <option value="">— None —</option>
-                                            {locationLinks.map(opt => (
-                                                <option key={String(opt.id)} value={String(opt.id)}>
-                                                    {opt.content ?? opt.title ?? `#${opt.id}`}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {locLinksLoading && (
-                                            <p className={styles.muted} aria-live="polite">
-                                                Loading locations...
-                                            </p>
-                                        )}
-                                        {!locLinksLoading && locLinksError && (
-                                            <p className={styles.error} role="alert">
-                                                {String(locLinksError)}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {updateError && (
-                                        <p role="alert" className={styles.error}>
-                                            {String(updateError)}
-                                        </p>
-                                    )}
-                                    {deleteError && (
-                                        <p role="alert" className={styles.error}>
-                                            {String(deleteError)}
-                                        </p>
-                                    )}
-
-                                    <div className={styles.actions}>
-                                        {!editMode ? (
-                                            <>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleOpenGenerateModal}
-                                                    disabled={disableAll || genLoading}
-                                                    aria-label="Generate event's fact check"
-                                                    title="Generate event's fact check"
-                                                >
-                                                    <svg className="icon" aria-hidden="true" focusable="false">
-                                                        <use href="/icons.svg#wand" />
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleEdit}
-                                                    disabled={disableAll}
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="dangerBtn"
-                                                    onClick={handleDelete}
-                                                    disabled={disableAll}
-                                                >
-                                                    {deleteLoading ? 'Deleting...' : 'Delete'}
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleSave}
-                                                    disabled={updateLoading}
-                                                >
-                                                    Save
-                                                </button>
-                                                <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                                    Cancel
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-                                </form>
-                            </section>
-
-                            <section className={styles.card} aria-label="Cast">
-                                <div className={styles.subHeader}>
-                                    <h2 className={styles.subTitle}>Cast</h2>
-                                    <button
-                                        type="button"
-                                        className="primaryBtn"
-                                        onClick={openAddCast}
-                                        disabled={participantsLoading}
-                                        aria-label="Add participant"
-                                        title="Add participant"
-                                    >
-                                        Add participant
-                                    </button>
-                                </div>
-
-                                {participantsLoading && (
-                                    <p aria-live="polite" className={styles.muted}>
-                                        Loading...
-                                    </p>
-                                )}
-                                {!participantsLoading && participantsError && (
-                                    <p role="alert" className={styles.error}>
-                                        {String(participantsError)}
-                                    </p>
-                                )}
-
-                                {!participantsLoading &&
-                                    !participantsError &&
-                                    (participants.length > 0 ? (
-                                        <List
-                                            items={participants}
-                                            onRemove={({ id: participantId, work_id: workIdProp }) => {
-                                                if (removingCastId) return;
-                                                handleRemoveCast(workIdProp || id, participantId);
-                                            }}
-                                        />
-                                    ) : (
-                                        <p className={styles.muted}>No participants yet.</p>
+                                    <option value="">— None —</option>
+                                    {locationLinks.map(opt => (
+                                        <option key={String(opt.id)} value={String(opt.id)}>
+                                            {opt.content ?? opt.title ?? `#${opt.id}`}
+                                        </option>
                                     ))}
-                            </section>
+                                </select>
+                                {locLinksError && (
+                                    <p className={styles.error} role="alert">
+                                        {String(locLinksError)}
+                                    </p>
+                                )}
+                            </div>
 
-                            {genModalOpen && (
-                                <dialog
-                                    ref={genDialogRef}
-                                    aria-labelledby="generate-description-title"
-                                    onClose={handleCloseGenerateModal}
-                                >
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
-                                    >
-                                        <h3 id="generate-description-title" className={styles.modalTitle}>
-                                            Generated description
-                                        </h3>
-
-                                        {genError && (
-                                            <p className={styles.error} role="alert">
-                                                {String(genError)}
-                                            </p>
-                                        )}
-
-                                        <div className={styles.field}>
-                                            <label htmlFor="generated-description" className={styles.label}>
-                                                Text
-                                            </label>
-                                            <textarea
-                                                id="generated-description"
-                                                className={`${styles.input} ${styles.textarea}`}
-                                                rows={10}
-                                                readOnly
-                                                value={genResult?.result ?? (genLoading ? 'Generating...' : '')}
-                                            />
-                                        </div>
-
-                                        <div className={styles.modalActions}>
-                                            <button
-                                                type="button"
-                                                onClick={handleCloseGenerateModal}
-                                                disabled={genLoading}
-                                            >
-                                                Close
-                                            </button>
-                                        </div>
-                                    </form>
-                                </dialog>
+                            {updateError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(updateError)}
+                                </p>
+                            )}
+                            {deleteError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(deleteError)}
+                                </p>
                             )}
 
-                            {addCastOpen && (
-                                <dialog ref={addCastRef} aria-labelledby="add-cast-title" onClose={closeAddCast}>
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
-                                    >
-                                        <h3 id="add-cast-title" className={styles.modalTitle}>
-                                            Add participant
-                                        </h3>
+                            <div className={styles.actions}>
+                                {!editMode ? (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleOpenGenerateModal}
+                                            disabled={globalLoading}
+                                            aria-label="Generate event's fact check"
+                                            title="Generate event's fact check"
+                                        >
+                                            <svg className="icon" aria-hidden="true" focusable="false">
+                                                <use href="/icons.svg#wand" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleEdit}
+                                            disabled={globalLoading}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="dangerBtn"
+                                            onClick={handleDelete}
+                                            disabled={globalLoading}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleSave}
+                                            disabled={globalLoading}
+                                        >
+                                            Save
+                                        </button>
+                                        <button type="button" onClick={handleCancel} disabled={globalLoading}>
+                                            Cancel
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </form>
+                    </section>
 
-                                        {possibleParticipantsLoading && (
-                                            <p className={styles.muted} aria-live="polite">
-                                                Loading characters...
-                                            </p>
-                                        )}
-                                        {!possibleParticipantsLoading && possibleParticipantsError && (
-                                            <p className={styles.error} role="alert">
-                                                {String(possibleParticipantsError)}
-                                            </p>
-                                        )}
+                    <section className={styles.card} aria-label="Cast">
+                        <div className={styles.subHeader}>
+                            <h2 className={styles.subTitle}>Cast</h2>
+                            <button
+                                type="button"
+                                className="primaryBtn"
+                                onClick={openAddCast}
+                                disabled={globalLoading}
+                                aria-label="Add participant"
+                                title="Add participant"
+                            >
+                                Add participant
+                            </button>
+                        </div>
 
-                                        {!possibleParticipantsLoading &&
-                                            !possibleParticipantsError &&
-                                            (possibleParticipants.length === 0 ? (
-                                                <p className={styles.muted}>No available characters to add.</p>
-                                            ) : (
-                                                <ul className={styles.radioList}>
-                                                    {possibleParticipants.map(p => (
-                                                        <li key={p.id}>
-                                                            <label className={styles.radioRow}>
-                                                                <input
-                                                                    type="radio"
-                                                                    name="participant"
-                                                                    value={p.id}
-                                                                    checked={
-                                                                        String(selectedCharacterId) === String(p.id)
-                                                                    }
-                                                                    onChange={e =>
-                                                                        setSelectedCharacterId(e.target.value)
-                                                                    }
-                                                                />
-                                                                <span>{p.content}</span>
-                                                            </label>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ))}
+                        {participantsError && (
+                            <p role="alert" className={styles.error}>
+                                {String(participantsError)}
+                            </p>
+                        )}
 
-                                        <div className={styles.modalActions}>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleAddCast}
-                                                disabled={
-                                                    addingCast || possibleParticipantsLoading || !selectedCharacterId
-                                                }
-                                            >
-                                                {addingCast ? 'Adding...' : 'Add'}
-                                            </button>
-                                            <button type="button" onClick={closeAddCast} disabled={addingCast}>
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                </dialog>
-                            )}
-                        </>
-                    )}
-                </main>
+                        {!participantsError &&
+                            (participants.length > 0 ? (
+                                <List
+                                    items={participants}
+                                    onRemove={({ id: participantId, work_id: workIdProp }) => {
+                                        handleRemoveCast(workIdProp || id, participantId);
+                                    }}
+                                />
+                            ) : (
+                                <p className={styles.muted}>No participants yet.</p>
+                            ))}
+                    </section>
+                </>
             )}
-        </>
+
+            {genModalOpen && (
+                <dialog
+                    ref={genDialogRef}
+                    aria-labelledby="generate-description-title"
+                    onClose={handleCloseGenerateModal}
+                >
+                    <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                        <h3 id="generate-description-title" className={styles.modalTitle}>
+                            Generated description
+                        </h3>
+
+                        {genError && (
+                            <p className={styles.error} role="alert">
+                                {String(genError)}
+                            </p>
+                        )}
+
+                        <div className={styles.field}>
+                            <label htmlFor="generated-description" className={styles.label}>
+                                Text
+                            </label>
+                            <textarea
+                                id="generated-description"
+                                className={`${styles.input} ${styles.textarea}`}
+                                rows={10}
+                                readOnly
+                                value={genResult?.result ?? 'Generating...'}
+                            />
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button type="button" onClick={handleCloseGenerateModal} disabled={globalLoading}>
+                                Close
+                            </button>
+                        </div>
+                    </form>
+                </dialog>
+            )}
+
+            {addCastOpen && (
+                <dialog ref={addCastRef} aria-labelledby="add-cast-title" onClose={closeAddCast}>
+                    <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                        <h3 id="add-cast-title" className={styles.modalTitle}>
+                            Add participant
+                        </h3>
+
+                        {possibleParticipantsError && (
+                            <p className={styles.error} role="alert">
+                                {String(possibleParticipantsError)}
+                            </p>
+                        )}
+
+                        {!possibleParticipantsError &&
+                            (possibleParticipants.length === 0 ? (
+                                <p className={styles.muted}>No available characters to add.</p>
+                            ) : (
+                                <ul className={styles.radioList}>
+                                    {possibleParticipants.map(p => (
+                                        <li key={p.id}>
+                                            <label className={styles.radioRow}>
+                                                <input
+                                                    type="radio"
+                                                    name="participant"
+                                                    value={p.id}
+                                                    checked={String(selectedCharacterId) === String(p.id)}
+                                                    onChange={e => setSelectedCharacterId(e.target.value)}
+                                                />
+                                                <span>{p.content}</span>
+                                            </label>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ))}
+
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className="primaryBtn"
+                                onClick={handleAddCast}
+                                disabled={globalLoading || !selectedCharacterId}
+                            >
+                                Add
+                            </button>
+                            <button type="button" onClick={closeAddCast} disabled={globalLoading}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </dialog>
+            )}
+        </main>
     );
 }

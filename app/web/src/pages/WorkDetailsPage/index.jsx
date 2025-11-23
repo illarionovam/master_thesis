@@ -25,31 +25,23 @@ import {
 
 import {
     selectWork,
-    selectGetWorkLoading,
     selectGetWorkError,
-    selectUpdateWorkLoading,
     selectUpdateWorkError,
-    selectDeleteWorkLoading,
     selectDeleteWorkError,
     selectWorkCast,
-    selectGetWorkCastLoading,
     selectGetWorkCastError,
     selectWorkPossibleCast,
-    selectGetWorkPossibleCastLoading,
     selectGetWorkPossibleCastError,
     selectWorkLocationLinks,
-    selectGetWorkLocationLinksLoading,
     selectGetWorkLocationLinksError,
     selectWorkPossibleLocationLinks,
-    selectGetWorkPossibleLocationLinksLoading,
     selectGetWorkPossibleLocationLinksError,
-    selectGetEventsLoading,
     selectGetEventsError,
     selectEvents,
-    selectGenerateWorkDescriptionLoading,
     selectGenerateWorkDescriptionError,
     selectGenerateWorkDescriptionResult,
 } from '../../redux/works/selectors';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 import { resetWork } from '../../redux/works/slice';
 
@@ -63,36 +55,29 @@ export default function WorkDetailsPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const globalLoading = useSelector(selectGlobalLoading);
+
     const work = useSelector(selectWork);
-    const loading = useSelector(selectGetWorkLoading);
     const error = useSelector(selectGetWorkError);
 
-    const updateLoading = useSelector(selectUpdateWorkLoading);
     const updateError = useSelector(selectUpdateWorkError);
-    const deleteLoading = useSelector(selectDeleteWorkLoading);
     const deleteError = useSelector(selectDeleteWorkError);
 
-    const cast = useSelector(selectWorkCast) || [];
-    const castLoading = useSelector(selectGetWorkCastLoading);
+    const cast = useSelector(selectWorkCast);
     const castError = useSelector(selectGetWorkCastError);
 
-    const possibleCast = useSelector(selectWorkPossibleCast) || [];
-    const possibleCastLoading = useSelector(selectGetWorkPossibleCastLoading);
+    const possibleCast = useSelector(selectWorkPossibleCast);
     const possibleCastError = useSelector(selectGetWorkPossibleCastError);
 
-    const locationLinks = useSelector(selectWorkLocationLinks) || [];
-    const locLinksLoading = useSelector(selectGetWorkLocationLinksLoading);
+    const locationLinks = useSelector(selectWorkLocationLinks);
     const locLinksError = useSelector(selectGetWorkLocationLinksError);
 
-    const possibleLocLinks = useSelector(selectWorkPossibleLocationLinks) || [];
-    const possibleLocLinksLoading = useSelector(selectGetWorkPossibleLocationLinksLoading);
+    const possibleLocLinks = useSelector(selectWorkPossibleLocationLinks);
     const possibleLocLinksError = useSelector(selectGetWorkPossibleLocationLinksError);
 
     const events = useSelector(selectEvents);
-    const eventsLoading = useSelector(selectGetEventsLoading);
     const eventsError = useSelector(selectGetEventsError);
 
-    const genLoading = useSelector(selectGenerateWorkDescriptionLoading);
     const genError = useSelector(selectGenerateWorkDescriptionError);
     const genResult = useSelector(selectGenerateWorkDescriptionResult);
 
@@ -100,25 +85,16 @@ export default function WorkDetailsPage() {
 
     const [castAddOpen, setCastAddOpen] = useState(false);
     const [selectedCharacterId, setSelectedCharacterId] = useState('');
-    const [addingCast, setAddingCast] = useState(false);
 
     const [locAddOpen, setLocAddOpen] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState('');
-    const [addingLoc, setAddingLoc] = useState(false);
-
-    const [removingCastId, setRemovingCastId] = useState(null);
-    const [removingLocId, setRemovingLocId] = useState(null);
 
     const [eventModalOpen, setEventModalOpen] = useState(false);
-    const [creatingEvent, setCreatingEvent] = useState(false);
 
     const [reorderMode, setReorderMode] = useState(false);
-    const [savingReorder, setSavingReorder] = useState(false);
     const [localEvents, setLocalEvents] = useState([]);
 
     const [genModalOpen, setGenModalOpen] = useState(false);
-
-    const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const dragIndexRef = useRef(null);
@@ -128,28 +104,24 @@ export default function WorkDetailsPage() {
 
     useEffect(() => {
         if (!id) {
-            setPrePageLoading(false);
             return;
         }
         if (work != null) {
             if (work.id === id) {
-                setPrePageLoading(false);
                 return;
             } else {
                 dispatch(resetWork());
             }
         }
-        setPrePageLoading(false);
         dispatch(getWork(id));
         dispatch(getWorkCast(id));
+        dispatch(getWorkPossibleCast(id));
         dispatch(getWorkLocationLinks(id));
+        dispatch(getWorkPossibleLocationLinks(id));
         dispatch(getEvents(id));
     }, [dispatch, id, work]);
 
     useEffect(() => {
-        if (!castAddOpen || !id) return;
-        dispatch(getWorkPossibleCast(id));
-
         const dlg = addCastRef.current;
         if (!dlg) return;
 
@@ -158,7 +130,7 @@ export default function WorkDetailsPage() {
         } else {
             if (dlg.open) dlg.close();
         }
-    }, [castAddOpen, dispatch, id]);
+    }, [castAddOpen]);
 
     useEffect(() => {
         const dlg = genDialogRef.current;
@@ -172,9 +144,6 @@ export default function WorkDetailsPage() {
     }, [genModalOpen]);
 
     useEffect(() => {
-        if (!locAddOpen || !id) return;
-        dispatch(getWorkPossibleLocationLinks(id));
-
         const dlg = addLocRef.current;
         if (!dlg) return;
 
@@ -183,13 +152,11 @@ export default function WorkDetailsPage() {
         } else {
             if (dlg.open) dlg.close();
         }
-    }, [locAddOpen, dispatch, id]);
+    }, [locAddOpen]);
 
     useEffect(() => {
         if (!reorderMode) setLocalEvents(events);
     }, [events, reorderMode]);
-
-    const disableAll = loading || updateLoading || deleteLoading;
 
     const handleEdit = () => setEditMode(true);
 
@@ -235,7 +202,6 @@ export default function WorkDetailsPage() {
         setCastAddOpen(true);
     };
     const closeCastAdd = () => {
-        if (addingCast) return;
         setCastAddOpen(false);
         setSelectedCharacterId('');
     };
@@ -245,87 +211,37 @@ export default function WorkDetailsPage() {
         setLocAddOpen(true);
     };
     const closeLocAdd = () => {
-        if (addingLoc) return;
         setLocAddOpen(false);
         setSelectedLocationId('');
     };
 
     const handleAddCast = async () => {
-        if (!id || !selectedCharacterId) return;
-        try {
-            setAddingCast(true);
-            const action = await dispatch(
-                linkWorkCharacter({ workId: id, data: { character_id: selectedCharacterId } })
-            );
-            if (linkWorkCharacter.fulfilled.match(action)) {
-                setCastAddOpen(false);
-                setSelectedCharacterId('');
-                dispatch(getWorkCast(id));
-            }
-        } finally {
-            setAddingCast(false);
-        }
+        closeCastAdd();
+        dispatch(linkWorkCharacter({ workId: id, data: { character_id: selectedCharacterId }, from: 'work' }));
     };
 
     const handleRemoveCast = async (workId, characterInWorkId) => {
-        if (!id) return;
-        try {
-            setRemovingCastId(characterInWorkId);
-            const action = await dispatch(deleteCharacterInWork({ workId, characterInWorkId }));
-            if (deleteCharacterInWork.fulfilled.match(action)) {
-                dispatch(getWorkCast(id));
-            }
-        } finally {
-            setRemovingCastId(null);
-        }
+        dispatch(deleteCharacterInWork({ workId, characterInWorkId, from: 'work' }));
     };
 
     const handleAddLocation = async () => {
-        if (!id || !selectedLocationId) return;
-        try {
-            setAddingLoc(true);
-            const action = await dispatch(linkWorkLocation({ workId: id, data: { location_id: selectedLocationId } }));
-            if (linkWorkLocation.fulfilled.match(action)) {
-                setLocAddOpen(false);
-                setSelectedLocationId('');
-                dispatch(getWorkLocationLinks(id));
-            }
-        } finally {
-            setAddingLoc(false);
-        }
+        closeLocAdd();
+        dispatch(linkWorkLocation({ workId: id, data: { location_id: selectedLocationId }, from: 'work' }));
     };
 
     const handleRemoveLocation = async (workId, locationInWorkId) => {
-        if (!id) return;
-        try {
-            setRemovingLocId(locationInWorkId);
-            const action = await dispatch(deleteLocationInWork({ workId, locationInWorkId }));
-            if (deleteLocationInWork.fulfilled.match(action)) {
-                dispatch(getWorkLocationLinks(id));
-            }
-        } finally {
-            setRemovingLocId(null);
-        }
+        dispatch(deleteLocationInWork({ workId, locationInWorkId, from: 'work' }));
     };
 
     const openEventModal = () => setEventModalOpen(true);
     const closeEventModal = () => {
-        if (creatingEvent) return;
         setEventModalOpen(false);
     };
 
     const handleCreateEvent = async payload => {
         if (!id) return;
-        try {
-            setCreatingEvent(true);
-            const action = await dispatch(createEvent({ workId: id, data: payload }));
-            if (createEvent.fulfilled.match(action)) {
-                setEventModalOpen(false);
-                dispatch(getEvents(id));
-            }
-        } finally {
-            setCreatingEvent(false);
-        }
+        setEventModalOpen(false);
+        dispatch(createEvent({ workId: id, data: payload }));
     };
 
     const handleStartReorder = () => {
@@ -340,22 +256,22 @@ export default function WorkDetailsPage() {
 
     const handleSaveReorder = async () => {
         if (!id) return;
-        try {
-            setSavingReorder(true);
-            const payload = {
-                data: localEvents.map((ev, idx) => ({
-                    id: ev.id,
-                    order_in_work: idx + 1,
-                })),
-            };
 
-            await dispatch(reorderEvents({ workId: id, data: payload }));
-            await dispatch(getEvents(id));
+        const payload = {
+            data: localEvents.map((ev, idx) => ({
+                id: ev.id,
+                order_in_work: idx + 1,
+            })),
+        };
 
-            setReorderMode(false);
-        } finally {
-            setSavingReorder(false);
-        }
+        dispatch(
+            reorderEvents({
+                workId: id,
+                data: payload,
+            })
+        );
+
+        setReorderMode(false);
     };
 
     const onDragStart = index => e => {
@@ -386,7 +302,6 @@ export default function WorkDetailsPage() {
     };
 
     const handleCloseGenerateModal = () => {
-        if (genLoading) return;
         setGenModalOpen(false);
     };
 
@@ -397,9 +312,15 @@ export default function WorkDetailsPage() {
     };
 
     return (
-        <>
-            {!prePageLoading && (
-                <main aria-labelledby={titleId} className="page">
+        <main aria-labelledby={titleId} className="page">
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {String(error)}
+                </p>
+            )}
+
+            {!globalLoading && !error && work && (
+                <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
                             <ol>
@@ -419,530 +340,456 @@ export default function WorkDetailsPage() {
                         <Title id={titleId}>{work?.title ?? '—'}</Title>
                     </div>
 
-                    {loading && (
-                        <p aria-live="polite" className={styles.muted}>
-                            Loading...
-                        </p>
-                    )}
-                    {error && (
-                        <p role="alert" className={styles.error}>
-                            {String(error)}
-                        </p>
-                    )}
+                    <section className={styles.card} aria-label="Work info">
+                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                            <div className={styles.field}>
+                                <label htmlFor="work-title" className={styles.label}>
+                                    Title
+                                </label>
+                                <input
+                                    id="work-title"
+                                    name="title"
+                                    type="text"
+                                    defaultValue={work.title ?? ''}
+                                    className={styles.input}
+                                    disabled={!editMode || globalLoading}
+                                    required
+                                />
+                            </div>
 
-                    {!loading && !error && work && (
-                        <>
-                            <section className={styles.card} aria-label="Work info">
-                                <form
-                                    ref={formRef}
-                                    className={styles.form}
-                                    onSubmit={e => e.preventDefault()}
-                                    noValidate
-                                >
-                                    <div className={styles.field}>
-                                        <label htmlFor="work-title" className={styles.label}>
-                                            Title
-                                        </label>
-                                        <input
-                                            id="work-title"
-                                            name="title"
-                                            type="text"
-                                            defaultValue={work.title ?? ''}
-                                            className={styles.input}
-                                            disabled={!editMode || disableAll}
-                                            required
-                                        />
-                                    </div>
+                            <div className={styles.field}>
+                                <label htmlFor="work-annotation" className={styles.label}>
+                                    Annotation
+                                </label>
+                                <textarea
+                                    id="work-annotation"
+                                    name="annotation"
+                                    rows={4}
+                                    defaultValue={work.annotation ?? ''}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    disabled={!editMode || globalLoading}
+                                />
+                            </div>
 
-                                    <div className={styles.field}>
-                                        <label htmlFor="work-annotation" className={styles.label}>
-                                            Annotation
-                                        </label>
-                                        <textarea
-                                            id="work-annotation"
-                                            name="annotation"
-                                            rows={4}
-                                            defaultValue={work.annotation ?? ''}
-                                            className={`${styles.input} ${styles.textarea}`}
-                                            disabled={!editMode || disableAll}
-                                        />
-                                    </div>
+                            <div className={styles.field}>
+                                <label htmlFor="work-synopsis" className={styles.label}>
+                                    Synopsis
+                                </label>
+                                <textarea
+                                    id="work-synopsis"
+                                    name="synopsis"
+                                    rows={8}
+                                    defaultValue={work.synopsis ?? ''}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    disabled={!editMode || globalLoading}
+                                />
+                            </div>
 
-                                    <div className={styles.field}>
-                                        <label htmlFor="work-synopsis" className={styles.label}>
-                                            Synopsis
-                                        </label>
-                                        <textarea
-                                            id="work-synopsis"
-                                            name="synopsis"
-                                            rows={8}
-                                            defaultValue={work.synopsis ?? ''}
-                                            className={`${styles.input} ${styles.textarea}`}
-                                            disabled={!editMode || disableAll}
-                                        />
-                                    </div>
+                            {updateError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(updateError)}
+                                </p>
+                            )}
+                            {deleteError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(deleteError)}
+                                </p>
+                            )}
 
-                                    {updateError && (
-                                        <p role="alert" className={styles.error}>
-                                            {String(updateError)}
-                                        </p>
-                                    )}
-                                    {deleteError && (
-                                        <p role="alert" className={styles.error}>
-                                            {String(deleteError)}
-                                        </p>
-                                    )}
-
-                                    <div className={styles.actions}>
-                                        {!editMode ? (
-                                            <>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleOpenGenerateModal}
-                                                    disabled={
-                                                        eventsLoading || events.length === 0 || genLoading || disableAll
-                                                    }
-                                                    aria-label="Generate description from events"
-                                                    title="Generate description from events"
-                                                >
-                                                    <svg className="icon" aria-hidden="true" focusable="false">
-                                                        <use href="/icons.svg#wand" />
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleEdit}
-                                                    disabled={disableAll}
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="dangerBtn"
-                                                    onClick={handleDelete}
-                                                    disabled={disableAll}
-                                                >
-                                                    {deleteLoading ? 'Deleting...' : 'Delete'}
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleSave}
-                                                    disabled={updateLoading}
-                                                >
-                                                    Save
-                                                </button>
-                                                <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                                    Cancel
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-                                </form>
-                            </section>
-
-                            <section className={styles.card} aria-label="Cast">
-                                <div className={styles.subHeader}>
-                                    <h2 className={styles.subTitle}>Cast</h2>
-                                    <button
-                                        type="button"
-                                        className="primaryBtn"
-                                        onClick={openCastAdd}
-                                        disabled={castLoading}
-                                        aria-label="Add character"
-                                        title="Add character"
-                                    >
-                                        Add character
-                                    </button>
-                                </div>
-
-                                {castLoading && (
-                                    <p aria-live="polite" className={styles.muted}>
-                                        Loading...
-                                    </p>
-                                )}
-                                {!castLoading && castError && (
-                                    <p role="alert" className={styles.error}>
-                                        {String(castError)}
-                                    </p>
-                                )}
-
-                                {!castLoading && !castError && (
+                            <div className={styles.actions}>
+                                {!editMode ? (
                                     <>
-                                        {cast.length > 0 ? (
-                                            <List
-                                                items={cast}
-                                                onRemove={({ id: characterInWorkId, work_id: workId }) => {
-                                                    if (removingCastId) return;
-                                                    handleRemoveCast(workId, characterInWorkId);
-                                                }}
-                                            />
-                                        ) : (
-                                            <p className={styles.muted}>No cast yet.</p>
-                                        )}
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleOpenGenerateModal}
+                                            disabled={globalLoading || events.length === 0}
+                                            aria-label="Generate description from events"
+                                            title="Generate description from events"
+                                        >
+                                            <svg className="icon" aria-hidden="true" focusable="false">
+                                                <use href="/icons.svg#wand" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleEdit}
+                                            disabled={globalLoading}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="dangerBtn"
+                                            onClick={handleDelete}
+                                            disabled={globalLoading}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleSave}
+                                            disabled={globalLoading}
+                                        >
+                                            Save
+                                        </button>
+                                        <button type="button" onClick={handleCancel} disabled={globalLoading}>
+                                            Cancel
+                                        </button>
                                     </>
                                 )}
-                            </section>
+                            </div>
+                        </form>
+                    </section>
 
-                            <section className={styles.card} aria-label="Location links">
-                                <div className={styles.subHeader}>
-                                    <h2 className={styles.subTitle}>Location links</h2>
-                                    <button
-                                        type="button"
-                                        className="primaryBtn"
-                                        onClick={openLocAdd}
-                                        disabled={locLinksLoading}
-                                        aria-label="Add location"
-                                        title="Add location"
-                                    >
-                                        Add location
-                                    </button>
-                                </div>
-
-                                {locLinksLoading && (
-                                    <p aria-live="polite" className={styles.muted}>
-                                        Loading...
-                                    </p>
-                                )}
-                                {!locLinksLoading && locLinksError && (
-                                    <p role="alert" className={styles.error}>
-                                        {String(locLinksError)}
-                                    </p>
-                                )}
-
-                                {!locLinksLoading && !locLinksError && (
-                                    <>
-                                        {locationLinks.length > 0 ? (
-                                            <List
-                                                items={locationLinks}
-                                                onRemove={({ id: locationInWorkId, work_id: workId }) => {
-                                                    if (removingLocId) return;
-                                                    handleRemoveLocation(workId, locationInWorkId);
-                                                }}
-                                            />
-                                        ) : (
-                                            <p className={styles.muted}>No locations linked yet.</p>
-                                        )}
-                                    </>
-                                )}
-                            </section>
-
+                    <section className={styles.card} aria-label="Cast">
+                        <div className={styles.subHeader}>
+                            <h2 className={styles.subTitle}>Cast</h2>
                             <button
                                 type="button"
-                                className={`roundBtn ${styles.fab}`}
-                                onClick={() => navigate('dashboard')}
-                                aria-label={'Open work dashboard'}
-                                title={'Open work dashboard'}
+                                className="primaryBtn"
+                                onClick={openCastAdd}
+                                disabled={globalLoading}
+                                aria-label="Add character"
+                                title="Add character"
                             >
-                                <svg className="icon" aria-hidden="true" focusable="false">
-                                    <use href="/icons.svg#chart" />
-                                </svg>
+                                Add character
                             </button>
+                        </div>
 
-                            {genModalOpen && (
-                                <dialog
-                                    ref={genDialogRef}
-                                    aria-labelledby="generate-description-title"
-                                    onClose={handleCloseGenerateModal}
-                                >
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
+                        {castError && (
+                            <p role="alert" className={styles.error}>
+                                {String(castError)}
+                            </p>
+                        )}
+
+                        {!castError && (
+                            <>
+                                {cast.length > 0 ? (
+                                    <List
+                                        items={cast}
+                                        onRemove={({ id: characterInWorkId, work_id: workId }) => {
+                                            handleRemoveCast(workId, characterInWorkId);
+                                        }}
+                                    />
+                                ) : (
+                                    <p className={styles.muted}>No cast yet.</p>
+                                )}
+                            </>
+                        )}
+                    </section>
+
+                    <section className={styles.card} aria-label="Location links">
+                        <div className={styles.subHeader}>
+                            <h2 className={styles.subTitle}>Location links</h2>
+                            <button
+                                type="button"
+                                className="primaryBtn"
+                                onClick={openLocAdd}
+                                disabled={globalLoading}
+                                aria-label="Add location"
+                                title="Add location"
+                            >
+                                Add location
+                            </button>
+                        </div>
+
+                        {locLinksError && (
+                            <p role="alert" className={styles.error}>
+                                {String(locLinksError)}
+                            </p>
+                        )}
+
+                        {!locLinksError && (
+                            <>
+                                {locationLinks.length > 0 ? (
+                                    <List
+                                        items={locationLinks}
+                                        onRemove={({ id: locationInWorkId, work_id: workId }) => {
+                                            handleRemoveLocation(workId, locationInWorkId);
+                                        }}
+                                    />
+                                ) : (
+                                    <p className={styles.muted}>No locations linked yet.</p>
+                                )}
+                            </>
+                        )}
+                    </section>
+
+                    <button
+                        type="button"
+                        className={`roundBtn ${styles.fab}`}
+                        onClick={() => navigate('dashboard')}
+                        aria-label={'Open work dashboard'}
+                        title={'Open work dashboard'}
+                    >
+                        <svg className="icon" aria-hidden="true" focusable="false">
+                            <use href="/icons.svg#chart" />
+                        </svg>
+                    </button>
+
+                    <section className={styles.card} aria-label="Events">
+                        <div className={styles.subHeader}>
+                            <h2 className={styles.subTitle}>Events</h2>
+                            {!reorderMode ? (
+                                <div className={styles.actionsRow}>
+                                    <button
+                                        type="button"
+                                        className="primaryBtn"
+                                        onClick={openEventModal}
+                                        disabled={globalLoading}
+                                        aria-label="Add event"
+                                        title="Add event"
                                     >
-                                        <h3 id="generate-description-title" className={styles.modalTitle}>
-                                            Generated description
-                                        </h3>
-
-                                        {genError && (
-                                            <p className={styles.error} role="alert">
-                                                {String(genError)}
-                                            </p>
-                                        )}
-
-                                        <div className={styles.field}>
-                                            <label htmlFor="generated-description" className={styles.label}>
-                                                Text
-                                            </label>
-                                            <textarea
-                                                id="generated-description"
-                                                className={`${styles.input} ${styles.textarea}`}
-                                                rows={10}
-                                                readOnly
-                                                value={genResult?.result ?? (genLoading ? 'Generating...' : '')}
-                                            />
-                                        </div>
-
-                                        <div className={styles.modalActions}>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleCopyGenerated}
-                                                disabled={!genResult?.result}
-                                            >
-                                                Copy
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={handleCloseGenerateModal}
-                                                disabled={genLoading}
-                                            >
-                                                Close
-                                            </button>
-                                        </div>
-                                    </form>
-                                </dialog>
-                            )}
-
-                            {castAddOpen && (
-                                <dialog ref={addCastRef} aria-labelledby="add-cast-title" onClose={closeCastAdd}>
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
+                                        Add event
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleStartReorder}
+                                        disabled={globalLoading || events.length === 0}
+                                        aria-label="Reorder events"
+                                        title="Reorder events"
                                     >
-                                        <h3 id="add-cast-title" className={styles.modalTitle}>
-                                            Add character
-                                        </h3>
-
-                                        {possibleCastLoading && (
-                                            <p className={styles.muted} aria-live="polite">
-                                                Loading characters...
-                                            </p>
-                                        )}
-                                        {!possibleCastLoading && possibleCastError && (
-                                            <p className={styles.error} role="alert">
-                                                {String(possibleCastError)}
-                                            </p>
-                                        )}
-
-                                        {!possibleCastLoading && !possibleCastError && (
-                                            <>
-                                                {possibleCast.length === 0 ? (
-                                                    <p className={styles.muted}>No available characters to add.</p>
-                                                ) : (
-                                                    <ul className={styles.radioList}>
-                                                        {possibleCast.map(c => (
-                                                            <li key={c.id}>
-                                                                <label className={styles.radioRow}>
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="character"
-                                                                        value={c.id}
-                                                                        checked={
-                                                                            String(selectedCharacterId) === String(c.id)
-                                                                        }
-                                                                        onChange={e =>
-                                                                            setSelectedCharacterId(e.target.value)
-                                                                        }
-                                                                    />
-                                                                    <span>{c.content ?? c.title ?? `#${c.id}`}</span>
-                                                                </label>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
-                                            </>
-                                        )}
-
-                                        <div className={styles.modalActions}>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleAddCast}
-                                                disabled={addingCast || possibleCastLoading || !selectedCharacterId}
-                                            >
-                                                {addingCast ? 'Adding...' : 'Add'}
-                                            </button>
-                                            <button type="button" onClick={closeCastAdd} disabled={addingCast}>
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                </dialog>
-                            )}
-
-                            {locAddOpen && (
-                                <dialog ref={addLocRef} aria-labelledby="add-loc-title" onClose={closeLocAdd}>
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
-                                    >
-                                        <h3 id="add-loc-title" className={styles.modalTitle}>
-                                            Add location
-                                        </h3>
-
-                                        {possibleLocLinksLoading && (
-                                            <p className={styles.muted} aria-live="polite">
-                                                Loading locations...
-                                            </p>
-                                        )}
-                                        {!possibleLocLinksLoading && possibleLocLinksError && (
-                                            <p className={styles.error} role="alert">
-                                                {String(possibleLocLinksError)}
-                                            </p>
-                                        )}
-
-                                        {!possibleLocLinksLoading && !possibleLocLinksError && (
-                                            <>
-                                                {possibleLocLinks.length === 0 ? (
-                                                    <p className={styles.muted}>No available locations to add.</p>
-                                                ) : (
-                                                    <ul className={styles.radioList}>
-                                                        {possibleLocLinks.map(l => (
-                                                            <li key={l.id}>
-                                                                <label className={styles.radioRow}>
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="location"
-                                                                        value={l.id}
-                                                                        checked={
-                                                                            String(selectedLocationId) === String(l.id)
-                                                                        }
-                                                                        onChange={e =>
-                                                                            setSelectedLocationId(e.target.value)
-                                                                        }
-                                                                    />
-                                                                    <span>{l.content ?? l.title ?? `#${l.id}`}</span>
-                                                                </label>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
-                                            </>
-                                        )}
-
-                                        <div className={styles.modalActions}>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleAddLocation}
-                                                disabled={addingLoc || possibleLocLinksLoading || !selectedLocationId}
-                                            >
-                                                {addingLoc ? 'Adding...' : 'Add'}
-                                            </button>
-                                            <button type="button" onClick={closeLocAdd} disabled={addingLoc}>
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                </dialog>
-                            )}
-
-                            <section className={styles.card} aria-label="Events">
-                                <div className={styles.subHeader}>
-                                    <h2 className={styles.subTitle}>Events</h2>
-                                    {!reorderMode ? (
-                                        <div className={styles.actionsRow}>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={openEventModal}
-                                                disabled={eventsLoading}
-                                                aria-label="Add event"
-                                                title="Add event"
-                                            >
-                                                Add event
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={handleStartReorder}
-                                                disabled={eventsLoading || events.length === 0}
-                                                aria-label="Reorder events"
-                                                title="Reorder events"
-                                            >
-                                                Reorder
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className={styles.actionsRow}>
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleSaveReorder}
-                                                disabled={savingReorder}
-                                                aria-label="Save order"
-                                                title="Save order"
-                                            >
-                                                {savingReorder ? 'Saving...' : 'Save'}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={handleCancelReorder}
-                                                disabled={savingReorder}
-                                                aria-label="Cancel reorder"
-                                                title="Cancel reorder"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    )}
+                                        Reorder
+                                    </button>
                                 </div>
-
-                                {eventsLoading && (
-                                    <p aria-live="polite" className={styles.muted}>
-                                        Loading...
-                                    </p>
-                                )}
-                                {!eventsLoading && eventsError && (
-                                    <p role="alert" className={styles.error}>
-                                        {String(eventsError)}
-                                    </p>
-                                )}
-
-                                {!eventsLoading &&
-                                    !eventsError &&
-                                    (events.length > 0 ? (
-                                        !reorderMode ? (
-                                            <List items={events} />
-                                        ) : (
-                                            <ul className={styles.draggableList} role="list">
-                                                {localEvents.map((ev, idx) => (
-                                                    <li
-                                                        key={ev.id}
-                                                        className={styles.draggableItem}
-                                                        draggable
-                                                        onDragStart={onDragStart(idx)}
-                                                        onDragOver={onDragOver(idx)}
-                                                        onDrop={onDrop}
-                                                        aria-label={`Move ${ev.title ?? ev.description}`}
-                                                        title="Drag to reorder"
-                                                    >
-                                                        <span className={styles.dragHandle} aria-hidden>
-                                                            ⋮⋮
-                                                        </span>
-                                                        <span className={styles.itemText}>
-                                                            {ev.content ?? ev.title ?? ev.description}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )
-                                    ) : (
-                                        <p className={styles.muted}>No events yet.</p>
-                                    ))}
-                            </section>
-
-                            {eventModalOpen && (
-                                <CreateEventModal
-                                    open={eventModalOpen}
-                                    onClose={closeEventModal}
-                                    onSubmit={handleCreateEvent}
-                                    submitting={creatingEvent}
-                                    error={null}
-                                    locationOptions={locationLinks}
-                                />
+                            ) : (
+                                <div className={styles.actionsRow}>
+                                    <button
+                                        type="button"
+                                        className="primaryBtn"
+                                        onClick={handleSaveReorder}
+                                        disabled={globalLoading}
+                                        aria-label="Save order"
+                                        title="Save order"
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelReorder}
+                                        disabled={globalLoading}
+                                        aria-label="Cancel reorder"
+                                        title="Cancel reorder"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             )}
-                        </>
-                    )}
-                </main>
+                        </div>
+
+                        {eventsError && (
+                            <p role="alert" className={styles.error}>
+                                {String(eventsError)}
+                            </p>
+                        )}
+
+                        {!eventsError &&
+                            (events.length > 0 ? (
+                                !reorderMode ? (
+                                    <List items={events} />
+                                ) : (
+                                    <ul className={styles.draggableList} role="list">
+                                        {localEvents.map((ev, idx) => (
+                                            <li
+                                                key={ev.id}
+                                                className={styles.draggableItem}
+                                                draggable
+                                                onDragStart={onDragStart(idx)}
+                                                onDragOver={onDragOver(idx)}
+                                                onDrop={onDrop}
+                                                aria-label={`Move ${ev.title ?? ev.description}`}
+                                                title="Drag to reorder"
+                                            >
+                                                <span className={styles.dragHandle} aria-hidden>
+                                                    ⋮⋮
+                                                </span>
+                                                <span className={styles.itemText}>
+                                                    {ev.content ?? ev.title ?? ev.description}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )
+                            ) : (
+                                <p className={styles.muted}>No events yet.</p>
+                            ))}
+                    </section>
+                </>
             )}
-        </>
+
+            {eventModalOpen && (
+                <CreateEventModal
+                    open={eventModalOpen}
+                    onClose={closeEventModal}
+                    onSubmit={handleCreateEvent}
+                    submitting={globalLoading}
+                    error={null}
+                    locationOptions={locationLinks}
+                />
+            )}
+
+            {genModalOpen && (
+                <dialog
+                    ref={genDialogRef}
+                    aria-labelledby="generate-description-title"
+                    onClose={handleCloseGenerateModal}
+                >
+                    <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                        <h3 id="generate-description-title" className={styles.modalTitle}>
+                            Generated description
+                        </h3>
+
+                        {genError && (
+                            <p className={styles.error} role="alert">
+                                {String(genError)}
+                            </p>
+                        )}
+
+                        <div className={styles.field}>
+                            <label htmlFor="generated-description" className={styles.label}>
+                                Text
+                            </label>
+                            <textarea
+                                id="generated-description"
+                                className={`${styles.input} ${styles.textarea}`}
+                                rows={10}
+                                readOnly
+                                value={genResult?.result ?? 'Generating...'}
+                            />
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className="primaryBtn"
+                                onClick={handleCopyGenerated}
+                                disabled={!genResult?.result}
+                            >
+                                Copy
+                            </button>
+                            <button type="button" onClick={handleCloseGenerateModal} disabled={globalLoading}>
+                                Close
+                            </button>
+                        </div>
+                    </form>
+                </dialog>
+            )}
+
+            {castAddOpen && (
+                <dialog ref={addCastRef} aria-labelledby="add-cast-title" onClose={closeCastAdd}>
+                    <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                        <h3 id="add-cast-title" className={styles.modalTitle}>
+                            Add character
+                        </h3>
+
+                        {possibleCastError && (
+                            <p className={styles.error} role="alert">
+                                {String(possibleCastError)}
+                            </p>
+                        )}
+
+                        {!possibleCastError && (
+                            <>
+                                {possibleCast.length === 0 ? (
+                                    <p className={styles.muted}>No available characters to add.</p>
+                                ) : (
+                                    <ul className={styles.radioList}>
+                                        {possibleCast.map(c => (
+                                            <li key={c.id}>
+                                                <label className={styles.radioRow}>
+                                                    <input
+                                                        type="radio"
+                                                        name="character"
+                                                        value={c.id}
+                                                        checked={String(selectedCharacterId) === String(c.id)}
+                                                        onChange={e => setSelectedCharacterId(e.target.value)}
+                                                    />
+                                                    <span>{c.content ?? c.title ?? `#${c.id}`}</span>
+                                                </label>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </>
+                        )}
+
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className="primaryBtn"
+                                onClick={handleAddCast}
+                                disabled={globalLoading || !selectedCharacterId}
+                            >
+                                Add
+                            </button>
+                            <button type="button" onClick={closeCastAdd} disabled={globalLoading}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </dialog>
+            )}
+
+            {locAddOpen && (
+                <dialog ref={addLocRef} aria-labelledby="add-loc-title" onClose={closeLocAdd}>
+                    <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                        <h3 id="add-loc-title" className={styles.modalTitle}>
+                            Add location
+                        </h3>
+
+                        {possibleLocLinksError && (
+                            <p className={styles.error} role="alert">
+                                {String(possibleLocLinksError)}
+                            </p>
+                        )}
+
+                        {!possibleLocLinksError && (
+                            <>
+                                {possibleLocLinks.length === 0 ? (
+                                    <p className={styles.muted}>No available locations to add.</p>
+                                ) : (
+                                    <ul className={styles.radioList}>
+                                        {possibleLocLinks.map(l => (
+                                            <li key={l.id}>
+                                                <label className={styles.radioRow}>
+                                                    <input
+                                                        type="radio"
+                                                        name="location"
+                                                        value={l.id}
+                                                        checked={String(selectedLocationId) === String(l.id)}
+                                                        onChange={e => setSelectedLocationId(e.target.value)}
+                                                    />
+                                                    <span>{l.content ?? l.title ?? `#${l.id}`}</span>
+                                                </label>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </>
+                        )}
+
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className="primaryBtn"
+                                onClick={handleAddLocation}
+                                disabled={globalLoading || !selectedLocationId}
+                            >
+                                Add
+                            </button>
+                            <button type="button" onClick={closeLocAdd} disabled={globalLoading}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </dialog>
+            )}
+        </main>
     );
 }

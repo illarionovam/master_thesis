@@ -10,14 +10,12 @@ import { getLocationInWork, updateLocationInWork, getEventsByLocationInWorkId } 
 
 import {
     selectLocationInWork,
-    selectGetLocationInWorkLoading,
     selectGetLocationInWorkError,
-    selectUpdateLocationInWorkLoading,
     selectUpdateLocationInWorkError,
-    selectGetEventsByLocationInWorkIdLoading,
     selectGetEventsByLocationInWorkIdError,
     selectGetEventsByLocationInWorkId,
 } from '../../redux/works/selectors';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 import { resetLocationInWork } from '../../redux/works/slice';
 
@@ -26,47 +24,37 @@ export default function LocationInWorkDetailsPage() {
     const titleId = useId();
     const dispatch = useDispatch();
 
+    const globalLoading = useSelector(selectGlobalLoading);
+
     const liw = useSelector(selectLocationInWork);
-    const loading = useSelector(selectGetLocationInWorkLoading);
     const error = useSelector(selectGetLocationInWorkError);
 
-    const updateLoading = useSelector(selectUpdateLocationInWorkLoading);
     const updateError = useSelector(selectUpdateLocationInWorkError);
 
-    const eventsLoading = useSelector(selectGetEventsByLocationInWorkIdLoading);
     const eventsError = useSelector(selectGetEventsByLocationInWorkIdError);
-    const events = useSelector(selectGetEventsByLocationInWorkId) || [];
+    const events = useSelector(selectGetEventsByLocationInWorkId);
 
     const [editMode, setEditMode] = useState(false);
     const [attrs, setAttrs] = useState({});
     const [addTagOpen, setAddTagOpen] = useState(false);
-
-    const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const addTagRef = useRef(null);
 
     useEffect(() => {
         if (!id || !locationInWorkId) {
-            setPrePageLoading(false);
             return;
         }
         if (liw != null) {
             if (liw.id === locationInWorkId) {
-                setPrePageLoading(false);
                 return;
             } else {
                 dispatch(resetLocationInWork());
             }
         }
-        setPrePageLoading(false);
         dispatch(getLocationInWork({ workId: id, locationInWorkId }));
-    }, [dispatch, id, locationInWorkId, liw]);
-
-    useEffect(() => {
-        if (!locationInWorkId) return;
         dispatch(getEventsByLocationInWorkId({ workId: id, locationInWorkId }));
-    }, [dispatch, id, locationInWorkId]);
+    }, [dispatch, id, locationInWorkId, liw]);
 
     useEffect(() => {
         if (liw?.attributes && typeof liw.attributes === 'object') {
@@ -92,8 +80,6 @@ export default function LocationInWorkDetailsPage() {
     const location = liw?.location;
     const parentTitle = liw?.location?.title ?? null;
 
-    const disableAll = loading || updateLoading;
-
     const removeAttr = key => {
         setAttrs(prev => {
             const next = { ...prev };
@@ -117,9 +103,15 @@ export default function LocationInWorkDetailsPage() {
     };
 
     return (
-        <>
-            {!prePageLoading && (
-                <main aria-labelledby={titleId} className="page">
+        <main aria-labelledby={titleId} className="page">
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {String(error)}
+                </p>
+            )}
+
+            {!globalLoading && !error && liw && (
+                <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
                             <ol>
@@ -151,188 +143,154 @@ export default function LocationInWorkDetailsPage() {
                         <Title id={titleId}>{location?.title ?? '—'}</Title>
                     </div>
 
-                    {loading && (
-                        <p aria-live="polite" className={styles.muted}>
-                            Loading...
-                        </p>
-                    )}
-                    {error && (
-                        <p role="alert" className={styles.error}>
-                            {String(error)}
-                        </p>
-                    )}
+                    <section className={styles.card} aria-label="Location in work">
+                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                            <div className={styles.field}>
+                                <label className={styles.label}>Title</label>
+                                <input
+                                    type="text"
+                                    className={styles.input}
+                                    value={location?.title ?? ''}
+                                    disabled
+                                    readOnly
+                                />
+                            </div>
 
-                    {!loading && !error && liw && (
-                        <>
-                            <section className={styles.card} aria-label="Location in work">
-                                <form
-                                    ref={formRef}
-                                    className={styles.form}
-                                    onSubmit={e => e.preventDefault()}
-                                    noValidate
-                                >
-                                    <div className={styles.field}>
-                                        <label className={styles.label}>Title</label>
-                                        <input
-                                            type="text"
-                                            className={styles.input}
-                                            value={location?.title ?? ''}
-                                            disabled
-                                            readOnly
-                                        />
-                                    </div>
+                            <div className={styles.field}>
+                                <label className={styles.label}>Description</label>
+                                <textarea
+                                    rows={5}
+                                    className={`${styles.input} ${styles.textarea}`}
+                                    value={location?.description ?? ''}
+                                    disabled
+                                    readOnly
+                                />
+                            </div>
 
-                                    <div className={styles.field}>
-                                        <label className={styles.label}>Description</label>
-                                        <textarea
-                                            rows={5}
-                                            className={`${styles.input} ${styles.textarea}`}
-                                            value={location?.description ?? ''}
-                                            disabled
-                                            readOnly
-                                        />
-                                    </div>
+                            <div className={styles.field}>
+                                <label className={styles.label}>Parent Location</label>
+                                <input
+                                    type="text"
+                                    className={styles.input}
+                                    value={parentTitle ?? '— None —'}
+                                    disabled
+                                    readOnly
+                                />
+                            </div>
 
-                                    <div className={styles.field}>
-                                        <label className={styles.label}>Parent Location</label>
-                                        <input
-                                            type="text"
-                                            className={styles.input}
-                                            value={parentTitle ?? '— None —'}
-                                            disabled
-                                            readOnly
-                                        />
-                                    </div>
+                            <div className={styles.field}>
+                                <span className={styles.label}>Tags</span>
+                                <div className={styles.chips}>
+                                    {Object.keys(attrs).length === 0 && (
+                                        <span className={styles.muted}>No tags yet.</span>
+                                    )}
 
-                                    <div className={styles.field}>
-                                        <span className={styles.label}>Tags</span>
-                                        <div className={styles.chips}>
-                                            {Object.keys(attrs).length === 0 && (
-                                                <span className={styles.muted}>No tags yet.</span>
-                                            )}
-
-                                            {Object.entries(attrs).map(([k, v]) => (
-                                                <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
-                                                    <strong className={styles.chipKey}>{k}</strong>
-                                                    <span className={styles.chipSep}>:</span>
-                                                    <span className={styles.chipVal}>{String(v)}</span>
-
-                                                    {editMode && (
-                                                        <button
-                                                            type="button"
-                                                            className={styles.chipRemove}
-                                                            onClick={() => removeAttr(k)}
-                                                            aria-label={`Remove tag ${k}`}
-                                                            title="Remove"
-                                                        >
-                                                            x
-                                                        </button>
-                                                    )}
-                                                </span>
-                                            ))}
+                                    {Object.entries(attrs).map(([k, v]) => (
+                                        <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
+                                            <strong className={styles.chipKey}>{k}</strong>
+                                            <span className={styles.chipSep}>:</span>
+                                            <span className={styles.chipVal}>{String(v)}</span>
 
                                             {editMode && (
                                                 <button
                                                     type="button"
-                                                    className={styles.addChipBtn}
-                                                    onClick={() => setAddTagOpen(true)}
-                                                    aria-label="Add tag"
-                                                    title="Add tag"
+                                                    className={styles.chipRemove}
+                                                    onClick={() => removeAttr(k)}
+                                                    aria-label={`Remove tag ${k}`}
+                                                    title="Remove"
                                                 >
-                                                    +
+                                                    x
                                                 </button>
                                             )}
-                                        </div>
-                                    </div>
-
-                                    {updateError && (
-                                        <p role="alert" className={styles.error}>
-                                            {String(updateError)}
-                                        </p>
-                                    )}
-
-                                    <div className={styles.actions}>
-                                        {!editMode ? (
-                                            <button
-                                                type="button"
-                                                className="primaryBtn"
-                                                onClick={handleEdit}
-                                                disabled={disableAll}
-                                            >
-                                                Edit
-                                            </button>
-                                        ) : (
-                                            <>
-                                                <button
-                                                    type="button"
-                                                    className="primaryBtn"
-                                                    onClick={handleSave}
-                                                    disabled={updateLoading}
-                                                >
-                                                    Save
-                                                </button>
-                                                <button type="button" onClick={handleCancel} disabled={updateLoading}>
-                                                    Cancel
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-                                </form>
-                            </section>
-
-                            <section className={styles.card} aria-label="Used in events">
-                                <h2 className={styles.subTitle}>Used in events</h2>
-
-                                {eventsLoading && (
-                                    <p aria-live="polite" className={styles.muted}>
-                                        Loading...
-                                    </p>
-                                )}
-                                {!eventsLoading && eventsError && (
-                                    <p role="alert" className={styles.error}>
-                                        {String(eventsError)}
-                                    </p>
-                                )}
-
-                                {!eventsLoading &&
-                                    !eventsError &&
-                                    (events.length > 0 ? (
-                                        <List items={events} />
-                                    ) : (
-                                        <p className={styles.muted}>No events yet.</p>
+                                        </span>
                                     ))}
-                            </section>
 
-                            {addTagOpen && (
-                                <dialog
-                                    ref={addTagRef}
-                                    aria-labelledby="add-tag-title"
-                                    onClose={() => setAddTagOpen(false)}
-                                >
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
-                                    >
-                                        <h3 id="add-tag-title" className={styles.modalTitle}>
-                                            Add tag
-                                        </h3>
-                                        <AddTagFields
-                                            onAdd={(k, v) => {
-                                                if (!k) return;
-                                                setAttrs(prev => ({ ...prev, [k]: v }));
-                                                setAddTagOpen(false);
-                                            }}
-                                            onCancel={() => setAddTagOpen(false)}
-                                        />
-                                    </form>
-                                </dialog>
+                                    {editMode && (
+                                        <button
+                                            type="button"
+                                            className={styles.addChipBtn}
+                                            onClick={() => setAddTagOpen(true)}
+                                            aria-label="Add tag"
+                                            title="Add tag"
+                                        >
+                                            +
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {updateError && (
+                                <p role="alert" className={styles.error}>
+                                    {String(updateError)}
+                                </p>
                             )}
-                        </>
-                    )}
-                </main>
+
+                            <div className={styles.actions}>
+                                {!editMode ? (
+                                    <button
+                                        type="button"
+                                        className="primaryBtn"
+                                        onClick={handleEdit}
+                                        disabled={globalLoading}
+                                    >
+                                        Edit
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className="primaryBtn"
+                                            onClick={handleSave}
+                                            disabled={globalLoading}
+                                        >
+                                            Save
+                                        </button>
+                                        <button type="button" onClick={handleCancel} disabled={globalLoading}>
+                                            Cancel
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </form>
+                    </section>
+
+                    <section className={styles.card} aria-label="Used in events">
+                        <h2 className={styles.subTitle}>Used in events</h2>
+
+                        {eventsError && (
+                            <p role="alert" className={styles.error}>
+                                {String(eventsError)}
+                            </p>
+                        )}
+
+                        {!eventsError &&
+                            (events.length > 0 ? (
+                                <List items={events} />
+                            ) : (
+                                <p className={styles.muted}>No events yet.</p>
+                            ))}
+                    </section>
+                </>
             )}
-        </>
+
+            {addTagOpen && (
+                <dialog ref={addTagRef} aria-labelledby="add-tag-title" onClose={() => setAddTagOpen(false)}>
+                    <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                        <h3 id="add-tag-title" className={styles.modalTitle}>
+                            Add tag
+                        </h3>
+                        <AddTagFields
+                            onAdd={(k, v) => {
+                                if (!k) return;
+                                setAttrs(prev => ({ ...prev, [k]: v }));
+                                setAddTagOpen(false);
+                            }}
+                            onCancel={() => setAddTagOpen(false)}
+                        />
+                    </form>
+                </dialog>
+            )}
+        </main>
     );
 }
 

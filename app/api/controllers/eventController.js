@@ -51,14 +51,25 @@ const reorderEvents = async (req, res) => {
 
     await eventService.reorderEvents(data);
 
-    res.sendStatus(200);
+    const eventsById = new Map(events.map(e => [e.id, e]));
+
+    const enriched = data.map(item => {
+        const event = eventsById.get(item.id);
+        return stripBulkEventResponse({
+            ...event.toJSON(),
+            order_in_work: item.order_in_work,
+        });
+    });
+
+    res.json(enriched);
 };
 
 const createEvent = async (req, res) => {
     const { location_in_work_id } = req.body;
 
+    let locationInWork = null;
     if (location_in_work_id != null) {
-        const locationInWork = await locationInWorkService.getLocationInWork(location_in_work_id);
+        locationInWork = await locationInWorkService.getLocationInWork(location_in_work_id);
 
         if (locationInWork == null || locationInWork.work_id !== req.work.id) {
             throw createHttpError(403, 'Forbidden');
@@ -66,11 +77,15 @@ const createEvent = async (req, res) => {
     }
 
     const event = await eventService.createEvent({
-        work_id: req.work.id,
         ...req.body,
+        work_id: req.work.id,
     });
 
-    res.status(201).json(event);
+    res.status(201).json({
+        ...event.toJSON(),
+        work: req.work,
+        locationLink: locationInWork,
+    });
 };
 
 const getEvent = async (req, res) => {
@@ -177,7 +192,7 @@ const linkParticipant = async (req, res) => {
         ...req.body,
     });
 
-    res.status(201).json(eventParticipant);
+    res.status(201).json({ ...eventParticipant.toJSON(), event, characterLink: characterInWork });
 };
 
 const unlinkParticipant = async (req, res) => {

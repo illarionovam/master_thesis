@@ -21,7 +21,6 @@ export const selectUpdateLocationError = state => state.locations.updateLocation
 
 export const selectDeleteLocationLoading = state => state.locations.deleteLocation.loading;
 export const selectDeleteLocationError = state => state.locations.deleteLocation.error;
-export const selectDeleteLocationSuccess = state => state.locations.deleteLocation.success;
 
 export const selectGetLocationPlacementsLoading = state => state.locations.getLocationPlacements.loading;
 export const selectGetLocationPlacementsError = state => state.locations.getLocationPlacements.error;

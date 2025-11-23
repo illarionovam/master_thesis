@@ -8,6 +8,8 @@ import {
     getLocationPlacements,
     getLocationPossiblePlacements,
 } from './operations';
+import { linkWorkLocation, deleteLocationInWork } from '../works/operations';
+import { stripBulkLocationInWorkResponse } from '../../../../api/helpers/strippers';
 
 const op = { loading: false, error: null };
 
@@ -18,7 +20,7 @@ const initialState = {
     createLocation: { ...op },
     getLocation: { ...op },
     updateLocation: { ...op },
-    deleteLocation: { ...op, success: false },
+    deleteLocation: { ...op },
     getLocationPlacements: { ...op, placements: [] },
     getLocationPossiblePlacements: { ...op, possiblePlacements: [] },
 };
@@ -32,9 +34,9 @@ const locationsSlice = createSlice({
             state.getLocation = { ...op };
             state.createLocation = { ...op };
             state.updateLocation = { ...op };
-            state.deleteLocation = { ...op, success: false };
-            state.getLocationPlacements = { ...op, appearances: [] };
-            state.getLocationPossiblePlacements = { ...op, possibleAppearances: [] };
+            state.deleteLocation = { ...op };
+            state.getLocationPlacements = { ...op, placements: [] };
+            state.getLocationPossiblePlacements = { ...op, possiblePlacements: [] };
         },
     },
     extraReducers: builder => {
@@ -93,11 +95,9 @@ const locationsSlice = createSlice({
             .addCase(deleteLocation.pending, state => {
                 state.deleteLocation.loading = true;
                 state.deleteLocation.error = null;
-                state.deleteLocation.success = false;
             })
             .addCase(deleteLocation.fulfilled, state => {
                 state.deleteLocation.loading = false;
-                state.deleteLocation.success = true;
                 state.location = null;
             })
             .addCase(deleteLocation.rejected, (state, action) => {
@@ -130,6 +130,39 @@ const locationsSlice = createSlice({
                 state.getLocationPossiblePlacements.loading = false;
                 state.getLocationPossiblePlacements.error = action.payload;
             });
+        builder.addCase(linkWorkLocation.fulfilled, (state, action) => {
+            const { from } = action.meta.arg;
+
+            if (from !== 'location') return;
+
+            state.getLocationPlacements.placements = [
+                ...state.getLocationPlacements.placements,
+                stripBulkLocationInWorkResponse(action.payload),
+            ];
+            state.getLocationPossiblePlacements.possiblePlacements =
+                state.getLocationPossiblePlacements.possiblePlacements.filter(
+                    item => item.id !== action.payload.work_id
+                );
+        });
+        builder.addCase(deleteLocationInWork.fulfilled, (state, action) => {
+            const { locationInWorkId, from } = action.meta.arg;
+
+            if (from !== 'location') return;
+
+            let removedPlacement = null;
+            state.getLocationPlacements.placements = state.getLocationPlacements.placements.filter(item => {
+                if (item.id === locationInWorkId) {
+                    removedPlacement = item;
+                    return false;
+                }
+                return true;
+            });
+
+            state.getLocationPossiblePlacements.possiblePlacements = [
+                ...state.getLocationPossiblePlacements.possiblePlacements,
+                removedPlacement.work,
+            ];
+        });
     },
 });
 

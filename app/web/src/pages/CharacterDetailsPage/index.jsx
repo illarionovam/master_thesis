@@ -17,19 +17,15 @@ import { linkWorkCharacter, deleteCharacterInWork } from '../../redux/works/oper
 
 import {
     selectCharacter,
-    selectGetCharacterLoading,
     selectGetCharacterError,
-    selectUpdateCharacterLoading,
     selectUpdateCharacterError,
     selectCharacterAppearances,
-    selectGetCharacterAppearancesLoading,
     selectGetCharacterAppearancesError,
     selectCharacterPossibleAppearances,
-    selectGetCharacterPossibleAppearancesLoading,
     selectGetCharacterPossibleAppearancesError,
-    selectDeleteCharacterLoading,
     selectDeleteCharacterError,
 } from '../../redux/characters/selectors';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 import { resetCharacter } from '../../redux/characters/slice';
 
@@ -41,22 +37,19 @@ export default function CharacterDetailsPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const globalLoading = useSelector(selectGlobalLoading);
+
     const character = useSelector(selectCharacter);
-    const loading = useSelector(selectGetCharacterLoading);
     const error = useSelector(selectGetCharacterError);
 
-    const updateLoading = useSelector(selectUpdateCharacterLoading);
     const updateError = useSelector(selectUpdateCharacterError);
 
-    const deleteLoading = useSelector(selectDeleteCharacterLoading);
     const deleteError = useSelector(selectDeleteCharacterError);
 
-    const appearances = useSelector(selectCharacterAppearances) || [];
-    const appearancesLoading = useSelector(selectGetCharacterAppearancesLoading);
+    const appearances = useSelector(selectCharacterAppearances);
     const appearancesError = useSelector(selectGetCharacterAppearancesError);
 
-    const possibleWorks = useSelector(selectCharacterPossibleAppearances) || [];
-    const possibleLoading = useSelector(selectGetCharacterPossibleAppearancesLoading);
+    const possibleWorks = useSelector(selectCharacterPossibleAppearances);
     const possibleError = useSelector(selectGetCharacterPossibleAppearancesError);
 
     const [editMode, setEditMode] = useState(false);
@@ -67,11 +60,6 @@ export default function CharacterDetailsPage() {
     const [addWorkOpen, setAddWorkOpen] = useState(false);
 
     const [selectedWorkId, setSelectedWorkId] = useState('');
-    const [adding, setAdding] = useState(false);
-
-    const [removingId, setRemovingId] = useState(null);
-
-    const [prePageLoading, setPrePageLoading] = useState(true);
 
     const formRef = useRef(null);
     const addTagRef = useRef(null);
@@ -79,26 +67,21 @@ export default function CharacterDetailsPage() {
 
     useEffect(() => {
         if (!id) {
-            setPrePageLoading(false);
             return;
         }
         if (character != null) {
             if (character.id === id) {
-                setPrePageLoading(false);
                 return;
             } else {
                 dispatch(resetCharacter());
             }
         }
-        setPrePageLoading(false);
         dispatch(getCharacter(id));
         dispatch(getCharacterAppearances(id));
+        dispatch(getCharacterPossibleAppearances(id));
     }, [dispatch, id, character]);
 
     useEffect(() => {
-        if (!addWorkOpen || !id) return;
-        dispatch(getCharacterPossibleAppearances(id));
-
         const dlg = addWorkRef.current;
         if (!dlg) return;
 
@@ -107,7 +90,7 @@ export default function CharacterDetailsPage() {
         } else {
             if (dlg.open) dlg.close();
         }
-    }, [addWorkOpen, dispatch, id]);
+    }, [addWorkOpen]);
 
     useEffect(() => {
         if (character) {
@@ -125,8 +108,6 @@ export default function CharacterDetailsPage() {
             if (dlg.open) dlg.close();
         }
     }, [addTagOpen]);
-
-    const disableAll = loading || updateLoading || deleteLoading;
 
     const handleEdit = () => setEditMode(true);
 
@@ -180,42 +161,28 @@ export default function CharacterDetailsPage() {
         setAddWorkOpen(true);
     };
     const closeAddWorkModal = () => {
-        if (adding) return;
         setAddWorkOpen(false);
         setSelectedWorkId('');
     };
     const handleAddToWork = async () => {
-        if (!id || !selectedWorkId) return;
-        try {
-            setAdding(true);
-            const action = await dispatch(linkWorkCharacter({ workId: selectedWorkId, data: { character_id: id } }));
-            if (linkWorkCharacter.fulfilled.match(action)) {
-                setAddWorkOpen(false);
-                setSelectedWorkId('');
-                dispatch(getCharacterAppearances(id));
-            }
-        } finally {
-            setAdding(false);
-        }
+        closeAddWorkModal();
+        dispatch(linkWorkCharacter({ workId: selectedWorkId, data: { character_id: id }, from: 'character' }));
     };
 
     const handleRemoveAppearance = async (workId, characterInWorkId) => {
-        if (!id) return;
-        try {
-            setRemovingId(workId);
-            const action = await dispatch(deleteCharacterInWork({ workId, characterInWorkId }));
-            if (deleteCharacterInWork.fulfilled.match(action)) {
-                dispatch(getCharacterAppearances(id));
-            }
-        } finally {
-            setRemovingId(null);
-        }
+        dispatch(deleteCharacterInWork({ workId, characterInWorkId, from: 'character' }));
     };
 
     return (
-        <>
-            {!prePageLoading && (
-                <main aria-labelledby={titleId} className="page">
+        <main aria-labelledby={titleId} className="page">
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {String(error)}
+                </p>
+            )}
+
+            {!globalLoading && !error && character && (
+                <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
                             <ol>
@@ -234,326 +201,273 @@ export default function CharacterDetailsPage() {
                         <Title id={titleId}>{character?.name ?? '—'}</Title>
                     </div>
 
-                    {loading && (
-                        <p aria-live="polite" className={styles.muted}>
-                            Loading...
-                        </p>
-                    )}
-                    {error && (
-                        <p role="alert" className={styles.error}>
-                            {String(error)}
-                        </p>
-                    )}
+                    <div className={styles.split}>
+                        <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
+                            <ImageSection
+                                characterId={id}
+                                name={character.name}
+                                imageUrl={character.image_url}
+                                disableAll={globalLoading}
+                            />
+                        </section>
 
-                    {!loading && !error && character && (
-                        <>
-                            <div className={styles.split}>
-                                <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
-                                    <ImageSection
-                                        characterId={id}
-                                        name={character.name}
-                                        imageUrl={character.image_url}
-                                        disableAll={disableAll}
+                        <section className={styles.card} aria-label="Character info">
+                            <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
+                                <div className={styles.field}>
+                                    <label htmlFor="ch-name" className={styles.label}>
+                                        Name
+                                    </label>
+                                    <input
+                                        id="ch-name"
+                                        name="name"
+                                        type="text"
+                                        defaultValue={character.name ?? ''}
+                                        className={styles.input}
+                                        disabled={!editMode || globalLoading}
+                                        required
                                     />
-                                </section>
+                                </div>
 
-                                <section className={styles.card} aria-label="Character info">
-                                    <form
-                                        ref={formRef}
-                                        className={styles.form}
-                                        onSubmit={e => e.preventDefault()}
-                                        noValidate
-                                    >
-                                        <div className={styles.field}>
-                                            <label htmlFor="ch-name" className={styles.label}>
-                                                Name
-                                            </label>
-                                            <input
-                                                id="ch-name"
-                                                name="name"
-                                                type="text"
-                                                defaultValue={character.name ?? ''}
-                                                className={styles.input}
-                                                disabled={!editMode || disableAll}
-                                                required
-                                            />
-                                        </div>
+                                <div className={styles.field}>
+                                    <label htmlFor="ch-appearance" className={styles.label}>
+                                        Appearance
+                                    </label>
+                                    <textarea
+                                        id="ch-appearance"
+                                        name="appearance"
+                                        rows={5}
+                                        defaultValue={character.appearance ?? ''}
+                                        className={`${styles.input} ${styles.textarea}`}
+                                        disabled={!editMode || globalLoading}
+                                    />
+                                </div>
 
-                                        <div className={styles.field}>
-                                            <label htmlFor="ch-appearance" className={styles.label}>
-                                                Appearance
-                                            </label>
-                                            <textarea
-                                                id="ch-appearance"
-                                                name="appearance"
-                                                rows={5}
-                                                defaultValue={character.appearance ?? ''}
-                                                className={`${styles.input} ${styles.textarea}`}
-                                                disabled={!editMode || disableAll}
-                                            />
-                                        </div>
+                                <div className={styles.field}>
+                                    <label htmlFor="ch-personality" className={styles.label}>
+                                        Personality
+                                    </label>
+                                    <textarea
+                                        id="ch-personality"
+                                        name="personality"
+                                        rows={5}
+                                        defaultValue={character.personality ?? ''}
+                                        className={`${styles.input} ${styles.textarea}`}
+                                        disabled={!editMode || globalLoading}
+                                    />
+                                </div>
 
-                                        <div className={styles.field}>
-                                            <label htmlFor="ch-personality" className={styles.label}>
-                                                Personality
-                                            </label>
-                                            <textarea
-                                                id="ch-personality"
-                                                name="personality"
-                                                rows={5}
-                                                defaultValue={character.personality ?? ''}
-                                                className={`${styles.input} ${styles.textarea}`}
-                                                disabled={!editMode || disableAll}
-                                            />
-                                        </div>
+                                <div className={styles.field}>
+                                    <label htmlFor="ch-bio" className={styles.label}>
+                                        Bio
+                                    </label>
+                                    <textarea
+                                        id="ch-bio"
+                                        name="bio"
+                                        rows={6}
+                                        defaultValue={character.bio ?? ''}
+                                        className={`${styles.input} ${styles.textarea}`}
+                                        disabled={!editMode || globalLoading}
+                                    />
+                                </div>
 
-                                        <div className={styles.field}>
-                                            <label htmlFor="ch-bio" className={styles.label}>
-                                                Bio
-                                            </label>
-                                            <textarea
-                                                id="ch-bio"
-                                                name="bio"
-                                                rows={6}
-                                                defaultValue={character.bio ?? ''}
-                                                className={`${styles.input} ${styles.textarea}`}
-                                                disabled={!editMode || disableAll}
-                                            />
-                                        </div>
+                                <div className={styles.field}>
+                                    <span className={styles.label}>Tags</span>
+                                    <div className={styles.chips}>
+                                        {Object.keys(attrs).length === 0 && (
+                                            <span className={styles.muted}>No tags yet.</span>
+                                        )}
 
-                                        <div className={styles.field}>
-                                            <span className={styles.label}>Tags</span>
-                                            <div className={styles.chips}>
-                                                {Object.keys(attrs).length === 0 && (
-                                                    <span className={styles.muted}>No tags yet.</span>
-                                                )}
-
-                                                {Object.entries(attrs).map(([k, v]) => (
-                                                    <span
-                                                        key={k}
-                                                        className={styles.chip}
-                                                        aria-label={`${k}: ${String(v)}`}
-                                                    >
-                                                        <strong className={styles.chipKey}>{k}</strong>
-                                                        <span className={styles.chipSep}>:</span>
-                                                        <span className={styles.chipVal}>{String(v)}</span>
-
-                                                        {editMode && (
-                                                            <button
-                                                                type="button"
-                                                                className={styles.chipRemove}
-                                                                onClick={() => removeAttr(k)}
-                                                                aria-label={`Remove tag ${k}`}
-                                                                title="Remove"
-                                                            >
-                                                                x
-                                                            </button>
-                                                        )}
-                                                    </span>
-                                                ))}
+                                        {Object.entries(attrs).map(([k, v]) => (
+                                            <span key={k} className={styles.chip} aria-label={`${k}: ${String(v)}`}>
+                                                <strong className={styles.chipKey}>{k}</strong>
+                                                <span className={styles.chipSep}>:</span>
+                                                <span className={styles.chipVal}>{String(v)}</span>
 
                                                 {editMode && (
                                                     <button
                                                         type="button"
-                                                        className={styles.addChipBtn}
-                                                        onClick={() => setAddTagOpen(true)}
-                                                        aria-label="Add tag"
-                                                        title="Add tag"
+                                                        className={styles.chipRemove}
+                                                        onClick={() => removeAttr(k)}
+                                                        aria-label={`Remove tag ${k}`}
+                                                        title="Remove"
                                                     >
-                                                        +
+                                                        x
                                                     </button>
                                                 )}
-                                            </div>
-                                        </div>
+                                            </span>
+                                        ))}
 
-                                        {updateError && (
-                                            <p role="alert" className={styles.error}>
-                                                {String(updateError)}
-                                            </p>
+                                        {editMode && (
+                                            <button
+                                                type="button"
+                                                className={styles.addChipBtn}
+                                                onClick={() => setAddTagOpen(true)}
+                                                aria-label="Add tag"
+                                                title="Add tag"
+                                            >
+                                                +
+                                            </button>
                                         )}
-                                        {deleteError && (
-                                            <p role="alert" className={styles.error}>
-                                                {String(deleteError)}
-                                            </p>
-                                        )}
-
-                                        <div className={styles.actions}>
-                                            {!editMode ? (
-                                                <>
-                                                    <button
-                                                        type="button"
-                                                        className="primaryBtn"
-                                                        onClick={handleEdit}
-                                                        disabled={disableAll}
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="dangerBtn"
-                                                        onClick={handleDelete}
-                                                        disabled={disableAll}
-                                                    >
-                                                        {deleteLoading ? 'Deleting...' : 'Delete'}
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <button
-                                                        type="button"
-                                                        className="primaryBtn"
-                                                        onClick={handleSave}
-                                                        disabled={updateLoading}
-                                                    >
-                                                        Save
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={handleCancel}
-                                                        disabled={updateLoading}
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </form>
-                                </section>
-                            </div>
-
-                            <section className={styles.card} aria-label="Character appearances">
-                                <div className={styles.subHeader}>
-                                    <h2 className={styles.subTitle}>Appearances</h2>
-                                    <button
-                                        type="button"
-                                        className="primaryBtn"
-                                        onClick={openAddWorkModal}
-                                        disabled={appearancesLoading}
-                                        aria-label="Add to work"
-                                        title="Add to work"
-                                    >
-                                        Add to work
-                                    </button>
+                                    </div>
                                 </div>
 
-                                {appearancesLoading && (
-                                    <p aria-live="polite" className={styles.muted}>
-                                        Loading...
-                                    </p>
-                                )}
-                                {!appearancesLoading && appearancesError && (
+                                {updateError && (
                                     <p role="alert" className={styles.error}>
-                                        {String(appearancesError)}
+                                        {String(updateError)}
+                                    </p>
+                                )}
+                                {deleteError && (
+                                    <p role="alert" className={styles.error}>
+                                        {String(deleteError)}
                                     </p>
                                 )}
 
-                                {!appearancesLoading &&
-                                    !appearancesError &&
-                                    (appearances.length > 0 ? (
-                                        <List
-                                            items={appearances}
-                                            onRemove={({ id: characterInWorkId, work_id: workId }) => {
-                                                if (removingId) return;
-                                                handleRemoveAppearance(workId, characterInWorkId);
-                                            }}
-                                        />
-                                    ) : (
-                                        <p className={styles.muted}>No appearances yet.</p>
-                                    ))}
-                            </section>
-
-                            {addTagOpen && (
-                                <dialog
-                                    ref={addTagRef}
-                                    aria-labelledby="add-tag-title"
-                                    onClose={() => setAddTagOpen(false)}
-                                >
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
-                                    >
-                                        <h3 id="add-tag-title" className={styles.modalTitle}>
-                                            Add tag
-                                        </h3>
-                                        <AddTagFields
-                                            onAdd={(k, v) => {
-                                                if (!k) return;
-                                                setAttrs(prev => ({ ...prev, [k]: v }));
-                                                setAddTagOpen(false);
-                                            }}
-                                            onCancel={() => setAddTagOpen(false)}
-                                        />
-                                    </form>
-                                </dialog>
-                            )}
-
-                            {addWorkOpen && (
-                                <dialog ref={addWorkRef} aria-labelledby="add-work-title" onClose={closeAddWorkModal}>
-                                    <form
-                                        method="dialog"
-                                        className={styles.modalBody}
-                                        onSubmit={e => e.preventDefault()}
-                                    >
-                                        <h3 id="add-work-title" className={styles.modalTitle}>
-                                            Add to work
-                                        </h3>
-
-                                        {possibleLoading && (
-                                            <p className={styles.muted} aria-live="polite">
-                                                Loading works...
-                                            </p>
-                                        )}
-                                        {!possibleLoading && possibleError && (
-                                            <p className={styles.error} role="alert">
-                                                {String(possibleError)}
-                                            </p>
-                                        )}
-
-                                        {!possibleLoading &&
-                                            !possibleError &&
-                                            (possibleWorks.length === 0 ? (
-                                                <p className={styles.muted}>No available works to add.</p>
-                                            ) : (
-                                                <ul className={styles.radioList}>
-                                                    {possibleWorks.map(w => (
-                                                        <li key={w.id}>
-                                                            <label className={styles.radioRow}>
-                                                                <input
-                                                                    type="radio"
-                                                                    name="work"
-                                                                    value={w.id}
-                                                                    checked={String(selectedWorkId) === String(w.id)}
-                                                                    onChange={e => setSelectedWorkId(e.target.value)}
-                                                                />
-                                                                <span>{w.content}</span>
-                                                            </label>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ))}
-
-                                        <div className={styles.modalActions}>
+                                <div className={styles.actions}>
+                                    {!editMode ? (
+                                        <>
                                             <button
                                                 type="button"
                                                 className="primaryBtn"
-                                                onClick={handleAddToWork}
-                                                disabled={adding || possibleLoading || !selectedWorkId}
+                                                onClick={handleEdit}
+                                                disabled={globalLoading}
                                             >
-                                                {adding ? 'Adding...' : 'Add'}
+                                                Edit
                                             </button>
-                                            <button type="button" onClick={closeAddWorkModal} disabled={adding}>
+                                            <button
+                                                type="button"
+                                                className="dangerBtn"
+                                                onClick={handleDelete}
+                                                disabled={globalLoading}
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="primaryBtn"
+                                                onClick={handleSave}
+                                                disabled={globalLoading}
+                                            >
+                                                Save
+                                            </button>
+                                            <button type="button" onClick={handleCancel} disabled={globalLoading}>
                                                 Cancel
                                             </button>
-                                        </div>
-                                    </form>
-                                </dialog>
-                            )}
-                        </>
-                    )}
-                </main>
+                                        </>
+                                    )}
+                                </div>
+                            </form>
+                        </section>
+                    </div>
+
+                    <section className={styles.card} aria-label="Character appearances">
+                        <div className={styles.subHeader}>
+                            <h2 className={styles.subTitle}>Appearances</h2>
+                            <button
+                                type="button"
+                                className="primaryBtn"
+                                onClick={openAddWorkModal}
+                                disabled={globalLoading}
+                                aria-label="Add to work"
+                                title="Add to work"
+                            >
+                                Add to work
+                            </button>
+                        </div>
+
+                        {appearancesError && (
+                            <p role="alert" className={styles.error}>
+                                {String(appearancesError)}
+                            </p>
+                        )}
+
+                        {!appearancesError &&
+                            (appearances.length > 0 ? (
+                                <List
+                                    items={appearances}
+                                    onRemove={({ id: characterInWorkId, work_id: workId }) => {
+                                        handleRemoveAppearance(workId, characterInWorkId);
+                                    }}
+                                />
+                            ) : (
+                                <p className={styles.muted}>No appearances yet.</p>
+                            ))}
+                    </section>
+                </>
             )}
-        </>
+
+            {addTagOpen && (
+                <dialog ref={addTagRef} aria-labelledby="add-tag-title" onClose={() => setAddTagOpen(false)}>
+                    <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                        <h3 id="add-tag-title" className={styles.modalTitle}>
+                            Add tag
+                        </h3>
+                        <AddTagFields
+                            onAdd={(k, v) => {
+                                if (!k) return;
+                                setAttrs(prev => ({ ...prev, [k]: v }));
+                                setAddTagOpen(false);
+                            }}
+                            onCancel={() => setAddTagOpen(false)}
+                        />
+                    </form>
+                </dialog>
+            )}
+
+            {addWorkOpen && (
+                <dialog ref={addWorkRef} aria-labelledby="add-work-title" onClose={closeAddWorkModal}>
+                    <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
+                        <h3 id="add-work-title" className={styles.modalTitle}>
+                            Add to work
+                        </h3>
+
+                        {possibleError && (
+                            <p className={styles.error} role="alert">
+                                {String(possibleError)}
+                            </p>
+                        )}
+
+                        {!possibleError &&
+                            (possibleWorks.length === 0 ? (
+                                <p className={styles.muted}>No available works to add.</p>
+                            ) : (
+                                <ul className={styles.radioList}>
+                                    {possibleWorks.map(w => (
+                                        <li key={w.id}>
+                                            <label className={styles.radioRow}>
+                                                <input
+                                                    type="radio"
+                                                    name="work"
+                                                    value={w.id}
+                                                    checked={String(selectedWorkId) === String(w.id)}
+                                                    onChange={e => setSelectedWorkId(e.target.value)}
+                                                />
+                                                <span>{w.content}</span>
+                                            </label>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ))}
+
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className="primaryBtn"
+                                onClick={handleAddToWork}
+                                disabled={globalLoading || !selectedWorkId}
+                            >
+                                Add
+                            </button>
+                            <button type="button" onClick={closeAddWorkModal}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </dialog>
+            )}
+        </main>
     );
 }
 

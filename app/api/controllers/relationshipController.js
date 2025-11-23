@@ -23,7 +23,7 @@ const createRelationship = async (req, res) => {
         ...req.body,
     });
 
-    res.status(201).json(relationship);
+    res.status(201).json({ ...relationship.toJSON(), from: characterInWork, to: characterInWorkTo });
 };
 
 const getRelationship = async (req, res) => {

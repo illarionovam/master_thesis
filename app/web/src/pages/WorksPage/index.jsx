@@ -3,7 +3,7 @@ import List from '../../components/List';
 import BulkPageLayout from '../../layouts/BulkPageLayout';
 
 import { getWorks, createWork } from '../../redux/works/operations';
-import { selectWorks, selectGetWorksLoading, selectGetWorksError } from '../../redux/works/selectors';
+import { selectWorks, selectGetWorksError } from '../../redux/works/selectors';
 import CreateWorkModal from '../../components/CreateWorkModal';
 
 export default function WorksPage() {
@@ -14,7 +14,6 @@ export default function WorksPage() {
             title="Works"
             fetchAction={getWorks}
             selectData={selectWorks}
-            selectLoading={selectGetWorksLoading}
             selectError={selectGetWorksError}
             render={items => <List items={items} />}
             CreateModal={CreateWorkModal}
