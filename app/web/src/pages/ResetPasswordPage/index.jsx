@@ -1,20 +1,16 @@
 import { useEffect, useId, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { confirmPassword } from '../../redux/auth/operations';
-import {
-    selectConfirmPasswordLoading,
-    selectConfirmPasswordError,
-    selectConfirmPasswordSuccess,
-} from '../../redux/auth/selectors';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 import styles from './ResetPasswordPage.module.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function ResetPasswordPage() {
     const titleId = useId();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const loading = useSelector(selectConfirmPasswordLoading);
-    const error = useSelector(selectConfirmPasswordError);
-    const success = useSelector(selectConfirmPasswordSuccess);
+    const globalLoading = useSelector(selectGlobalLoading);
 
     const [token, setToken] = useState('');
 
@@ -23,13 +19,14 @@ export default function ResetPasswordPage() {
         setToken(t);
     }, []);
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
         const new_password = (fd.get('new_password') || '').toString();
         if (!new_password || !token) return;
-        dispatch(confirmPassword({ token, new_password }));
+        await dispatch(confirmPassword({ token, new_password }));
         e.currentTarget.reset();
+        navigate('/');
     };
 
     return (
@@ -49,28 +46,17 @@ export default function ResetPasswordPage() {
                         type="password"
                         autoComplete="new-password"
                         required
-                        disabled={loading || !token}
+                        disabled={globalLoading || !token}
                         className={styles.input}
                     />
                 </div>
 
                 <div className={styles.actions}>
-                    <button type="submit" disabled={loading || !token} className="primaryBtn">
-                        {loading ? 'Submitting...' : 'Set New Password'}
+                    <button type="submit" disabled={globalLoading || !token} className="primaryBtn">
+                        Set New Password
                     </button>
                 </div>
             </form>
-
-            {success && (
-                <p aria-live="polite" className={styles.success}>
-                    Password changed.
-                </p>
-            )}
-            {error && (
-                <p role="alert" className={styles.error}>
-                    {error}
-                </p>
-            )}
         </main>
     );
 }

@@ -1,18 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetPassword } from '../../redux/auth/operations';
-import {
-    selectResetPasswordLoading,
-    selectResetPasswordError,
-    selectResetPasswordSuccess,
-} from '../../redux/auth/selectors';
 import styles from './ResetPasswordModal.module.css';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 export default function ResetPasswordModal({ onClose }) {
     const dispatch = useDispatch();
-    const loading = useSelector(selectResetPasswordLoading);
-    const error = useSelector(selectResetPasswordError);
-    const success = useSelector(selectResetPasswordSuccess);
+
+    const globalLoading = useSelector(selectGlobalLoading);
 
     const [email, setEmail] = useState('');
     const dialogRef = useRef(null);
@@ -26,13 +21,14 @@ export default function ResetPasswordModal({ onClose }) {
 
     const handleCancel = e => {
         e?.preventDefault?.();
-        if (!loading) onClose?.();
+        onClose?.();
     };
 
     const handleSubmit = e => {
         e.preventDefault();
         const emailTrim = email.trim();
         if (!emailTrim) return;
+        onClose?.();
         dispatch(resetPassword({ email: emailTrim }));
     };
 
@@ -56,22 +52,15 @@ export default function ResetPasswordModal({ onClose }) {
                         autoComplete="email"
                         required
                         className={styles.input}
-                        disabled={loading}
+                        disabled={globalLoading}
                     />
                 </div>
 
-                {error && (
-                    <p role="alert" className={styles.error}>
-                        {error}
-                    </p>
-                )}
-                {success && <p className={styles.success}>Reset link sent. Check your email!</p>}
-
                 <div className={styles.actions}>
-                    <button type="submit" className="primaryBtn" disabled={loading}>
-                        {loading ? 'Submitting...' : 'Reset'}
+                    <button type="submit" className="primaryBtn" disabled={globalLoading}>
+                        Reset
                     </button>
-                    <button type="button" onClick={handleCancel} disabled={loading}>
+                    <button type="button" onClick={handleCancel} disabled={globalLoading}>
                         Cancel
                     </button>
                 </div>

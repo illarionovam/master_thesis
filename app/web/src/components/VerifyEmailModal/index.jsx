@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { verifyEmail } from '../../redux/auth/operations';
-import { selectVerifyEmailLoading, selectVerifyEmailError, selectVerifyEmailSuccess } from '../../redux/auth/selectors';
 import styles from './VerifyEmailModal.module.css';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 export default function VerifyEmailModal({ onClose }) {
     const dispatch = useDispatch();
-    const loading = useSelector(selectVerifyEmailLoading);
-    const error = useSelector(selectVerifyEmailError);
-    const success = useSelector(selectVerifyEmailSuccess);
+
+    const globalLoading = useSelector(selectGlobalLoading);
 
     const [email, setEmail] = useState('');
     const dialogRef = useRef(null);
@@ -22,13 +21,14 @@ export default function VerifyEmailModal({ onClose }) {
 
     const handleCancel = e => {
         e?.preventDefault?.();
-        if (!loading) onClose?.();
+        onClose?.();
     };
 
     const handleSubmit = e => {
         e.preventDefault();
         const emailTrim = email.trim();
         if (!emailTrim) return;
+        onClose?.();
         dispatch(verifyEmail({ email: emailTrim }));
     };
 
@@ -52,22 +52,15 @@ export default function VerifyEmailModal({ onClose }) {
                         autoComplete="email"
                         required
                         className={styles.input}
-                        disabled={loading}
+                        disabled={globalLoading}
                     />
                 </div>
 
-                {error && (
-                    <p role="alert" className={styles.error}>
-                        {error}
-                    </p>
-                )}
-                {success && <p className={styles.success}>Verification link sent. Check your email!</p>}
-
                 <div className={styles.actions}>
-                    <button type="submit" className="primaryBtn" disabled={loading}>
-                        {loading ? 'Submitting...' : 'Verify'}
+                    <button type="submit" className="primaryBtn" disabled={globalLoading}>
+                        Verify
                     </button>
-                    <button type="button" onClick={handleCancel} disabled={loading}>
+                    <button type="button" onClick={handleCancel} disabled={globalLoading}>
                         Cancel
                     </button>
                 </div>
