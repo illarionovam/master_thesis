@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { generateCharacterImage, updateCharacter } from '../../redux/characters/operations';
 import { generateCharacterInWorkImage, updateCharacterInWork } from '../../redux/works/operations';
+import { uploadImageHelper } from '../../redux/helpers/operations';
 import { selectGenerateCharacterImageError } from '../../redux/characters/selectors';
 import { selectGenerateCharacterInWorkImageError } from '../../redux/works/selectors';
+import { selectUploadImageError } from '../../redux/helpers/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-import { uploadImage } from '../../api/upload';
 import styles from './ImageSection.module.css';
 
 export default function CharacterImageSection({ characterId, workId, ciwId, name, imageUrl }) {
@@ -16,6 +17,8 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
 
     const generateError = useSelector(selectGenerateCharacterImageError);
     const generateErrorCIW = useSelector(selectGenerateCharacterInWorkImageError);
+
+    const uploadImageError = useSelector(selectUploadImageError);
 
     const [previewUrl, setPreviewUrl] = useState('');
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -44,22 +47,19 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
         } else if (characterId) {
             dispatch(generateCharacterImage(characterId));
         }
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
+
         setPreviewUrl('');
     };
 
     const handleUploadImage = async file => {
         if (!file) return;
 
+        setUploadOpen(false);
+
         const fd = new FormData();
         fd.append('file', file);
 
-        const res = await uploadImage(fd);
-        const url = res?.url;
-
-        if (!url || typeof url !== 'string') {
-            throw new Error('Upload succeeded but no URL was returned');
-        }
+        const { url } = await dispatch(uploadImageHelper(fd)).unwrap();
 
         if (ciwId && workId) {
             dispatch(
@@ -73,7 +73,6 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
             dispatch(updateCharacter({ id: characterId, data: { image_url: url } }));
         }
 
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
         setPreviewUrl('');
     };
 
@@ -100,6 +99,11 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
                 {generateErrorCIW && (
                     <p role="alert" className={styles.error}>
                         {String(generateErrorCIW)}
+                    </p>
+                )}
+                {uploadImageError && (
+                    <p role="alert" className={styles.error}>
+                        {uploadImageError}
                     </p>
                 )}
                 <div className={styles.imageActions}>
@@ -153,11 +157,9 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
                                         const file = inputEl.files?.[0];
                                         if (!file) return;
 
-                                        if (previewUrl) URL.revokeObjectURL(previewUrl);
                                         setPreviewUrl(URL.createObjectURL(file));
 
                                         await handleUploadImage(file);
-                                        setUploadOpen(false);
                                         inputEl.value = '';
                                     }}
                                     disabled={globalLoading}
@@ -169,7 +171,6 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
                             <button
                                 type="button"
                                 onClick={() => {
-                                    if (previewUrl) URL.revokeObjectURL(previewUrl);
                                     setPreviewUrl('');
                                     setUploadOpen(false);
                                 }}
