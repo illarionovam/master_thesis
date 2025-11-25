@@ -218,7 +218,6 @@ export default function CharacterInWorkDetailsPage() {
                                 ciwId={characterInWorkId}
                                 name={ciw.name}
                                 imageUrl={ciw.image_url ?? ciw.character.image_url}
-                                disableAll={globalLoading}
                             />
                         </section>
                         <section className={styles.card} aria-label="Character in work">

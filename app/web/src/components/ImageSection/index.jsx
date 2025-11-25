@@ -2,28 +2,22 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { generateCharacterImage, updateCharacter } from '../../redux/characters/operations';
 import { generateCharacterInWorkImage, updateCharacterInWork } from '../../redux/works/operations';
-import {
-    selectGenerateCharacterImageLoading,
-    selectGenerateCharacterImageError,
-} from '../../redux/characters/selectors';
-import {
-    selectGenerateCharacterInWorkImageError,
-    selectGenerateCharacterInWorkImageLoading,
-} from '../../redux/works/selectors';
+import { selectGenerateCharacterImageError } from '../../redux/characters/selectors';
+import { selectGenerateCharacterInWorkImageError } from '../../redux/works/selectors';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
+
 import { uploadImage } from '../../api/upload';
 import styles from './ImageSection.module.css';
 
-export default function CharacterImageSection({ characterId, workId, ciwId, name, imageUrl, disableAll }) {
+export default function CharacterImageSection({ characterId, workId, ciwId, name, imageUrl }) {
     const dispatch = useDispatch();
 
-    const generateLoading = useSelector(selectGenerateCharacterImageLoading);
-    const generateLoadingCIW = useSelector(selectGenerateCharacterInWorkImageLoading);
+    const globalLoading = useSelector(selectGlobalLoading);
+
     const generateError = useSelector(selectGenerateCharacterImageError);
     const generateErrorCIW = useSelector(selectGenerateCharacterInWorkImageError);
 
     const [previewUrl, setPreviewUrl] = useState('');
-    const [uploading, setUploading] = useState(false);
-    const [uploadError, setUploadError] = useState('');
     const [uploadOpen, setUploadOpen] = useState(false);
 
     const uploadRef = useRef(null);
@@ -46,62 +40,41 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
 
     const handleGenerateImage = async () => {
         if (ciwId && workId) {
-            const action = await dispatch(generateCharacterInWorkImage({ workId, characterInWorkId: ciwId }));
-            if (generateCharacterInWorkImage.fulfilled.match(action)) {
-                if (previewUrl) URL.revokeObjectURL(previewUrl);
-                setPreviewUrl('');
-                setUploadError('');
-            }
+            dispatch(generateCharacterInWorkImage({ workId, characterInWorkId: ciwId }));
         } else if (characterId) {
-            const action = await dispatch(generateCharacterImage(characterId));
-            if (generateCharacterImage.fulfilled.match(action)) {
-                if (previewUrl) URL.revokeObjectURL(previewUrl);
-                setPreviewUrl('');
-                setUploadError('');
-            }
+            dispatch(generateCharacterImage(characterId));
         }
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl('');
     };
 
     const handleUploadImage = async file => {
         if (!file) return;
-        try {
-            setUploading(true);
-            setUploadError('');
 
-            const fd = new FormData();
-            fd.append('file', file);
+        const fd = new FormData();
+        fd.append('file', file);
 
-            const res = await uploadImage(fd);
-            const url = res?.url;
+        const res = await uploadImage(fd);
+        const url = res?.url;
 
-            if (!url || typeof url !== 'string') {
-                throw new Error('Upload succeeded but no URL was returned');
-            }
-
-            if (ciwId && workId) {
-                const action = await dispatch(
-                    updateCharacterInWork({
-                        workId,
-                        characterInWorkId: ciwId,
-                        data: { image_url: url },
-                    })
-                );
-                if (updateCharacterInWork.fulfilled.match(action)) {
-                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                    setPreviewUrl('');
-                }
-            } else if (characterId) {
-                const action = await dispatch(updateCharacter({ id: characterId, data: { image_url: url } }));
-                if (updateCharacter.fulfilled.match(action)) {
-                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                    setPreviewUrl('');
-                }
-            }
-        } catch (err) {
-            setUploadError(err?.message || 'Failed to upload image');
-        } finally {
-            setUploading(false);
+        if (!url || typeof url !== 'string') {
+            throw new Error('Upload succeeded but no URL was returned');
         }
+
+        if (ciwId && workId) {
+            dispatch(
+                updateCharacterInWork({
+                    workId,
+                    characterInWorkId: ciwId,
+                    data: { image_url: url },
+                })
+            );
+        } else if (characterId) {
+            dispatch(updateCharacter({ id: characterId, data: { image_url: url } }));
+        }
+
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl('');
     };
 
     return (
@@ -134,17 +107,17 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
                         type="button"
                         className="primaryBtn"
                         onClick={() => setUploadOpen(true)}
-                        disabled={uploading || disableAll || generateLoading || generateLoadingCIW}
+                        disabled={globalLoading}
                         aria-label="Upload and attach image"
                         title="Upload and attach image"
                     >
-                        {uploading ? 'Uploading...' : 'Upload & Attach'}
+                        Upload & Attach
                     </button>
                     <button
                         type="button"
                         className="primaryBtn"
                         onClick={handleGenerateImage}
-                        disabled={generateLoading || disableAll || uploading || generateLoadingCIW}
+                        disabled={globalLoading}
                         aria-label="Generate image"
                         title="Generate image"
                     >
@@ -176,7 +149,6 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
                                     type="file"
                                     accept="image/*"
                                     onChange={async e => {
-                                        setUploadError('');
                                         const inputEl = e.currentTarget;
                                         const file = inputEl.files?.[0];
                                         if (!file) return;
@@ -188,27 +160,20 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
                                         setUploadOpen(false);
                                         inputEl.value = '';
                                     }}
-                                    disabled={uploading || disableAll}
+                                    disabled={globalLoading}
                                 />
                             </label>
                         </div>
-
-                        {uploadError && (
-                            <p role="alert" className={styles.error}>
-                                {uploadError}
-                            </p>
-                        )}
 
                         <div className={styles.modalActions}>
                             <button
                                 type="button"
                                 onClick={() => {
-                                    setUploadError('');
                                     if (previewUrl) URL.revokeObjectURL(previewUrl);
                                     setPreviewUrl('');
                                     setUploadOpen(false);
                                 }}
-                                disabled={uploading}
+                                disabled={globalLoading}
                             >
                                 Cancel
                             </button>

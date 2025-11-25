@@ -24,7 +24,7 @@ export const getCharacter = createAsyncThunk('characters/getCharacter', async (i
 );
 
 export const generateCharacterImage = createAsyncThunk(
-    'works/generateCharacterImage',
+    'characters/generateCharacterImage',
     async (id, { rejectWithValue }) => wrapper(generateAppUserCharacterImage, rejectWithValue)(id)
 );
 

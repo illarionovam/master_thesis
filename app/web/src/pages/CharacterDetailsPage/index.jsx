@@ -207,7 +207,6 @@ export default function CharacterDetailsPage() {
                                 characterId={id}
                                 name={character.name}
                                 imageUrl={character.image_url}
-                                disableAll={globalLoading}
                             />
                         </section>
 
