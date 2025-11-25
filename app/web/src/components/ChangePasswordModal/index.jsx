@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styles from './ChangePasswordModal.module.css';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-export default function ChangePasswordModal({ open, onClose, onSubmit, loading, apiError }) {
+export default function ChangePasswordModal({ open, onClose, onSubmit, apiError }) {
+    const globalLoading = useSelector(selectGlobalLoading);
+
     const dialogRef = useRef(null);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -45,7 +49,7 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
                             autoComplete="current-password"
                             required
                             className={styles.input}
-                            disabled={loading}
+                            disabled={globalLoading}
                         />
                     </label>
 
@@ -60,7 +64,7 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
                             required
                             minLength={8}
                             className={styles.input}
-                            disabled={loading}
+                            disabled={globalLoading}
                         />
                     </label>
 
@@ -72,10 +76,10 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, loading, 
                 </div>
 
                 <div className={styles.actions}>
-                    <button type="submit" disabled={loading} className="primaryBtn">
-                        {loading ? 'Saving...' : 'Save'}
+                    <button type="submit" disabled={globalLoading} className="primaryBtn">
+                        Save
                     </button>
-                    <button type="button" onClick={onClose} disabled={loading}>
+                    <button type="button" onClick={onClose} disabled={globalLoading}>
                         Cancel
                     </button>
                 </div>

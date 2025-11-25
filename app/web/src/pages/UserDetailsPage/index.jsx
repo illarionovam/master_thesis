@@ -5,13 +5,11 @@ import { getUserInfo, signOut, updateUser, updateUserEmail } from '../../redux/a
 
 import {
     selectUser,
-    selectGetUserInfoLoading,
     selectGetUserInfoError,
-    selectUpdateUserLoading,
     selectUpdateUserError,
-    selectUpdateUserEmailLoading,
     selectUpdateUserEmailError,
 } from '../../redux/auth/selectors';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
 import { resetChangePassword } from '../../redux/auth/slice';
 
@@ -23,14 +21,13 @@ export default function UserDetailPage() {
     const titleId = useId();
     const dispatch = useDispatch();
 
+    const globalLoading = useSelector(selectGlobalLoading);
+
     const user = useSelector(selectUser);
-    const loading = useSelector(selectGetUserInfoLoading);
     const error = useSelector(selectGetUserInfoError);
 
-    const updateLoading = useSelector(selectUpdateUserLoading);
     const updateError = useSelector(selectUpdateUserError);
 
-    const emailLoading = useSelector(selectUpdateUserEmailLoading);
     const emailError = useSelector(selectUpdateUserEmailError);
 
     const [editMode, setEditMode] = useState(false);
@@ -42,10 +39,10 @@ export default function UserDetailPage() {
     const formRef = useRef(null);
 
     useEffect(() => {
-        dispatch(getUserInfo());
-    }, [dispatch]);
-
-    const disableAll = loading || updateLoading || emailLoading;
+        if (!user) {
+            dispatch(getUserInfo());
+        }
+    }, [dispatch, user]);
 
     const handleEdit = () => setEditMode(true);
     const handleCancelEdit = () => {
@@ -60,10 +57,8 @@ export default function UserDetailPage() {
         const nameRaw = fd.get('name')?.toString().trim() ?? '';
         const name = nameRaw === '' ? null : nameRaw;
 
-        const action = await dispatch(updateUser({ username, name }));
-        if (updateUser.fulfilled.match(action)) {
-            setEditMode(false);
-        }
+        setEditMode(false);
+        dispatch(updateUser({ username, name }));
     };
 
     const handleStartEmailEdit = () => setEmailEdit(true);
@@ -76,10 +71,8 @@ export default function UserDetailPage() {
         const email = fd.get('email')?.toString().trim();
         if (!email) return;
 
-        const action = await dispatch(updateUserEmail({ new_email: email }));
-        if (updateUserEmail.fulfilled.match(action)) {
-            setEmailEdit(false);
-        }
+        setEmailEdit(false);
+        dispatch(updateUserEmail({ new_email: email }));
     };
 
     const handleOpenChangePass = () => {
@@ -88,10 +81,8 @@ export default function UserDetailPage() {
     };
     const handleCloseChangePass = () => setCpOpen(false);
     const handleSubmitChangePass = async ({ current_password, new_password }) => {
-        const action = await dispatch(updateUser({ password: current_password, new_password }));
-        if (updateUser.fulfilled.match(action)) {
-            setCpOpen(false);
-        }
+        setCpOpen(false);
+        dispatch(updateUser({ password: current_password, new_password }));
     };
 
     const handleSignOut = () => setSignoutOpen(true);
@@ -107,17 +98,17 @@ export default function UserDetailPage() {
 
     return (
         <main aria-labelledby={titleId} className="page centered">
-            <section className={styles.card} aria-busy={disableAll ? 'true' : 'false'}>
-                <h1 id={titleId} className={styles.title}>
-                    User
-                </h1>
-                {error && (
-                    <p role="alert" className={styles.error}>
-                        {error.message ?? String(error)}
-                    </p>
-                )}
+            {error && (
+                <p role="alert" className={styles.error}>
+                    {error.message ?? String(error)}
+                </p>
+            )}
 
-                {!loading && !error && user && (
+            {!globalLoading && !error && user && (
+                <section className={styles.card} aria-busy={globalLoading ? 'true' : 'false'}>
+                    <h1 id={titleId} className={styles.title}>
+                        User
+                    </h1>
                     <form
                         ref={formRef}
                         className={styles.form}
@@ -141,14 +132,14 @@ export default function UserDetailPage() {
                                     type="email"
                                     defaultValue={user.email ?? ''}
                                     className={styles.input}
-                                    disabled={disableAll || !emailEdit}
+                                    disabled={globalLoading || !emailEdit}
                                     autoComplete="email"
                                     required
                                 />
                             </div>
 
                             {!emailEdit ? (
-                                <button type="button" onClick={handleStartEmailEdit} disabled={disableAll}>
+                                <button type="button" onClick={handleStartEmailEdit} disabled={globalLoading}>
                                     Change email
                                 </button>
                             ) : (
@@ -157,11 +148,11 @@ export default function UserDetailPage() {
                                         type="button"
                                         className="primaryBtn"
                                         onClick={handleSaveEmail}
-                                        disabled={emailLoading}
+                                        disabled={globalLoading}
                                     >
                                         Save
                                     </button>
-                                    <button type="button" onClick={handleCancelEmailEdit} disabled={emailLoading}>
+                                    <button type="button" onClick={handleCancelEmailEdit} disabled={globalLoading}>
                                         Cancel
                                     </button>
                                 </div>
@@ -183,7 +174,7 @@ export default function UserDetailPage() {
                                 type="text"
                                 defaultValue={user.username ?? ''}
                                 className={styles.input}
-                                disabled={disableAll || !editMode}
+                                disabled={globalLoading || !editMode}
                                 autoComplete="username"
                             />
                         </div>
@@ -198,7 +189,7 @@ export default function UserDetailPage() {
                                 type="text"
                                 defaultValue={user.name ?? ''}
                                 className={styles.input}
-                                disabled={disableAll || !editMode}
+                                disabled={globalLoading || !editMode}
                                 autoComplete="name"
                             />
                         </div>
@@ -216,12 +207,12 @@ export default function UserDetailPage() {
                                         type="button"
                                         className="primaryBtn"
                                         onClick={handleEdit}
-                                        disabled={disableAll}
+                                        disabled={globalLoading}
                                     >
                                         Edit
                                     </button>
 
-                                    <button type="button" onClick={handleOpenChangePass} disabled={disableAll}>
+                                    <button type="button" onClick={handleOpenChangePass} disabled={globalLoading}>
                                         Change password
                                     </button>
 
@@ -229,7 +220,7 @@ export default function UserDetailPage() {
                                         type="button"
                                         className="dangerBtn"
                                         onClick={handleSignOut}
-                                        disabled={disableAll}
+                                        disabled={globalLoading}
                                     >
                                         Sign out
                                     </button>
@@ -240,25 +231,24 @@ export default function UserDetailPage() {
                                         type="button"
                                         className="primaryBtn"
                                         onClick={handleSaveEdit}
-                                        disabled={updateLoading}
+                                        disabled={globalLoading}
                                     >
                                         Save
                                     </button>
-                                    <button type="button" onClick={handleCancelEdit} disabled={updateLoading}>
+                                    <button type="button" onClick={handleCancelEdit} disabled={globalLoading}>
                                         Cancel
                                     </button>
                                 </>
                             )}
                         </div>
                     </form>
-                )}
-            </section>
+                </section>
+            )}
 
             <ChangePasswordModal
                 open={cpOpen}
                 onClose={handleCloseChangePass}
                 onSubmit={handleSubmitChangePass}
-                loading={updateLoading}
                 apiError={updateError}
             />
 
