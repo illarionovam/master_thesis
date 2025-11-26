@@ -18,14 +18,14 @@ const initialState = {
     user: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null,
 
     signUp: { ...op, success: false },
-    signIn: { ...op, result: null },
-    verifyEmail: { ...op, success: false },
-    resetPassword: { ...op, success: false },
+    signIn: { ...op },
+    verifyEmail: { ...op },
+    resetPassword: { ...op },
     getUserInfo: { ...op },
     updateUser: { ...op },
-    updateUserEmail: { ...op, success: false },
-    confirmEmail: { ...op, success: false },
-    confirmPassword: { ...op, success: false },
+    updateUserEmail: { ...op },
+    confirmEmail: { ...op },
+    confirmPassword: { ...op },
 };
 
 const authSlice = createSlice({
@@ -40,7 +40,6 @@ const authSlice = createSlice({
         resetSignIn(state) {
             state.signIn.loading = false;
             state.signIn.error = null;
-            state.signIn.result = null;
         },
         resetChangePassword(state) {
             state.updateUser.loading = false;
@@ -78,7 +77,6 @@ const authSlice = createSlice({
             })
             .addCase(signIn.fulfilled, (state, action) => {
                 state.signIn.loading = false;
-                state.signIn.result = action.payload;
 
                 const { token, ...user } = action.payload;
                 state.token = token;
@@ -104,11 +102,9 @@ const authSlice = createSlice({
             .addCase(verifyEmail.pending, state => {
                 state.verifyEmail.loading = true;
                 state.verifyEmail.error = null;
-                state.verifyEmail.success = false;
             })
             .addCase(verifyEmail.fulfilled, state => {
                 state.verifyEmail.loading = false;
-                state.verifyEmail.success = true;
             })
             .addCase(verifyEmail.rejected, (state, action) => {
                 state.verifyEmail.loading = false;
@@ -118,11 +114,9 @@ const authSlice = createSlice({
             .addCase(resetPassword.pending, state => {
                 state.resetPassword.loading = true;
                 state.resetPassword.error = null;
-                state.resetPassword.success = false;
             })
             .addCase(resetPassword.fulfilled, state => {
                 state.resetPassword.loading = false;
-                state.resetPassword.success = true;
             })
             .addCase(resetPassword.rejected, (state, action) => {
                 state.resetPassword.loading = false;
@@ -166,11 +160,9 @@ const authSlice = createSlice({
             .addCase(updateUserEmail.pending, state => {
                 state.updateUserEmail.loading = true;
                 state.updateUserEmail.error = null;
-                state.updateUserEmail.success = false;
             })
             .addCase(updateUserEmail.fulfilled, state => {
                 state.updateUserEmail.loading = false;
-                state.updateUserEmail.success = true;
             })
             .addCase(updateUserEmail.rejected, (state, action) => {
                 state.updateUserEmail.loading = false;
@@ -180,11 +172,9 @@ const authSlice = createSlice({
             .addCase(confirmEmail.pending, state => {
                 state.confirmEmail.loading = true;
                 state.confirmEmail.error = null;
-                state.confirmEmail.success = false;
             })
             .addCase(confirmEmail.fulfilled, state => {
                 state.confirmEmail.loading = false;
-                state.confirmEmail.success = true;
             })
             .addCase(confirmEmail.rejected, (state, action) => {
                 state.confirmEmail.loading = false;
@@ -194,11 +184,9 @@ const authSlice = createSlice({
             .addCase(confirmPassword.pending, state => {
                 state.confirmPassword.loading = true;
                 state.confirmPassword.error = null;
-                state.confirmPassword.success = false;
             })
             .addCase(confirmPassword.fulfilled, state => {
                 state.confirmPassword.loading = false;
-                state.confirmPassword.success = true;
             })
             .addCase(confirmPassword.rejected, (state, action) => {
                 state.confirmPassword.loading = false;

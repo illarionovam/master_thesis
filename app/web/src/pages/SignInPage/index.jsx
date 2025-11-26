@@ -3,7 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { signIn } from '../../redux/auth/operations';
 import { resetSignIn } from '../../redux/auth/slice';
-import { selectSignInError, selectToken } from '../../redux/auth/selectors';
+import {
+    selectSignInError,
+    selectToken,
+    selectVerifyEmailError,
+    selectResetPasswordError,
+} from '../../redux/auth/selectors';
 import ResetPasswordModal from '../../components/ResetPasswordModal';
 import VerifyEmailModal from '../../components/VerifyEmailModal';
 import styles from './SignInPage.module.css';
@@ -20,6 +25,8 @@ export default function SignInPage() {
     const token = useSelector(selectToken);
 
     const error = useSelector(selectSignInError);
+    const verifyEmailError = useSelector(selectVerifyEmailError);
+    const resetPasswordError = useSelector(selectResetPasswordError);
 
     const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
     const [isVerifyEmailModalOpen, setIsVerifyEmailModalOpen] = useState(false);
@@ -96,6 +103,18 @@ export default function SignInPage() {
                         {error && (
                             <p role="alert" className={styles.error}>
                                 {error}
+                            </p>
+                        )}
+
+                        {verifyEmailError && (
+                            <p role="alert" className={styles.error}>
+                                {verifyEmailError}
+                            </p>
+                        )}
+
+                        {resetPasswordError && (
+                            <p role="alert" className={styles.error}>
+                                {resetPasswordError}
                             </p>
                         )}
 

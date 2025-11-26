@@ -1,17 +1,38 @@
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useId } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { confirmEmail } from '../../redux/auth/operations';
 import { useNavigate } from 'react-router-dom';
+import { selectConfirmEmailError } from '../../redux/auth/selectors';
+import styles from './ConfirmEmailPage.module.css';
 
 export default function ConfirmEmailPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const titleId = useId();
+
+    const confirmEmailError = useSelector(selectConfirmEmailError);
 
     useEffect(() => {
-        let t = window.location.hash ? window.location.hash.slice(1) : '';
-        if (t) dispatch(confirmEmail(t));
-        navigate('/');
+        const t = window.location.hash ? window.location.hash.slice(1) : '';
+        if (!t) return;
+
+        const run = async () => {
+            const action = await dispatch(confirmEmail(t));
+            if (confirmEmail.fulfilled.match(action)) {
+                navigate('/', { replace: true });
+            }
+        };
+
+        run();
     }, [dispatch, navigate]);
 
-    return <></>;
+    return (
+        <main aria-labelledby={titleId} className="page">
+            {confirmEmailError && (
+                <p role="alert" className={styles.error}>
+                    {confirmEmailError}
+                </p>
+            )}
+        </main>
+    );
 }
