@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import styles from './CreateLocationModal.module.css';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-export default function CreateLocationModal({
-    open,
-    onClose,
-    onSubmit,
-    submitting = false,
-    error = null,
-    parentOptions = [],
-}) {
+export default function CreateLocationModal({ open, onClose, onSubmit, error = null, parentOptions = [] }) {
     const dialogRef = useRef(null);
+
+    const globalLoading = useSelector(selectGlobalLoading);
 
     const [title, setTitle] = useState('');
     const [parentId, setParentId] = useState('');
@@ -66,7 +63,7 @@ export default function CreateLocationModal({
                         required
                         placeholder="e.g., Northern Outpost"
                         className={styles.input}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -79,7 +76,7 @@ export default function CreateLocationModal({
                         value={parentId}
                         onChange={e => setParentId(e.target.value)}
                         className={styles.input}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     >
                         <option value="">— None —</option>
                         {parentOptions.map(opt => (
@@ -102,7 +99,7 @@ export default function CreateLocationModal({
                         required
                         placeholder="Short description..."
                         className={`${styles.input} ${styles.textarea}`}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -113,11 +110,11 @@ export default function CreateLocationModal({
                 )}
 
                 <div className={styles.actions}>
-                    <button type="button" onClick={onClose} disabled={submitting}>
+                    <button type="button" onClick={onClose} disabled={globalLoading}>
                         Cancel
                     </button>
-                    <button type="submit" className="primaryBtn" disabled={!isValid || submitting}>
-                        {submitting ? 'Submitting...' : 'Create'}
+                    <button type="submit" className="primaryBtn" disabled={!isValid || globalLoading}>
+                        Create
                     </button>
                 </div>
             </form>

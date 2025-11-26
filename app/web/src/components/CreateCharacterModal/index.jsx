@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import styles from './CreateCharacterModal.module.css';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-export default function CreateCharacterModal({ open, onClose, onSubmit, submitting = false, error = null }) {
+export default function CreateCharacterModal({ open, onClose, onSubmit, error = null }) {
     const dialogRef = useRef(null);
+
+    const globalLoading = useSelector(selectGlobalLoading);
 
     const [name, setName] = useState('');
     const [appearance, setAppearance] = useState('');
@@ -69,7 +73,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, submitti
                         required
                         placeholder="e.g., Tyrel"
                         className={styles.input}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -85,7 +89,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, submitti
                         required
                         placeholder="Short appearance description..."
                         className={`${styles.input} ${styles.textarea}`}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -101,7 +105,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, submitti
                         required
                         placeholder="Key personality traits..."
                         className={`${styles.input} ${styles.textarea}`}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -117,7 +121,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, submitti
                         required
                         placeholder="Backstory / biography..."
                         className={`${styles.input} ${styles.textarea}`}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -128,11 +132,11 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, submitti
                 )}
 
                 <div className={styles.actions}>
-                    <button type="button" onClick={onClose} disabled={submitting}>
+                    <button type="button" onClick={onClose} disabled={globalLoading}>
                         Cancel
                     </button>
-                    <button type="submit" className="primaryBtn" disabled={!isValid || submitting}>
-                        {submitting ? 'Submitting...' : 'Create'}
+                    <button type="submit" className="primaryBtn" disabled={!isValid || globalLoading}>
+                        Create
                     </button>
                 </div>
             </form>

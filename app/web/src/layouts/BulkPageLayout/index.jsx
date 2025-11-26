@@ -47,12 +47,15 @@ export default function BulkPageLayout({
 
     return (
         <main aria-labelledby={titleId} className="page">
-            <div className={styles.header}>
-                <Title id={titleId}>{title}</Title>
-            </div>
-
             {error && <p role="alert">{error}</p>}
-            {!globalLoading && !error && render?.(data)}
+            {!globalLoading && !error && data && (
+                <>
+                    <div className={styles.header}>
+                        <Title id={titleId}>{title}</Title>
+                    </div>
+                    {render?.(data)}
+                </>
+            )}
 
             {CreateModal && createAction && (
                 <>
@@ -75,7 +78,6 @@ export default function BulkPageLayout({
                             mode="create"
                             onClose={handleCloseCreate}
                             onSubmit={handleSubmitCreate}
-                            submitting={globalLoading}
                             error={error}
                         />
                     )}

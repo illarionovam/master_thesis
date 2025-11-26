@@ -41,18 +41,18 @@ export default function CharacterInWorkDetailsPage() {
     const globalLoading = useSelector(selectGlobalLoading);
 
     const ciw = useSelector(selectCharacterInWork);
+    const events = useSelector(selectGetEventsByCharacterInWorkId);
+    const relationships = useSelector(selectCharacterInWorkRelationships);
+    const possibleRels = useSelector(selectCharacterInWorkPossibleRelationships);
+
     const error = useSelector(selectGetCharacterInWorkError);
+    const eventsError = useSelector(selectGetEventsByCharacterInWorkIdError);
+    const relError = useSelector(selectGetCharacterInWorkRelationshipsError);
+    const possibleRelError = useSelector(selectGetCharacterInWorkPossibleRelationshipsError);
 
     const updateError = useSelector(selectUpdateCharacterInWorkError);
 
-    const eventsError = useSelector(selectGetEventsByCharacterInWorkIdError);
-    const events = useSelector(selectGetEventsByCharacterInWorkId);
-
-    const relError = useSelector(selectGetCharacterInWorkRelationshipsError);
-    const relationships = useSelector(selectCharacterInWorkRelationships);
-
-    const possibleRelError = useSelector(selectGetCharacterInWorkPossibleRelationshipsError);
-    const possibleRels = useSelector(selectCharacterInWorkPossibleRelationships);
+    const globalError = error ?? eventsError ?? relError ?? possibleRelError;
 
     const [editMode, setEditMode] = useState(false);
     const [currentAttrs, setCurrentAttrs] = useState({});
@@ -172,13 +172,13 @@ export default function CharacterInWorkDetailsPage() {
 
     return (
         <main aria-labelledby={titleId} className="page">
-            {error && (
+            {globalError && (
                 <p role="alert" className={styles.error}>
-                    {String(error)}
+                    {globalError}
                 </p>
             )}
 
-            {!globalLoading && !error && ciw && (
+            {!globalLoading && !globalError && ciw && events && relationships && possibleRels && (
                 <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
@@ -212,7 +212,7 @@ export default function CharacterInWorkDetailsPage() {
                     </div>
 
                     <div className={styles.split}>
-                        <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
+                        <section className={`card ${styles.imageCard}`} aria-label="Character image">
                             <ImageSection
                                 workId={workId}
                                 ciwId={characterInWorkId}
@@ -220,7 +220,7 @@ export default function CharacterInWorkDetailsPage() {
                                 imageUrl={ciw.image_url ?? ciw.character.image_url}
                             />
                         </section>
-                        <section className={styles.card} aria-label="Character in work">
+                        <section className="card" aria-label="Character in work">
                             <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
                                 <div className={styles.field}>
                                     <label className={styles.label}>Character Name</label>
@@ -360,21 +360,10 @@ export default function CharacterInWorkDetailsPage() {
                         </section>
                     </div>
 
-                    <section className={styles.card} aria-label="Used in events">
+                    <section className="card" aria-label="Used in events">
                         <h2 className={styles.subTitle}>Used in events</h2>
 
-                        {eventsError && (
-                            <p role="alert" className={styles.error}>
-                                {String(eventsError)}
-                            </p>
-                        )}
-
-                        {!eventsError &&
-                            (events.length > 0 ? (
-                                <List items={events} />
-                            ) : (
-                                <p className={styles.muted}>No events yet.</p>
-                            ))}
+                        {events.length > 0 ? <List items={events} /> : <p className={styles.muted}>No events yet.</p>}
                     </section>
 
                     <button
@@ -389,7 +378,7 @@ export default function CharacterInWorkDetailsPage() {
                         </svg>
                     </button>
 
-                    <section className={styles.card} aria-label="Relationships">
+                    <section className="card" aria-label="Relationships">
                         <div className={styles.subHeader}>
                             <h2 className={styles.subTitle}>Relationships</h2>
                             <button
@@ -404,23 +393,16 @@ export default function CharacterInWorkDetailsPage() {
                             </button>
                         </div>
 
-                        {relError && (
-                            <p role="alert" className={styles.error}>
-                                {String(relError)}
-                            </p>
+                        {relationships.length > 0 ? (
+                            <List
+                                items={relationships}
+                                onRemove={({ id: relationshipId, work_id: workId }) => {
+                                    handleRemoveRelationship(workId, relationshipId);
+                                }}
+                            />
+                        ) : (
+                            <p className={styles.muted}>No relationships yet.</p>
                         )}
-
-                        {!relError &&
-                            (relationships.length > 0 ? (
-                                <List
-                                    items={relationships}
-                                    onRemove={({ id: relationshipId, work_id: workId }) => {
-                                        handleRemoveRelationship(workId, relationshipId);
-                                    }}
-                                />
-                            ) : (
-                                <p className={styles.muted}>No relationships yet.</p>
-                            ))}
                     </section>
                 </>
             )}
@@ -432,33 +414,26 @@ export default function CharacterInWorkDetailsPage() {
                             Add relationship
                         </h3>
 
-                        {possibleRelError && (
-                            <p className={styles.error} role="alert">
-                                {String(possibleRelError)}
-                            </p>
+                        {possibleRels.length === 0 ? (
+                            <p className={styles.muted}>No available characters to relate.</p>
+                        ) : (
+                            <ul className={styles.radioList}>
+                                {possibleRels.map(t => (
+                                    <li key={t.id}>
+                                        <label className={styles.radioRow}>
+                                            <input
+                                                type="radio"
+                                                name="rel-target"
+                                                value={t.id}
+                                                checked={String(selectedTargetId) === String(t.id)}
+                                                onChange={e => setSelectedTargetId(e.target.value)}
+                                            />
+                                            <span>{t.content}</span>
+                                        </label>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
-
-                        {!possibleRelError &&
-                            (possibleRels.length === 0 ? (
-                                <p className={styles.muted}>No available characters to relate.</p>
-                            ) : (
-                                <ul className={styles.radioList}>
-                                    {possibleRels.map(t => (
-                                        <li key={t.id}>
-                                            <label className={styles.radioRow}>
-                                                <input
-                                                    type="radio"
-                                                    name="rel-target"
-                                                    value={t.id}
-                                                    checked={String(selectedTargetId) === String(t.id)}
-                                                    onChange={e => setSelectedTargetId(e.target.value)}
-                                                />
-                                                <span>{t.content}</span>
-                                            </label>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ))}
 
                         <div className={styles.field}>
                             <label className={styles.label}>

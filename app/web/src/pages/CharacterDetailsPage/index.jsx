@@ -40,17 +40,17 @@ export default function CharacterDetailsPage() {
     const globalLoading = useSelector(selectGlobalLoading);
 
     const character = useSelector(selectCharacter);
+    const appearances = useSelector(selectCharacterAppearances);
+    const possibleWorks = useSelector(selectCharacterPossibleAppearances);
+
     const error = useSelector(selectGetCharacterError);
+    const appearancesError = useSelector(selectGetCharacterAppearancesError);
+    const possibleError = useSelector(selectGetCharacterPossibleAppearancesError);
 
     const updateError = useSelector(selectUpdateCharacterError);
-
     const deleteError = useSelector(selectDeleteCharacterError);
 
-    const appearances = useSelector(selectCharacterAppearances);
-    const appearancesError = useSelector(selectGetCharacterAppearancesError);
-
-    const possibleWorks = useSelector(selectCharacterPossibleAppearances);
-    const possibleError = useSelector(selectGetCharacterPossibleAppearancesError);
+    const globalError = error ?? appearancesError ?? possibleError;
 
     const [editMode, setEditMode] = useState(false);
 
@@ -175,13 +175,13 @@ export default function CharacterDetailsPage() {
 
     return (
         <main aria-labelledby={titleId} className="page">
-            {error && (
+            {globalError && (
                 <p role="alert" className={styles.error}>
-                    {String(error)}
+                    {globalError}
                 </p>
             )}
 
-            {!globalLoading && !error && character && (
+            {!globalLoading && !globalError && character && appearances && possibleWorks && (
                 <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
@@ -202,15 +202,11 @@ export default function CharacterDetailsPage() {
                     </div>
 
                     <div className={styles.split}>
-                        <section className={`${styles.card} ${styles.imageCard}`} aria-label="Character image">
-                            <ImageSection
-                                characterId={id}
-                                name={character.name}
-                                imageUrl={character.image_url}
-                            />
+                        <section className={`card ${styles.imageCard}`} aria-label="Character image">
+                            <ImageSection characterId={id} name={character.name} imageUrl={character.image_url} />
                         </section>
 
-                        <section className={styles.card} aria-label="Character info">
+                        <section className="card" aria-label="Character info">
                             <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
                                 <div className={styles.field}>
                                     <label htmlFor="ch-name" className={styles.label}>
@@ -361,7 +357,7 @@ export default function CharacterDetailsPage() {
                         </section>
                     </div>
 
-                    <section className={styles.card} aria-label="Character appearances">
+                    <section className="card" aria-label="Character appearances">
                         <div className={styles.subHeader}>
                             <h2 className={styles.subTitle}>Appearances</h2>
                             <button
@@ -376,23 +372,16 @@ export default function CharacterDetailsPage() {
                             </button>
                         </div>
 
-                        {appearancesError && (
-                            <p role="alert" className={styles.error}>
-                                {String(appearancesError)}
-                            </p>
+                        {appearances.length > 0 ? (
+                            <List
+                                items={appearances}
+                                onRemove={({ id: characterInWorkId, work_id: workId }) => {
+                                    handleRemoveAppearance(workId, characterInWorkId);
+                                }}
+                            />
+                        ) : (
+                            <p className={styles.muted}>No appearances yet.</p>
                         )}
-
-                        {!appearancesError &&
-                            (appearances.length > 0 ? (
-                                <List
-                                    items={appearances}
-                                    onRemove={({ id: characterInWorkId, work_id: workId }) => {
-                                        handleRemoveAppearance(workId, characterInWorkId);
-                                    }}
-                                />
-                            ) : (
-                                <p className={styles.muted}>No appearances yet.</p>
-                            ))}
                     </section>
                 </>
             )}
@@ -422,33 +411,26 @@ export default function CharacterDetailsPage() {
                             Add to work
                         </h3>
 
-                        {possibleError && (
-                            <p className={styles.error} role="alert">
-                                {String(possibleError)}
-                            </p>
+                        {possibleWorks.length === 0 ? (
+                            <p className={styles.muted}>No available works to add.</p>
+                        ) : (
+                            <ul className={styles.radioList}>
+                                {possibleWorks.map(w => (
+                                    <li key={w.id}>
+                                        <label className={styles.radioRow}>
+                                            <input
+                                                type="radio"
+                                                name="work"
+                                                value={w.id}
+                                                checked={String(selectedWorkId) === String(w.id)}
+                                                onChange={e => setSelectedWorkId(e.target.value)}
+                                            />
+                                            <span>{w.content}</span>
+                                        </label>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
-
-                        {!possibleError &&
-                            (possibleWorks.length === 0 ? (
-                                <p className={styles.muted}>No available works to add.</p>
-                            ) : (
-                                <ul className={styles.radioList}>
-                                    {possibleWorks.map(w => (
-                                        <li key={w.id}>
-                                            <label className={styles.radioRow}>
-                                                <input
-                                                    type="radio"
-                                                    name="work"
-                                                    value={w.id}
-                                                    checked={String(selectedWorkId) === String(w.id)}
-                                                    onChange={e => setSelectedWorkId(e.target.value)}
-                                                />
-                                                <span>{w.content}</span>
-                                            </label>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ))}
 
                         <div className={styles.modalActions}>
                             <button

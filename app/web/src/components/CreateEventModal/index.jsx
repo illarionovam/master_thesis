@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import styles from './CreateEventModal.module.css';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-export default function CreateEventModal({
-    open,
-    onClose,
-    onSubmit,
-    submitting = false,
-    error = null,
-    locationOptions = [],
-}) {
+export default function CreateEventModal({ open, onClose, onSubmit, error = null, locationOptions = [] }) {
     const dialogRef = useRef(null);
+
+    const globalLoading = useSelector(selectGlobalLoading);
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -69,7 +66,7 @@ export default function CreateEventModal({
                         onChange={e => setTitle(e.target.value)}
                         placeholder="e.g., Caravan arrives"
                         className={styles.input}
-                        disabled={submitting}
+                        disabled={globalLoading}
                         required
                         maxLength={100}
                         aria-describedby="ev-title-hint"
@@ -91,7 +88,7 @@ export default function CreateEventModal({
                         required
                         placeholder="Short description of the event..."
                         className={`${styles.input} ${styles.textarea}`}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -104,7 +101,7 @@ export default function CreateEventModal({
                         value={locationInWorkId}
                         onChange={e => setLocationInWorkId(e.target.value)}
                         className={styles.input}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     >
                         <option value="">— None —</option>
                         {locationOptions.map(opt => (
@@ -122,11 +119,11 @@ export default function CreateEventModal({
                 )}
 
                 <div className={styles.actions}>
-                    <button type="button" onClick={onClose} disabled={submitting}>
+                    <button type="button" onClick={onClose} disabled={globalLoading}>
                         Cancel
                     </button>
-                    <button type="submit" className="primaryBtn" disabled={!isValid || submitting}>
-                        {submitting ? 'Submitting...' : 'Create'}
+                    <button type="submit" className="primaryBtn" disabled={!isValid || globalLoading}>
+                        Create
                     </button>
                 </div>
             </form>

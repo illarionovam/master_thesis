@@ -17,7 +17,6 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
 
     const generateError = useSelector(selectGenerateCharacterImageError);
     const generateErrorCIW = useSelector(selectGenerateCharacterInWorkImageError);
-
     const uploadImageError = useSelector(selectUploadImageError);
 
     const [previewUrl, setPreviewUrl] = useState('');
@@ -93,12 +92,12 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
             <div className={styles.uploader}>
                 {generateError && (
                     <p role="alert" className={styles.error}>
-                        {String(generateError)}
+                        {generateError}
                     </p>
                 )}
                 {generateErrorCIW && (
                     <p role="alert" className={styles.error}>
-                        {String(generateErrorCIW)}
+                        {generateErrorCIW}
                     </p>
                 )}
                 {uploadImageError && (

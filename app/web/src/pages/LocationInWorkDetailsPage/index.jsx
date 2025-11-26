@@ -27,12 +27,14 @@ export default function LocationInWorkDetailsPage() {
     const globalLoading = useSelector(selectGlobalLoading);
 
     const liw = useSelector(selectLocationInWork);
+    const events = useSelector(selectGetEventsByLocationInWorkId);
+
     const error = useSelector(selectGetLocationInWorkError);
+    const eventsError = useSelector(selectGetEventsByLocationInWorkIdError);
 
     const updateError = useSelector(selectUpdateLocationInWorkError);
 
-    const eventsError = useSelector(selectGetEventsByLocationInWorkIdError);
-    const events = useSelector(selectGetEventsByLocationInWorkId);
+    const globalError = error ?? eventsError;
 
     const [editMode, setEditMode] = useState(false);
     const [attrs, setAttrs] = useState({});
@@ -104,13 +106,13 @@ export default function LocationInWorkDetailsPage() {
 
     return (
         <main aria-labelledby={titleId} className="page">
-            {error && (
+            {globalError && (
                 <p role="alert" className={styles.error}>
-                    {String(error)}
+                    {globalError}
                 </p>
             )}
 
-            {!globalLoading && !error && liw && (
+            {!globalLoading && !globalError && liw && events && (
                 <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
@@ -143,7 +145,7 @@ export default function LocationInWorkDetailsPage() {
                         <Title id={titleId}>{location?.title ?? '—'}</Title>
                     </div>
 
-                    <section className={styles.card} aria-label="Location in work">
+                    <section className="card" aria-label="Location in work">
                         <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
                             <div className={styles.field}>
                                 <label className={styles.label}>Title</label>
@@ -254,21 +256,10 @@ export default function LocationInWorkDetailsPage() {
                         </form>
                     </section>
 
-                    <section className={styles.card} aria-label="Used in events">
+                    <section className="card" aria-label="Used in events">
                         <h2 className={styles.subTitle}>Used in events</h2>
 
-                        {eventsError && (
-                            <p role="alert" className={styles.error}>
-                                {String(eventsError)}
-                            </p>
-                        )}
-
-                        {!eventsError &&
-                            (events.length > 0 ? (
-                                <List items={events} />
-                            ) : (
-                                <p className={styles.muted}>No events yet.</p>
-                            ))}
+                        {events.length > 0 ? <List items={events} /> : <p className={styles.muted}>No events yet.</p>}
                     </section>
                 </>
             )}

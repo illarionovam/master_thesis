@@ -18,6 +18,7 @@ import {
     selectLocation,
     selectGetLocationError,
     selectLocations,
+    selectGetLocationsError,
     selectUpdateLocationError,
     selectLocationPlacements,
     selectGetLocationPlacementsError,
@@ -40,23 +41,24 @@ export default function LocationDetailsPage() {
     const globalLoading = useSelector(selectGlobalLoading);
 
     const location = useSelector(selectLocation);
-    const error = useSelector(selectGetLocationError);
-
     const allLocations = useSelector(selectLocations);
-    const updateError = useSelector(selectUpdateLocationError);
-
     const placements = useSelector(selectLocationPlacements);
-    const placementsError = useSelector(selectGetLocationPlacementsError);
-
     const possibleWorks = useSelector(selectLocationPossiblePlacements);
+
+    const error = useSelector(selectGetLocationError);
+    const allLocationsError = useSelector(selectGetLocationsError);
+    const placementsError = useSelector(selectGetLocationPlacementsError);
     const possibleError = useSelector(selectGetLocationPossiblePlacementsError);
 
+    const updateError = useSelector(selectUpdateLocationError);
     const deleteError = useSelector(selectDeleteLocationError);
 
     const [addOpen, setAddOpen] = useState(false);
     const [selectedWorkId, setSelectedWorkId] = useState('');
 
     const [editMode, setEditMode] = useState(false);
+
+    const globalError = error ?? allLocationsError ?? placementsError ?? possibleError;
 
     const formRef = useRef(null);
     const addWorkRef = useRef(null);
@@ -149,13 +151,13 @@ export default function LocationDetailsPage() {
 
     return (
         <main aria-labelledby={titleId} className="page">
-            {error && (
+            {globalError && (
                 <p role="alert" className={styles.error}>
-                    {error}
+                    {globalError}
                 </p>
             )}
 
-            {!globalLoading && !error && location && (
+            {!globalLoading && !globalError && location && allLocations && placements && possibleWorks && (
                 <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
@@ -176,7 +178,7 @@ export default function LocationDetailsPage() {
                         <Title id={titleId}>{location?.title ?? '—'}</Title>
                     </div>
 
-                    <section className={styles.card} aria-label="Location info">
+                    <section className="card" aria-label="Location info">
                         <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
                             <div className={styles.field}>
                                 <label htmlFor="loc-title" className={styles.label}>
@@ -279,7 +281,7 @@ export default function LocationDetailsPage() {
                         </form>
                     </section>
 
-                    <section className={styles.card} aria-label="Location placements">
+                    <section className="card" aria-label="Location placements">
                         <div className={styles.subHeader}>
                             <h2 className={styles.subTitle}>Placements</h2>
                             <button
@@ -294,25 +296,15 @@ export default function LocationDetailsPage() {
                             </button>
                         </div>
 
-                        {placementsError && (
-                            <p role="alert" className={styles.error}>
-                                {String(placementsError)}
-                            </p>
-                        )}
-
-                        {!placementsError && (
-                            <>
-                                {placements.length > 0 ? (
-                                    <List
-                                        items={placements}
-                                        onRemove={({ id: locationInWorkId, work_id: workId }) => {
-                                            handleRemovePlacement(workId, locationInWorkId);
-                                        }}
-                                    />
-                                ) : (
-                                    <p className={styles.muted}>No placements yet.</p>
-                                )}
-                            </>
+                        {placements.length > 0 ? (
+                            <List
+                                items={placements}
+                                onRemove={({ id: locationInWorkId, work_id: workId }) => {
+                                    handleRemovePlacement(workId, locationInWorkId);
+                                }}
+                            />
+                        ) : (
+                            <p className={styles.muted}>No placements yet.</p>
                         )}
                     </section>
                 </>
@@ -325,35 +317,25 @@ export default function LocationDetailsPage() {
                             Add to work
                         </h3>
 
-                        {possibleError && (
-                            <p className={styles.error} role="alert">
-                                {String(possibleError)}
-                            </p>
-                        )}
-
-                        {!possibleError && (
-                            <>
-                                {possibleWorks.length === 0 ? (
-                                    <p className={styles.muted}>No available works to add.</p>
-                                ) : (
-                                    <ul className={styles.radioList}>
-                                        {possibleWorks.map(w => (
-                                            <li key={w.id}>
-                                                <label className={styles.radioRow}>
-                                                    <input
-                                                        type="radio"
-                                                        name="work"
-                                                        value={w.id}
-                                                        checked={String(selectedWorkId) === String(w.id)}
-                                                        onChange={e => setSelectedWorkId(e.target.value)}
-                                                    />
-                                                    <span>{w.content}</span>
-                                                </label>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </>
+                        {possibleWorks.length === 0 ? (
+                            <p className={styles.muted}>No available works to add.</p>
+                        ) : (
+                            <ul className={styles.radioList}>
+                                {possibleWorks.map(w => (
+                                    <li key={w.id}>
+                                        <label className={styles.radioRow}>
+                                            <input
+                                                type="radio"
+                                                name="work"
+                                                value={w.id}
+                                                checked={String(selectedWorkId) === String(w.id)}
+                                                onChange={e => setSelectedWorkId(e.target.value)}
+                                            />
+                                            <span>{w.content}</span>
+                                        </label>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
 
                         <div className={styles.modalActions}>

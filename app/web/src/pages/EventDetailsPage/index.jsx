@@ -46,22 +46,22 @@ export default function EventDetailsPage() {
     const globalLoading = useSelector(selectGlobalLoading);
 
     const event = useSelector(selectEvent);
+    const participants = useSelector(selectEventParticipants);
+    const possibleParticipants = useSelector(selectEventPossibleParticipants);
+    const locationLinks = useSelector(selectWorkLocationLinks);
+
+    const genResult = useSelector(selectGenerateEventCheckResult);
+
     const error = useSelector(selectGetEventError);
+    const participantsError = useSelector(selectGetEventParticipantsError);
+    const possibleParticipantsError = useSelector(selectGetEventPossibleParticipantsError);
+    const locLinksError = useSelector(selectGetWorkLocationLinksError);
 
     const updateError = useSelector(selectUpdateEventError);
     const deleteError = useSelector(selectDeleteEventError);
-
-    const participants = useSelector(selectEventParticipants);
-    const participantsError = useSelector(selectGetEventParticipantsError);
-
-    const possibleParticipants = useSelector(selectEventPossibleParticipants);
-    const possibleParticipantsError = useSelector(selectGetEventPossibleParticipantsError);
-
-    const locationLinks = useSelector(selectWorkLocationLinks);
-    const locLinksError = useSelector(selectGetWorkLocationLinksError);
-
     const genError = useSelector(selectGenerateEventCheckError);
-    const genResult = useSelector(selectGenerateEventCheckResult);
+
+    const globalError = error ?? participantsError ?? possibleParticipantsError ?? locLinksError;
 
     const [editMode, setEditMode] = useState(false);
 
@@ -196,13 +196,13 @@ export default function EventDetailsPage() {
 
     return (
         <main aria-labelledby={titleId} className="page">
-            {error && (
+            {globalError && (
                 <p role="alert" className={styles.error}>
-                    {String(error)}
+                    {globalError}
                 </p>
             )}
 
-            {!globalLoading && !error && event && (
+            {!globalLoading && !globalError && event && participants && possibleParticipants && locationLinks && (
                 <>
                     <div className={styles.header}>
                         <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
@@ -231,7 +231,7 @@ export default function EventDetailsPage() {
 
                         <Title id={titleId}>{pageTitle}</Title>
                     </div>
-                    <section className={styles.card} aria-label="Event info">
+                    <section className="card" aria-label="Event info">
                         <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
                             <div className={styles.field}>
                                 <label htmlFor="ev-title" className={styles.label}>
@@ -351,7 +351,7 @@ export default function EventDetailsPage() {
                         </form>
                     </section>
 
-                    <section className={styles.card} aria-label="Cast">
+                    <section className="card" aria-label="Cast">
                         <div className={styles.subHeader}>
                             <h2 className={styles.subTitle}>Cast</h2>
                             <button
@@ -366,23 +366,16 @@ export default function EventDetailsPage() {
                             </button>
                         </div>
 
-                        {participantsError && (
-                            <p role="alert" className={styles.error}>
-                                {String(participantsError)}
-                            </p>
+                        {participants.length > 0 ? (
+                            <List
+                                items={participants}
+                                onRemove={({ id: participantId, work_id: workIdProp }) => {
+                                    handleRemoveCast(workIdProp || id, participantId);
+                                }}
+                            />
+                        ) : (
+                            <p className={styles.muted}>No participants yet.</p>
                         )}
-
-                        {!participantsError &&
-                            (participants.length > 0 ? (
-                                <List
-                                    items={participants}
-                                    onRemove={({ id: participantId, work_id: workIdProp }) => {
-                                        handleRemoveCast(workIdProp || id, participantId);
-                                    }}
-                                />
-                            ) : (
-                                <p className={styles.muted}>No participants yet.</p>
-                            ))}
                     </section>
                 </>
             )}
@@ -398,12 +391,6 @@ export default function EventDetailsPage() {
                             Generated description
                         </h3>
 
-                        {genError && (
-                            <p className={styles.error} role="alert">
-                                {String(genError)}
-                            </p>
-                        )}
-
                         <div className={styles.field}>
                             <label htmlFor="generated-description" className={styles.label}>
                                 Text
@@ -416,6 +403,12 @@ export default function EventDetailsPage() {
                                 value={genResult?.result ?? 'Generating...'}
                             />
                         </div>
+
+                        {genError && (
+                            <p className={styles.error} role="alert">
+                                {String(genError)}
+                            </p>
+                        )}
 
                         <div className={styles.modalActions}>
                             <button type="button" onClick={handleCloseGenerateModal} disabled={globalLoading}>
@@ -433,33 +426,26 @@ export default function EventDetailsPage() {
                             Add participant
                         </h3>
 
-                        {possibleParticipantsError && (
-                            <p className={styles.error} role="alert">
-                                {String(possibleParticipantsError)}
-                            </p>
+                        {possibleParticipants.length === 0 ? (
+                            <p className={styles.muted}>No available characters to add.</p>
+                        ) : (
+                            <ul className={styles.radioList}>
+                                {possibleParticipants.map(p => (
+                                    <li key={p.id}>
+                                        <label className={styles.radioRow}>
+                                            <input
+                                                type="radio"
+                                                name="participant"
+                                                value={p.id}
+                                                checked={String(selectedCharacterId) === String(p.id)}
+                                                onChange={e => setSelectedCharacterId(e.target.value)}
+                                            />
+                                            <span>{p.content}</span>
+                                        </label>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
-
-                        {!possibleParticipantsError &&
-                            (possibleParticipants.length === 0 ? (
-                                <p className={styles.muted}>No available characters to add.</p>
-                            ) : (
-                                <ul className={styles.radioList}>
-                                    {possibleParticipants.map(p => (
-                                        <li key={p.id}>
-                                            <label className={styles.radioRow}>
-                                                <input
-                                                    type="radio"
-                                                    name="participant"
-                                                    value={p.id}
-                                                    checked={String(selectedCharacterId) === String(p.id)}
-                                                    onChange={e => setSelectedCharacterId(e.target.value)}
-                                                />
-                                                <span>{p.content}</span>
-                                            </label>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ))}
 
                         <div className={styles.modalActions}>
                             <button

@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import styles from './CreateWorkModal.module.css';
+import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-export default function CreateWorkModal({ open, onClose, onSubmit, submitting = false, error = null }) {
+export default function CreateWorkModal({ open, onClose, onSubmit, error = null }) {
     const dialogRef = useRef(null);
+
+    const globalLoading = useSelector(selectGlobalLoading);
 
     const [title, setTitle] = useState('');
     const [annotation, setAnnotation] = useState('');
@@ -59,7 +63,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, submitting = 
                         required
                         placeholder="e.g., The Ashen Caravan"
                         className={styles.input}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -74,7 +78,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, submitting = 
                         onChange={e => setAnnotation(e.target.value)}
                         placeholder="One-two sentences summary..."
                         className={`${styles.input} ${styles.textarea}`}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -89,7 +93,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, submitting = 
                         onChange={e => setSynopsis(e.target.value)}
                         placeholder="Extended outline, key beats, arcs..."
                         className={`${styles.input} ${styles.textarea}`}
-                        disabled={submitting}
+                        disabled={globalLoading}
                     />
                 </div>
 
@@ -100,11 +104,11 @@ export default function CreateWorkModal({ open, onClose, onSubmit, submitting = 
                 )}
 
                 <div className={styles.actions}>
-                    <button type="button" onClick={onClose} disabled={submitting}>
+                    <button type="button" onClick={onClose} disabled={globalLoading}>
                         Cancel
                     </button>
-                    <button type="submit" className="primaryBtn" disabled={!isValid || submitting}>
-                        {submitting ? 'Submitting...' : 'Create'}
+                    <button type="submit" className="primaryBtn" disabled={!isValid || globalLoading}>
+                        Create
                     </button>
                 </div>
             </form>

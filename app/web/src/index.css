@@ -6,10 +6,20 @@
     --black: #111827;
     --white: #ffffff;
     --red: #dc2626;
+    --gray: #6b7280;
     --light-gray: rgba(0, 0, 0, 0.08);
     --shadow-gray: rgba(0, 0, 0, 0.16);
+    --blue: #1d4ed8;
 
     --box-shadow: 4px 4px 8px var(--light-gray);
+
+    --border: 1px solid var(--light-gray);
+    --border-radius: 12px;
+    --circle-border-radius: 9999px;
+
+    --button-height: 40px;
+    --gap: 12px;
+    --padding: 16px;
 
     color: var(--black);
     background-color: var(--white);
@@ -29,7 +39,7 @@ a {
     text-decoration: none;
 
     &:hover {
-        color: #747bff;
+        color: var(--blue);
         text-decoration: none;
     }
 }
@@ -53,12 +63,12 @@ ol {
 
 button {
     margin: 0;
-    padding: 0 16px;
+    padding: 0 var(--padding);
 
-    border: 1px solid var(--light-gray);
-    border-radius: 8px;
+    border: var(--border);
+    border-radius: var(--border-radius);
 
-    height: 40px;
+    height: var(--button-height);
     cursor: pointer;
 
     background-color: var(--white);
@@ -79,7 +89,7 @@ button {
 .roundBtn {
     padding: 0;
     width: 40px;
-    border-radius: 9999px;
+    border-radius: var(--circle-border-radius);
     box-shadow: var(--box-shadow);
 
     display: grid;
@@ -106,7 +116,7 @@ button {
 
 dialog {
     border: none;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     padding: 0;
     width: 100%;
     max-width: 520px;
@@ -119,12 +129,31 @@ dialog {
 }
 
 .page {
-    padding: 16px;
+    padding: var(--padding);
     display: grid;
-    gap: 12px;
+    gap: var(--gap);
 
     &.centered {
         place-items: center;
         min-height: 100%;
+    }
+}
+
+.card {
+    padding: var(--padding);
+    border: var(--border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: grid;
+    gap: var(--gap);
+
+    &.wide {
+        width: 100%;
+        max-width: 720px;
+    }
+
+    &.narrow {
+        width: 100%;
+        max-width: 420px;
     }
 }

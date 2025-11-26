@@ -1,15 +1,24 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useRef, useState, useId } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import CytoscapeComponent from 'react-cytoscapejs';
+
 import styles from './DashboardPage.module.css';
 
+import { selectGlobalLoading } from '../../redux/globalSelectors';
+
 import { getWorkCast, getWorkRelationships } from '../../redux/works/operations';
+import {
+    selectGetWorkCastError,
+    selectWorkCast,
+    selectGetWorkRelationshipsError,
+    selectWorkRelationships,
+} from '../../redux/works/selectors';
 
 function mapCastToNodes(cast = []) {
     return cast.map(c => ({
         data: {
-            id: c.id,
+            id: String(c.id),
             label: c.character.name,
         },
     }));
@@ -20,14 +29,16 @@ function mapRelationshipsToEdges(rels = [], focusId) {
         focusId == null
             ? rels
             : rels.filter(
-                  r => String(r.from_character_in_work_id) === focusId || String(r.to_character_in_work_id) === focusId
+                  r =>
+                      String(r.from_character_in_work_id) === String(focusId) ||
+                      String(r.to_character_in_work_id) === String(focusId)
               );
 
     return filtered.map(r => ({
         data: {
-            id: r.id,
-            source: r.from_character_in_work_id,
-            target: r.to_character_in_work_id,
+            id: String(r.id),
+            source: String(r.from_character_in_work_id),
+            target: String(r.to_character_in_work_id),
             label: r.type,
         },
     }));
@@ -36,11 +47,19 @@ function mapRelationshipsToEdges(rels = [], focusId) {
 export default function DashboardPage() {
     const dispatch = useDispatch();
     const { id, characterInWorkId } = useParams();
+    const titleId = useId();
+
+    const globalLoading = useSelector(selectGlobalLoading);
+
+    const cast = useSelector(selectWorkCast);
+    const rels = useSelector(selectWorkRelationships);
+
+    const castError = useSelector(selectGetWorkCastError);
+    const relsError = useSelector(selectGetWorkRelationshipsError);
+
+    const globalError = castError ?? relsError;
 
     const cyRef = useRef(null);
-
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [elements, setElements] = useState([]);
 
     const stylesheet = [
@@ -86,37 +105,34 @@ export default function DashboardPage() {
         },
     ];
 
-    const refresh = useCallback(async () => {
+    useEffect(() => {
         if (!id) return;
-        setLoading(true);
-        setError('');
+        dispatch(getWorkCast(id));
+        dispatch(getWorkRelationships(id));
+    }, [dispatch, id]);
 
-        const [castRes, relsRes] = await Promise.all([
-            dispatch(getWorkCast(id)).unwrap(),
-            dispatch(getWorkRelationships(id)).unwrap(),
-        ]);
+    useEffect(() => {
+        if (!cast || !rels) {
+            setElements([]);
+            return;
+        }
 
-        const edges = mapRelationshipsToEdges(relsRes, characterInWorkId);
-        const nodesAll = mapCastToNodes(castRes);
+        const edges = mapRelationshipsToEdges(rels, characterInWorkId ?? null);
+        const nodesAll = mapCastToNodes(cast);
 
         let nodes = nodesAll;
         if (characterInWorkId != null) {
-            const connectedIds = new Set(edges.flatMap(e => [e.data.source, e.data.target].map(String)));
-            nodes = nodesAll.filter(n => connectedIds.has(n.data.id));
+            const connectedIds = new Set(edges.flatMap(e => [String(e.data.source), String(e.data.target)]));
+            nodes = nodesAll.filter(n => connectedIds.has(String(n.data.id)));
         }
 
         setElements([...nodes, ...edges]);
-
-        setLoading(false);
-    }, [dispatch, id, characterInWorkId]);
-
-    useEffect(() => {
-        refresh();
-    }, [refresh]);
+    }, [cast, rels, characterInWorkId]);
 
     useEffect(() => {
         const cy = cyRef.current;
         if (!cy || elements.length === 0) return;
+
         cy.layout({
             name: 'cose',
             fit: true,
@@ -125,6 +141,7 @@ export default function DashboardPage() {
             nodeRepulsion: 8000,
             idealEdgeLength: 80,
         }).run();
+
         cy.fit(undefined, 20);
     }, [elements]);
 
@@ -133,21 +150,20 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className={styles.container}>
-            <div>
-                <h1>Work graph</h1>
-                {loading && <span>Loading...</span>}
-                {error && <span>{error}</span>}
-            </div>
-
-            <div className={styles.chart}>
+        <main aria-labelledby={titleId} className="page">
+            {globalError && (
+                <p role="alert" className={styles.error}>
+                    {globalError}
+                </p>
+            )}
+            {!globalLoading && !globalError && cast && rels && (
                 <CytoscapeComponent
                     elements={CytoscapeComponent.normalizeElements(elements)}
                     stylesheet={stylesheet}
-                    style={{ height: '100%' }}
+                    style={{ height: '770px' }}
                     cy={onCyReady}
                 />
-            </div>
-        </div>
+            )}
+        </main>
     );
 }

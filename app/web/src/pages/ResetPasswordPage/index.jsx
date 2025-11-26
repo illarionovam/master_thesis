@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { confirmPassword } from '../../redux/auth/operations';
+import { selectConfirmPasswordError } from '../../redux/auth/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 import styles from './ResetPasswordPage.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,8 @@ export default function ResetPasswordPage() {
     const navigate = useNavigate();
 
     const globalLoading = useSelector(selectGlobalLoading);
+
+    const error = useSelector(selectConfirmPasswordError);
 
     const [token, setToken] = useState('');
 
@@ -31,32 +34,42 @@ export default function ResetPasswordPage() {
 
     return (
         <main aria-labelledby={titleId} className="page centered">
-            <h1 id={titleId} className={styles.title}>
-                Reset Password
-            </h1>
+            {!globalLoading && (
+                <section className="card narrow" aria-busy={globalLoading ? 'true' : 'false'}>
+                    <h1 id={titleId} className={styles.title}>
+                        Reset Password
+                    </h1>
 
-            <form onSubmit={handleSubmit} noValidate className={styles.form}>
-                <div className={styles.field}>
-                    <label htmlFor="new_password" className={styles.label}>
-                        New password
-                    </label>
-                    <input
-                        id="new_password"
-                        name="new_password"
-                        type="password"
-                        autoComplete="new-password"
-                        required
-                        disabled={globalLoading || !token}
-                        className={styles.input}
-                    />
-                </div>
+                    <form onSubmit={handleSubmit} noValidate className={styles.form}>
+                        <div className={styles.field}>
+                            <label htmlFor="new_password" className={styles.label}>
+                                New password
+                            </label>
+                            <input
+                                id="new_password"
+                                name="new_password"
+                                type="password"
+                                autoComplete="new-password"
+                                required
+                                disabled={globalLoading || !token}
+                                className={styles.input}
+                            />
+                        </div>
 
-                <div className={styles.actions}>
-                    <button type="submit" disabled={globalLoading || !token} className="primaryBtn">
-                        Set New Password
-                    </button>
-                </div>
-            </form>
+                        {error && (
+                            <p role="alert" className={styles.error}>
+                                {error}
+                            </p>
+                        )}
+
+                        <div className={styles.actions}>
+                            <button type="submit" disabled={globalLoading || !token} className="primaryBtn">
+                                Set New Password
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            )}
         </main>
     );
 }

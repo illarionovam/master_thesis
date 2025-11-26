@@ -30,7 +30,6 @@ export default function RelationshipDetailsPage() {
     const error = useSelector(selectGetRelationshipError);
 
     const updateError = useSelector(selectUpdateRelationshipError);
-
     const deleteError = useSelector(selectDeleteRelationshipError);
 
     const [editMode, setEditMode] = useState(false);
@@ -95,7 +94,7 @@ export default function RelationshipDetailsPage() {
         <main aria-labelledby={titleId} className="page">
             {error && (
                 <p role="alert" className={styles.error}>
-                    {String(error)}
+                    {error}
                 </p>
             )}
 
@@ -146,7 +145,7 @@ export default function RelationshipDetailsPage() {
                         </nav>
                         <Title id={titleId}>Relationship</Title>
                     </div>
-                    <section className={styles.card} aria-label="Relationship details">
+                    <section className="card" aria-label="Relationship details">
                         <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
                             <div className={styles.field}>
                                 <label className={styles.label}>From</label>
@@ -196,6 +195,7 @@ export default function RelationshipDetailsPage() {
                                     {String(updateError)}
                                 </p>
                             )}
+
                             {deleteError && (
                                 <p role="alert" className={styles.error}>
                                     {String(deleteError)}

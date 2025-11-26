@@ -41,16 +41,6 @@
     border-radius: 8px;
 }
 
-.card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-    padding: 16px;
-    display: grid;
-    gap: 10px;
-}
-
 .row {
     display: grid;
     grid-template-columns: 160px 1fr;
@@ -280,10 +270,6 @@
     gap: 8px;
     flex-wrap: wrap;
     align-items: center;
-}
-
-.card {
-    box-sizing: border-box;
 }
 
 .fab {

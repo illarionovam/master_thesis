@@ -24,10 +24,10 @@ export default function UserDetailPage() {
     const globalLoading = useSelector(selectGlobalLoading);
 
     const user = useSelector(selectUser);
+
     const error = useSelector(selectGetUserInfoError);
 
     const updateError = useSelector(selectUpdateUserError);
-
     const emailError = useSelector(selectUpdateUserEmailError);
 
     const [editMode, setEditMode] = useState(false);
@@ -100,12 +100,12 @@ export default function UserDetailPage() {
         <main aria-labelledby={titleId} className="page centered">
             {error && (
                 <p role="alert" className={styles.error}>
-                    {error.message ?? String(error)}
+                    {error}
                 </p>
             )}
 
             {!globalLoading && !error && user && (
-                <section className={styles.card} aria-busy={globalLoading ? 'true' : 'false'}>
+                <section className="card wide" aria-busy={globalLoading ? 'true' : 'false'}>
                     <h1 id={titleId} className={styles.title}>
                         User
                     </h1>
@@ -158,6 +158,7 @@ export default function UserDetailPage() {
                                 </div>
                             )}
                         </div>
+
                         {emailError && (
                             <p role="alert" className={styles.error}>
                                 {emailError}
