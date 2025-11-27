@@ -15,8 +15,6 @@ import {
 } from '../../redux/works/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-import { resetRelationship } from '../../redux/works/slice';
-
 export default function RelationshipDetailsPage() {
     const { id: workId, characterInWorkId, relationshipId } = useParams();
     const titleId = useId();
@@ -40,15 +38,12 @@ export default function RelationshipDetailsPage() {
         if (!workId || !characterInWorkId || !relationshipId) {
             return;
         }
-        if (rel != null) {
-            if (rel.id === relationshipId) {
-                return;
-            } else {
-                dispatch(resetRelationship());
-            }
+
+        if (rel && rel.id === relationshipId) {
+            return;
         }
         dispatch(getRelationship({ workId, characterInWorkId, relationshipId }));
-    }, [dispatch, workId, characterInWorkId, relationshipId, rel]);
+    }, [dispatch, workId, characterInWorkId, relationshipId]);
 
     useEffect(() => {
         if (!rel) return;

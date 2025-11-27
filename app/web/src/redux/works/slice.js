@@ -108,59 +108,7 @@ const initialState = {
 const worksSlice = createSlice({
     name: 'works',
     initialState,
-    reducers: {
-        resetWork(state) {
-            state.work = null;
-            state.getWork = { ...op };
-            state.createWork = { ...op };
-            state.updateWork = { ...op };
-            state.deleteWork = { ...op };
-            state.getWorkCast = { ...op, cast: [] };
-            state.getWorkPossibleCast = { ...op, possibleCast: [] };
-            state.getWorkLocationLinks = { ...op, locationLinks: [] };
-            state.getWorkPossibleLocationLinks = { ...op, possibleLocationLinks: [] };
-            state.getEvents = { ...op, events: [] };
-            state.reorderEvents = { ...op };
-            state.getWorkRelationships = { ...op, relationships: [] };
-            state.generateWorkDescription = { ...op, result: null };
-            state.generateEventCheck = { ...op, result: null };
-        },
-        resetCharacterInWork(state) {
-            state.characterInWork = null;
-            state.getCharacterInWork = { ...op };
-            state.linkWorkCharacter = { ...op };
-            state.updateCharacterInWork = { ...op };
-            state.deleteCharacterInWork = { ...op };
-            state.getEventsByCharacterInWorkId = { ...op, events: [] };
-            state.getCharacterInWorkRelationships = { ...op, relationships: [] };
-            state.getCharacterInWorkPossibleRelationships = { ...op, possibleRelationships: [] };
-            state.generateCharacterInWorkImage = { ...op };
-        },
-        resetLocationInWork(state) {
-            state.locationInWork = null;
-            state.getLocationInWork = { ...op };
-            state.linkWorkLocation = { ...op };
-            state.updateLocationInWork = { ...op };
-            state.deleteLocationInWork = { ...op };
-            state.getEventsByLocationInWorkId = { ...op, events: [] };
-        },
-        resetEvent(state) {
-            state.event = null;
-            state.getEvent = { ...op };
-            state.createEvent = { ...op };
-            state.updateEvent = { ...op };
-            state.deleteEvent = { ...op };
-            state.getEventParticipants = { ...op, participants: [] };
-            state.getEventPossibleParticipants = { ...op, possibleParticipants: [] };
-        },
-        resetRelationship(state) {
-            state.relationship = null;
-            state.getRelationship = { ...op };
-            state.createRelationship = { ...op };
-            state.updateRelationship = { ...op };
-            state.deleteRelationship = { ...op };
-        },
-    },
+    reducers: {},
     extraReducers: builder => {
         builder
             .addCase(getWorks.pending, state => {
@@ -783,6 +731,4 @@ const worksSlice = createSlice({
     },
 });
 
-export const { resetWork, resetCharacterInWork, resetLocationInWork, resetEvent, resetRelationship } =
-    worksSlice.actions;
 export default worksSlice.reducer;

@@ -30,8 +30,6 @@ import {
 } from '../../redux/works/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-import { resetCharacterInWork } from '../../redux/works/slice';
-
 export default function CharacterInWorkDetailsPage() {
     const { id, characterInWorkId } = useParams();
     const titleId = useId();
@@ -70,19 +68,14 @@ export default function CharacterInWorkDetailsPage() {
         if (!id || !characterInWorkId) {
             return;
         }
-        if (ciw != null) {
-            if (ciw.id === characterInWorkId) {
-                return;
-            } else {
-                dispatch(resetCharacterInWork());
-            }
+        if (ciw && ciw.id === characterInWorkId) {
+            return;
         }
-
         dispatch(getCharacterInWork({ workId: id, characterInWorkId }));
         dispatch(getEventsByCharacterInWorkId({ workId: id, characterInWorkId }));
         dispatch(getCharacterInWorkRelationships({ workId: id, characterInWorkId }));
         dispatch(getCharacterInWorkPossibleRelationships({ workId: id, characterInWorkId }));
-    }, [dispatch, id, characterInWorkId, ciw]);
+    }, [dispatch, id, characterInWorkId]);
 
     useEffect(() => {
         if (ciw?.character?.attributes && typeof ciw.character.attributes === 'object') {

@@ -28,8 +28,6 @@ import {
 } from '../../redux/locations/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-import { resetLocation } from '../../redux/locations/slice';
-
 import styles from './LocationDetailsPage.module.css';
 
 export default function LocationDetailsPage() {
@@ -67,18 +65,14 @@ export default function LocationDetailsPage() {
         if (!id) {
             return;
         }
-        if (location != null) {
-            if (location.id === id) {
-                return;
-            } else {
-                dispatch(resetLocation());
-            }
+        if (location && location.id === id) {
+            return;
         }
         dispatch(getLocations());
         dispatch(getLocation(id));
         dispatch(getLocationPlacements(id));
         dispatch(getLocationPossiblePlacements(id));
-    }, [dispatch, id, location]);
+    }, [dispatch, id]);
 
     useEffect(() => {
         const dlg = addWorkRef.current;

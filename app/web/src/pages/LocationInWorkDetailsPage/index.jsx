@@ -17,8 +17,6 @@ import {
 } from '../../redux/works/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-import { resetLocationInWork } from '../../redux/works/slice';
-
 export default function LocationInWorkDetailsPage() {
     const { id, locationInWorkId } = useParams();
     const titleId = useId();
@@ -47,16 +45,12 @@ export default function LocationInWorkDetailsPage() {
         if (!id || !locationInWorkId) {
             return;
         }
-        if (liw != null) {
-            if (liw.id === locationInWorkId) {
-                return;
-            } else {
-                dispatch(resetLocationInWork());
-            }
+        if (liw && liw.id === locationInWorkId) {
+            return;
         }
         dispatch(getLocationInWork({ workId: id, locationInWorkId }));
         dispatch(getEventsByLocationInWorkId({ workId: id, locationInWorkId }));
-    }, [dispatch, id, locationInWorkId, liw]);
+    }, [dispatch, id, locationInWorkId]);
 
     useEffect(() => {
         if (liw?.attributes && typeof liw.attributes === 'object') {

@@ -43,8 +43,6 @@ import {
 } from '../../redux/works/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-import { resetWork } from '../../redux/works/slice';
-
 import styles from './WorkDetailsPage.module.css';
 
 import CreateEventModal from '../../components/CreateEventModal';
@@ -105,20 +103,18 @@ export default function WorkDetailsPage() {
         if (!id) {
             return;
         }
-        if (work != null) {
-            if (work.id === id) {
-                return;
-            } else {
-                dispatch(resetWork());
-            }
+
+        if (work && work.id === id) {
+            return;
         }
+
         dispatch(getWork(id));
         dispatch(getWorkCast(id));
         dispatch(getWorkPossibleCast(id));
         dispatch(getWorkLocationLinks(id));
         dispatch(getWorkPossibleLocationLinks(id));
         dispatch(getEvents(id));
-    }, [dispatch, id, work]);
+    }, [dispatch, id]);
 
     useEffect(() => {
         const dlg = addCastRef.current;

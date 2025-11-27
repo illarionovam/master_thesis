@@ -27,8 +27,6 @@ import {
 } from '../../redux/characters/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-import { resetCharacter } from '../../redux/characters/slice';
-
 import styles from './CharacterDetailsPage.module.css';
 
 export default function CharacterDetailsPage() {
@@ -69,17 +67,13 @@ export default function CharacterDetailsPage() {
         if (!id) {
             return;
         }
-        if (character != null) {
-            if (character.id === id) {
-                return;
-            } else {
-                dispatch(resetCharacter());
-            }
+        if (character && character.id === id) {
+            return;
         }
         dispatch(getCharacter(id));
         dispatch(getCharacterAppearances(id));
         dispatch(getCharacterPossibleAppearances(id));
-    }, [dispatch, id, character]);
+    }, [dispatch, id]);
 
     useEffect(() => {
         const dlg = addWorkRef.current;

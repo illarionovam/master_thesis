@@ -33,8 +33,6 @@ import {
 } from '../../redux/works/selectors';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
-import { resetEvent } from '../../redux/works/slice';
-
 import styles from './EventDetailsPage.module.css';
 
 export default function EventDetailsPage() {
@@ -78,18 +76,16 @@ export default function EventDetailsPage() {
         if (!id || !eventId) {
             return;
         }
-        if (event != null) {
-            if (event.id === eventId) {
-                return;
-            } else {
-                dispatch(resetEvent());
-            }
+
+        if (event && event.id === eventId) {
+            return;
         }
+
         dispatch(getEvent({ workId: id, eventId }));
         dispatch(getEventParticipants({ workId: id, eventId }));
         dispatch(getWorkLocationLinks(id));
         dispatch(getEventPossibleParticipants({ workId: id, eventId }));
-    }, [dispatch, id, eventId, event]);
+    }, [dispatch, id, eventId]);
 
     useEffect(() => {
         const dlg = addCastRef.current;

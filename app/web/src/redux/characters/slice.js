@@ -30,18 +30,7 @@ const initialState = {
 const charactersSlice = createSlice({
     name: 'characters',
     initialState,
-    reducers: {
-        resetCharacter(state) {
-            state.character = null;
-            state.getCharacter = { ...op };
-            state.createCharacter = { ...op };
-            state.updateCharacter = { ...op };
-            state.deleteCharacter = { ...op };
-            state.getCharacterAppearances = { ...op, appearances: [] };
-            state.getCharacterPossibleAppearances = { ...op, possibleAppearances: [] };
-            state.generateCharacterImage = { ...op };
-        },
-    },
+    reducers: {},
     extraReducers: builder => {
         builder
             .addCase(getCharacters.pending, state => {
@@ -186,5 +175,4 @@ const charactersSlice = createSlice({
     },
 });
 
-export const { resetCharacter } = charactersSlice.actions;
 export default charactersSlice.reducer;

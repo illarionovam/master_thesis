@@ -28,17 +28,7 @@ const initialState = {
 const locationsSlice = createSlice({
     name: 'locations',
     initialState,
-    reducers: {
-        resetLocation(state) {
-            state.location = null;
-            state.getLocation = { ...op };
-            state.createLocation = { ...op };
-            state.updateLocation = { ...op };
-            state.deleteLocation = { ...op };
-            state.getLocationPlacements = { ...op, placements: [] };
-            state.getLocationPossiblePlacements = { ...op, possiblePlacements: [] };
-        },
-    },
+    reducers: {},
     extraReducers: builder => {
         builder
             .addCase(getLocations.pending, state => {
@@ -170,5 +160,4 @@ const locationsSlice = createSlice({
     },
 });
 
-export const { resetLocation } = locationsSlice.actions;
 export default locationsSlice.reducer;

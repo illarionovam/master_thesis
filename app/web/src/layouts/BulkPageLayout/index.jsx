@@ -24,6 +24,7 @@ export default function BulkPageLayout({
     const error = useSelector(selectError);
 
     const [openCreate, setOpenCreate] = useState(false);
+    const [navigatingAfterCreate, setNavigatingAfterCreate] = useState(false);
 
     useEffect(() => {
         if (data.length === 0) {
@@ -41,8 +42,18 @@ export default function BulkPageLayout({
 
     const handleSubmitCreate = async formData => {
         setOpenCreate(false);
+        setNavigatingAfterCreate(true);
+
         const res = await dispatch(createAction(formData)).unwrap();
         onCreated?.(res);
+
+        const action = await dispatch(createAction(formData));
+
+        if (createAction.fulfilled.match(action)) {
+            onCreated?.(action.payload);
+        } else {
+            setNavigatingAfterCreate(false);
+        }
     };
 
     const modalProps = { ...createModalProps, parentOptions: data };
@@ -50,7 +61,7 @@ export default function BulkPageLayout({
     return (
         <main aria-labelledby={titleId} className="page">
             {error && <p role="alert">{error}</p>}
-            {!globalLoading && !error && data && (
+            {!globalLoading && !error && data && !navigatingAfterCreate && (
                 <>
                     <div className={styles.header}>
                         <Title id={titleId}>{title}</Title>
