@@ -10,7 +10,7 @@ import {
     generateCharacterImage,
 } from './operations';
 import { linkWorkCharacter, deleteCharacterInWork } from '../works/operations';
-import { stripBulkCharacterInWorkResponse } from '../../../../api/helpers/strippers';
+import { stripBulkCharacterInWorkResponse, stripBulkCharacterResponse } from '../../../../api/helpers/strippers';
 
 const op = { loading: false, error: null };
 
@@ -61,8 +61,9 @@ const charactersSlice = createSlice({
                 state.createCharacter.loading = true;
                 state.createCharacter.error = null;
             })
-            .addCase(createCharacter.fulfilled, state => {
+            .addCase(createCharacter.fulfilled, (state, action) => {
                 state.createCharacter.loading = false;
+                state.characters = [...state.characters, stripBulkCharacterResponse(action.payload)];
             })
             .addCase(createCharacter.rejected, (state, action) => {
                 state.createCharacter.loading = false;
@@ -112,8 +113,11 @@ const charactersSlice = createSlice({
                 state.deleteCharacter.loading = true;
                 state.deleteCharacter.error = null;
             })
-            .addCase(deleteCharacter.fulfilled, state => {
+            .addCase(deleteCharacter.fulfilled, (state, action) => {
+                const id = action.meta.arg;
+
                 state.deleteCharacter.loading = false;
+                state.characters = state.characters.filter(item => item.id !== id);
                 state.character = null;
             })
             .addCase(deleteCharacter.rejected, (state, action) => {

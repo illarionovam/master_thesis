@@ -9,7 +9,7 @@ import {
     getLocationPossiblePlacements,
 } from './operations';
 import { linkWorkLocation, deleteLocationInWork } from '../works/operations';
-import { stripBulkLocationInWorkResponse } from '../../../../api/helpers/strippers';
+import { stripBulkLocationInWorkResponse, stripBulkLocationResponse } from '../../../../api/helpers/strippers';
 
 const op = { loading: false, error: null };
 
@@ -58,8 +58,9 @@ const locationsSlice = createSlice({
                 state.createLocation.loading = true;
                 state.createLocation.error = null;
             })
-            .addCase(createLocation.fulfilled, state => {
+            .addCase(createLocation.fulfilled, (state, action) => {
                 state.createLocation.loading = false;
+                state.locations = [...state.locations, stripBulkLocationResponse(action.payload)];
             })
             .addCase(createLocation.rejected, (state, action) => {
                 state.createLocation.loading = false;
@@ -96,8 +97,11 @@ const locationsSlice = createSlice({
                 state.deleteLocation.loading = true;
                 state.deleteLocation.error = null;
             })
-            .addCase(deleteLocation.fulfilled, state => {
+            .addCase(deleteLocation.fulfilled, (state, action) => {
+                const id = action.meta.arg;
+
                 state.deleteLocation.loading = false;
+                state.locations = state.locations.filter(item => item.id !== id);
                 state.location = null;
             })
             .addCase(deleteLocation.rejected, (state, action) => {

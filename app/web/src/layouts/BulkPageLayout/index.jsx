@@ -26,8 +26,10 @@ export default function BulkPageLayout({
     const [openCreate, setOpenCreate] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchAction());
-    }, [dispatch, fetchAction]);
+        if (data.length === 0) {
+            dispatch(fetchAction());
+        }
+    }, [dispatch, data.length, fetchAction]);
 
     const handleOpenCreate = () => {
         setOpenCreate(true);
@@ -38,9 +40,9 @@ export default function BulkPageLayout({
     };
 
     const handleSubmitCreate = async formData => {
+        setOpenCreate(false);
         const res = await dispatch(createAction(formData)).unwrap();
         onCreated?.(res);
-        setOpenCreate(false);
     };
 
     const modalProps = { ...createModalProps, parentOptions: data };

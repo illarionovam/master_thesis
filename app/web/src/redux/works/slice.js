@@ -46,6 +46,7 @@ import {
     stripBulkEventResponse,
     stripBulkLocationInWorkResponse,
     stripBulkRelationshipResponse,
+    stripBulkWorkResponse,
 } from '../../../../api/helpers/strippers';
 
 const op = { loading: false, error: null };
@@ -179,8 +180,10 @@ const worksSlice = createSlice({
                 state.createWork.loading = true;
                 state.createWork.error = null;
             })
-            .addCase(createWork.fulfilled, state => {
+            .addCase(createWork.fulfilled, (state, action) => {
                 state.createWork.loading = false;
+                state.works = [...state.works, stripBulkWorkResponse(action.payload)];
+                console.log('works after create:', JSON.parse(JSON.stringify(state.works)));
             })
             .addCase(createWork.rejected, (state, action) => {
                 state.createWork.loading = false;
@@ -243,8 +246,11 @@ const worksSlice = createSlice({
                 state.deleteWork.loading = true;
                 state.deleteWork.error = null;
             })
-            .addCase(deleteWork.fulfilled, state => {
+            .addCase(deleteWork.fulfilled, (state, action) => {
+                const id = action.meta.arg;
+
                 state.deleteWork.loading = false;
+                state.works = state.works.filter(item => item.id !== id);
                 state.work = null;
             })
             .addCase(deleteWork.rejected, (state, action) => {
