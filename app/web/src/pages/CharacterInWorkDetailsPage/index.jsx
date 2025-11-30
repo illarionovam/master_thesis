@@ -166,7 +166,7 @@ export default function CharacterInWorkDetailsPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {globalError && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {globalError}
                 </p>
             )}
@@ -214,23 +214,17 @@ export default function CharacterInWorkDetailsPage() {
                             />
                         </section>
                         <section className="card" aria-label="Character in work">
-                            <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                            <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>
                                 <div className="field">
                                     <label className="label">Character Name</label>
-                                    <input
-                                        type="text"
-                                        className={styles.input}
-                                        value={characterName}
-                                        disabled
-                                        readOnly
-                                    />
+                                    <input type="text" className="input" value={characterName} disabled readOnly />
                                 </div>
 
                                 <div className="field">
                                     <label className="label">Appearance</label>
                                     <textarea
                                         rows={5}
-                                        className={`${styles.input} ${styles.textarea}`}
+                                        className={`input ${styles.textarea}`}
                                         value={characterAppearance}
                                         disabled
                                         readOnly
@@ -241,7 +235,7 @@ export default function CharacterInWorkDetailsPage() {
                                     <label className="label">Personality</label>
                                     <textarea
                                         rows={5}
-                                        className={`${styles.input} ${styles.textarea}`}
+                                        className={`input ${styles.textarea}`}
                                         value={characterPersonality}
                                         disabled
                                         readOnly
@@ -252,7 +246,7 @@ export default function CharacterInWorkDetailsPage() {
                                     <label className="label">Bio</label>
                                     <textarea
                                         rows={6}
-                                        className={`${styles.input} ${styles.textarea}`}
+                                        className={`input ${styles.textarea}`}
                                         value={characterBio}
                                         disabled
                                         readOnly
@@ -318,7 +312,7 @@ export default function CharacterInWorkDetailsPage() {
                                 </div>
 
                                 {updateError && (
-                                    <p role="alert" className={styles.error}>
+                                    <p role="alert" className="infoMessage error">
                                         {String(updateError)}
                                     </p>
                                 )}
@@ -432,7 +426,7 @@ export default function CharacterInWorkDetailsPage() {
                             <label className="label">
                                 Type
                                 <input
-                                    className={styles.input}
+                                    className="input"
                                     type="text"
                                     value={relType}
                                     onChange={e => setRelType(e.target.value)}
@@ -499,7 +493,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <label className="label">
                     Key
                     <input
-                        className={styles.input}
+                        className="input"
                         type="text"
                         value={keyStr}
                         onChange={e => setKeyStr(e.target.value)}
@@ -512,7 +506,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <label className="label">
                     Value
                     <input
-                        className={styles.input}
+                        className="input"
                         type="text"
                         value={valStr}
                         onChange={e => setValStr(e.target.value)}
@@ -522,7 +516,7 @@ function AddTagFields({ onAdd, onCancel }) {
             </div>
 
             {err && (
-                <p className={styles.error} role="alert">
+                <p className="infoMessage error" role="alert">
                     {err}
                 </p>
             )}

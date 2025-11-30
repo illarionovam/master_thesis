@@ -99,7 +99,7 @@ export default function UserDetailPage() {
     return (
         <main aria-labelledby={titleId} className="page centered">
             {error && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {error}
                 </p>
             )}
@@ -111,7 +111,6 @@ export default function UserDetailPage() {
                     </h1>
                     <form
                         ref={formRef}
-                        className="form"
                         noValidate
                         onSubmit={e => {
                             if (editMode) {
@@ -131,7 +130,7 @@ export default function UserDetailPage() {
                                     name="email"
                                     type="email"
                                     defaultValue={user.email ?? ''}
-                                    className={styles.input}
+                                    className="input"
                                     disabled={globalLoading || !emailEdit}
                                     autoComplete="email"
                                     required
@@ -160,7 +159,7 @@ export default function UserDetailPage() {
                         </div>
 
                         {emailError && (
-                            <p role="alert" className={styles.error}>
+                            <p role="alert" className="infoMessage error">
                                 {emailError}
                             </p>
                         )}
@@ -174,7 +173,7 @@ export default function UserDetailPage() {
                                 name="username"
                                 type="text"
                                 defaultValue={user.username ?? ''}
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading || !editMode}
                                 autoComplete="username"
                             />
@@ -189,14 +188,14 @@ export default function UserDetailPage() {
                                 name="name"
                                 type="text"
                                 defaultValue={user.name ?? ''}
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading || !editMode}
                                 autoComplete="name"
                             />
                         </div>
 
                         {updateError && (
-                            <p role="alert" className={styles.error}>
+                            <p role="alert" className="infoMessage error">
                                 {updateError}
                             </p>
                         )}

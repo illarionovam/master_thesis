@@ -56,7 +56,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-character-title" onClose={onClose}>
-            <form onSubmit={handleSubmit} className="form modal">
+            <form onSubmit={handleSubmit} className="modal">
                 <h2 id="create-character-title" className={styles.title}>
                     Create Character
                 </h2>
@@ -72,7 +72,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                         onChange={e => setName(e.target.value)}
                         required
                         placeholder="Name"
-                        className={styles.input}
+                        className="input"
                         disabled={globalLoading}
                     />
                 </div>
@@ -88,7 +88,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                         onChange={e => setAppearance(e.target.value)}
                         required
                         placeholder="Short appearance description"
-                        className={`${styles.input} ${styles.textarea}`}
+                        className={`input ${styles.textarea}`}
                         disabled={globalLoading}
                     />
                 </div>
@@ -104,7 +104,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                         onChange={e => setPersonality(e.target.value)}
                         required
                         placeholder="Key personality traits"
-                        className={`${styles.input} ${styles.textarea}`}
+                        className={`input ${styles.textarea}`}
                         disabled={globalLoading}
                     />
                 </div>
@@ -120,13 +120,13 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                         onChange={e => setBio(e.target.value)}
                         required
                         placeholder="Backstory"
-                        className={`${styles.input} ${styles.textarea}`}
+                        className={`input ${styles.textarea}`}
                         disabled={globalLoading}
                     />
                 </div>
 
                 {(formError || error) && (
-                    <p role="alert" className={styles.error}>
+                    <p role="alert" className="infoMessage error">
                         {formError || error}
                     </p>
                 )}

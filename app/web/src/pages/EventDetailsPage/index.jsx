@@ -193,7 +193,7 @@ export default function EventDetailsPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {globalError && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {globalError}
                 </p>
             )}
@@ -228,7 +228,7 @@ export default function EventDetailsPage() {
                         <Title id={titleId}>{pageTitle}</Title>
                     </div>
                     <section className="card" aria-label="Event info">
-                        <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                        <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>
                             <div className="field">
                                 <label htmlFor="ev-title" className="label">
                                     Title
@@ -238,7 +238,7 @@ export default function EventDetailsPage() {
                                     name="title"
                                     type="text"
                                     defaultValue={event.title ?? ''}
-                                    className={styles.input}
+                                    className="input"
                                     disabled={!editMode || globalLoading}
                                     required
                                     maxLength={100}
@@ -254,7 +254,7 @@ export default function EventDetailsPage() {
                                     name="description"
                                     rows={6}
                                     defaultValue={event.description ?? ''}
-                                    className={`${styles.input} ${styles.textarea}`}
+                                    className={`input ${styles.textarea}`}
                                     disabled={!editMode || globalLoading}
                                     required
                                 />
@@ -268,7 +268,7 @@ export default function EventDetailsPage() {
                                     id="ev-location"
                                     name="location_in_work_id"
                                     defaultValue={defaultLocationInWorkId}
-                                    className={styles.input}
+                                    className="input"
                                     disabled={!editMode || globalLoading}
                                 >
                                     <option value="">— None —</option>
@@ -279,19 +279,19 @@ export default function EventDetailsPage() {
                                     ))}
                                 </select>
                                 {locLinksError && (
-                                    <p className={styles.error} role="alert">
+                                    <p className="infoMessage error" role="alert">
                                         {String(locLinksError)}
                                     </p>
                                 )}
                             </div>
 
                             {updateError && (
-                                <p role="alert" className={styles.error}>
+                                <p role="alert" className="infoMessage error">
                                     {String(updateError)}
                                 </p>
                             )}
                             {deleteError && (
-                                <p role="alert" className={styles.error}>
+                                <p role="alert" className="infoMessage error">
                                     {String(deleteError)}
                                 </p>
                             )}
@@ -393,7 +393,7 @@ export default function EventDetailsPage() {
                             </label>
                             <textarea
                                 id="generated-description"
-                                className={`${styles.input} ${styles.textarea}`}
+                                className={`input ${styles.textarea}`}
                                 rows={10}
                                 readOnly
                                 value={genResult?.result ?? 'Generating...'}
@@ -401,7 +401,7 @@ export default function EventDetailsPage() {
                         </div>
 
                         {genError && (
-                            <p className={styles.error} role="alert">
+                            <p className="infoMessage error" role="alert">
                                 {String(genError)}
                             </p>
                         )}

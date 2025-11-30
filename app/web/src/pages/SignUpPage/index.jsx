@@ -53,7 +53,7 @@ export default function SignUpPage() {
                         Sign Up
                     </h1>
 
-                    <form onSubmit={handleSubmit} noValidate className="form" onInput={clearLocalValidation}>
+                    <form onSubmit={handleSubmit} noValidate onInput={clearLocalValidation}>
                         <div className="field">
                             <label htmlFor="name" className="label">
                                 Name
@@ -63,7 +63,7 @@ export default function SignUpPage() {
                                 name="name"
                                 type="text"
                                 autoComplete="name"
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading}
                             />
                         </div>
@@ -77,7 +77,7 @@ export default function SignUpPage() {
                                 name="username"
                                 type="text"
                                 autoComplete="username"
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading}
                             />
                         </div>
@@ -92,7 +92,7 @@ export default function SignUpPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading}
                             />
                         </div>
@@ -107,7 +107,7 @@ export default function SignUpPage() {
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading}
                             />
                         </div>
@@ -122,19 +122,19 @@ export default function SignUpPage() {
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading}
                             />
                         </div>
 
                         {(mismatch || error) && (
-                            <p role="alert" className={styles.error}>
+                            <p role="alert" className="infoMessage error">
                                 {mismatch || error}
                             </p>
                         )}
 
                         {success && (
-                            <p aria-live="polite" className={styles.success}>
+                            <p aria-live="polite" className="infoMessage success">
                                 Verify email before signing in.
                             </p>
                         )}

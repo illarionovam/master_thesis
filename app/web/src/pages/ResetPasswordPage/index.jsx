@@ -40,7 +40,7 @@ export default function ResetPasswordPage() {
                         Reset Password
                     </h1>
 
-                    <form onSubmit={handleSubmit} noValidate className="form">
+                    <form onSubmit={handleSubmit} noValidate>
                         <div className="field">
                             <label htmlFor="new_password" className="label">
                                 New password
@@ -52,12 +52,12 @@ export default function ResetPasswordPage() {
                                 autoComplete="new-password"
                                 required
                                 disabled={globalLoading || !token}
-                                className={styles.input}
+                                className="input"
                             />
                         </div>
 
                         {error && (
-                            <p role="alert" className={styles.error}>
+                            <p role="alert" className="infoMessage error">
                                 {error}
                             </p>
                         )}

@@ -4,41 +4,10 @@
     font-weight: 700;
 }
 
-.input {
-    height: 40px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 0 12px;
-    font-size: 16px;
-    background: #fff;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.input:focus {
-    outline: none;
-    border-color: #111827;
-    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.15);
-}
-
-.input:disabled {
-    background: #f9fafb;
-    cursor: not-allowed;
-    color: #6b7280;
-}
-
 .textarea {
     min-height: 120px;
     padding: 10px 12px;
     height: auto;
-}
-
-.error {
-    font-size: 14px;
-    color: #b91c1c;
-    background: #fee2e2;
-    border: 1px solid #fecaca;
-    border-radius: 8px;
-    padding: 8px 10px;
 }
 
 .actions {

@@ -34,7 +34,7 @@ export default function ResetPasswordModal({ onClose }) {
 
     return (
         <dialog ref={dialogRef} aria-labelledby="reset-title" onCancel={handleCancel}>
-            <form onSubmit={handleSubmit} className="form modal" noValidate>
+            <form onSubmit={handleSubmit} className="modal" noValidate>
                 <h2 id="reset-title" className={styles.title}>
                     Reset Password
                 </h2>
@@ -51,7 +51,7 @@ export default function ResetPasswordModal({ onClose }) {
                         onChange={e => setEmail(e.target.value)}
                         autoComplete="email"
                         required
-                        className={styles.input}
+                        className="input"
                         disabled={globalLoading}
                     />
                 </div>

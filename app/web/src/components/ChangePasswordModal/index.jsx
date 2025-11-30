@@ -48,7 +48,7 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, apiError 
                             onChange={e => setCurrentPassword(e.target.value)}
                             autoComplete="current-password"
                             required
-                            className={styles.input}
+                            className="input"
                             disabled={globalLoading}
                         />
                     </label>
@@ -63,13 +63,13 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, apiError 
                             autoComplete="new-password"
                             required
                             minLength={8}
-                            className={styles.input}
+                            className="input"
                             disabled={globalLoading}
                         />
                     </label>
 
                     {(formError || apiError) && (
-                        <p role="alert" className={styles.error}>
+                        <p role="alert" className="infoMessage error">
                             {formError || apiError}
                         </p>
                     )}

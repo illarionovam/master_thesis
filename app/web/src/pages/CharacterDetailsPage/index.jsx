@@ -170,7 +170,7 @@ export default function CharacterDetailsPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {globalError && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {globalError}
                 </p>
             )}
@@ -201,7 +201,7 @@ export default function CharacterDetailsPage() {
                         </section>
 
                         <section className="card" aria-label="Character info">
-                            <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                            <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>
                                 <div className="field">
                                     <label htmlFor="ch-name" className="label">
                                         Name
@@ -211,7 +211,7 @@ export default function CharacterDetailsPage() {
                                         name="name"
                                         type="text"
                                         defaultValue={character.name ?? ''}
-                                        className={styles.input}
+                                        className="input"
                                         disabled={!editMode || globalLoading}
                                         required
                                     />
@@ -226,7 +226,7 @@ export default function CharacterDetailsPage() {
                                         name="appearance"
                                         rows={5}
                                         defaultValue={character.appearance ?? ''}
-                                        className={`${styles.input} ${styles.textarea}`}
+                                        className={`input ${styles.textarea}`}
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
@@ -240,7 +240,7 @@ export default function CharacterDetailsPage() {
                                         name="personality"
                                         rows={5}
                                         defaultValue={character.personality ?? ''}
-                                        className={`${styles.input} ${styles.textarea}`}
+                                        className={`input ${styles.textarea}`}
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
@@ -254,7 +254,7 @@ export default function CharacterDetailsPage() {
                                         name="bio"
                                         rows={6}
                                         defaultValue={character.bio ?? ''}
-                                        className={`${styles.input} ${styles.textarea}`}
+                                        className={`input ${styles.textarea}`}
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
@@ -301,12 +301,12 @@ export default function CharacterDetailsPage() {
                                 </div>
 
                                 {updateError && (
-                                    <p role="alert" className={styles.error}>
+                                    <p role="alert" className="infoMessage error">
                                         {String(updateError)}
                                     </p>
                                 )}
                                 {deleteError && (
-                                    <p role="alert" className={styles.error}>
+                                    <p role="alert" className="infoMessage error">
                                         {String(deleteError)}
                                     </p>
                                 )}
@@ -464,7 +464,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <label className="label">
                     Key
                     <input
-                        className={styles.input}
+                        className="input"
                         type="text"
                         value={keyStr}
                         onChange={e => setKeyStr(e.target.value)}
@@ -477,7 +477,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <label className="label">
                     Value
                     <input
-                        className={styles.input}
+                        className="input"
                         type="text"
                         value={valStr}
                         onChange={e => setValStr(e.target.value)}
@@ -487,7 +487,7 @@ function AddTagFields({ onAdd, onCancel }) {
             </div>
 
             {err && (
-                <p className={styles.error} role="alert">
+                <p className="infoMessage error" role="alert">
                     {err}
                 </p>
             )}

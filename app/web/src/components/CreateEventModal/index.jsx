@@ -50,7 +50,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-event-title" onClose={onClose}>
-            <form onSubmit={handleSubmit} className="form modal">
+            <form onSubmit={handleSubmit} className="modal">
                 <h2 id="create-event-title" className={styles.title}>
                     Create Event
                 </h2>
@@ -65,7 +65,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                         value={title}
                         onChange={e => setTitle(e.target.value)}
                         placeholder="e.g., Caravan arrives"
-                        className={styles.input}
+                        className="input"
                         disabled={globalLoading}
                         required
                         maxLength={100}
@@ -87,7 +87,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                         onChange={e => setDescription(e.target.value)}
                         required
                         placeholder="Short description of the event..."
-                        className={`${styles.input} ${styles.textarea}`}
+                        className={`input ${styles.textarea}`}
                         disabled={globalLoading}
                     />
                 </div>
@@ -100,7 +100,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                         id="ev-location"
                         value={locationInWorkId}
                         onChange={e => setLocationInWorkId(e.target.value)}
-                        className={styles.input}
+                        className="input"
                         disabled={globalLoading}
                     >
                         <option value="">— None —</option>
@@ -113,7 +113,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                 </div>
 
                 {(formError || error) && (
-                    <p role="alert" className={styles.error}>
+                    <p role="alert" className="infoMessage error">
                         {formError || error}
                     </p>
                 )}

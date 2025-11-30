@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { confirmEmail } from '../../redux/auth/operations';
 import { useNavigate } from 'react-router-dom';
 import { selectConfirmEmailError } from '../../redux/auth/selectors';
-import styles from './ConfirmEmailPage.module.css';
 
 export default function ConfirmEmailPage() {
     const dispatch = useDispatch();
@@ -29,7 +28,7 @@ export default function ConfirmEmailPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {confirmEmailError && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {confirmEmailError}
                 </p>
             )}

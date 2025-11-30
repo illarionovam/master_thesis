@@ -152,7 +152,7 @@ export default function DashboardPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {globalError && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {globalError}
                 </p>
             )}

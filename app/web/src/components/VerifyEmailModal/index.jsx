@@ -34,7 +34,7 @@ export default function VerifyEmailModal({ onClose }) {
 
     return (
         <dialog ref={dialogRef} aria-labelledby="verify-title" onCancel={handleCancel}>
-            <form onSubmit={handleSubmit} className="form modal" noValidate>
+            <form onSubmit={handleSubmit} className="modal" noValidate>
                 <h2 id="verify-title" className={styles.title}>
                     Verify Email
                 </h2>
@@ -51,7 +51,7 @@ export default function VerifyEmailModal({ onClose }) {
                         onChange={e => setEmail(e.target.value)}
                         autoComplete="email"
                         required
-                        className={styles.input}
+                        className="input"
                         disabled={globalLoading}
                     />
                 </div>

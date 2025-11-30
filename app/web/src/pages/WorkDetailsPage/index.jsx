@@ -309,7 +309,7 @@ export default function WorkDetailsPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {globalError && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {globalError}
                 </p>
             )}
@@ -343,7 +343,7 @@ export default function WorkDetailsPage() {
                         </div>
 
                         <section className="card" aria-label="Work info">
-                            <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                            <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>
                                 <div className="field">
                                     <label htmlFor="work-title" className="label">
                                         Title
@@ -353,7 +353,7 @@ export default function WorkDetailsPage() {
                                         name="title"
                                         type="text"
                                         defaultValue={work.title ?? ''}
-                                        className={styles.input}
+                                        className="input"
                                         disabled={!editMode || globalLoading}
                                         required
                                     />
@@ -368,7 +368,7 @@ export default function WorkDetailsPage() {
                                         name="annotation"
                                         rows={4}
                                         defaultValue={work.annotation ?? ''}
-                                        className={`${styles.input} ${styles.textarea}`}
+                                        className={`input ${styles.textarea}`}
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
@@ -382,18 +382,18 @@ export default function WorkDetailsPage() {
                                         name="synopsis"
                                         rows={8}
                                         defaultValue={work.synopsis ?? ''}
-                                        className={`${styles.input} ${styles.textarea}`}
+                                        className={`input ${styles.textarea}`}
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
 
                                 {updateError && (
-                                    <p role="alert" className={styles.error}>
+                                    <p role="alert" className="infoMessage error">
                                         {updateError}
                                     </p>
                                 )}
                                 {deleteError && (
-                                    <p role="alert" className={styles.error}>
+                                    <p role="alert" className="infoMessage error">
                                         {deleteError}
                                     </p>
                                 )}
@@ -625,7 +625,7 @@ export default function WorkDetailsPage() {
                             </label>
                             <textarea
                                 id="generated-description"
-                                className={`${styles.input} ${styles.textarea}`}
+                                className={`input ${styles.textarea}`}
                                 rows={10}
                                 readOnly
                                 value={genResult?.result ?? 'Generating...'}
@@ -633,7 +633,7 @@ export default function WorkDetailsPage() {
                         </div>
 
                         {genError && (
-                            <p className={styles.error} role="alert">
+                            <p className="infoMessage error" role="alert">
                                 {genError}
                             </p>
                         )}

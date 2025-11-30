@@ -101,7 +101,7 @@ export default function LocationInWorkDetailsPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {globalError && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {globalError}
                 </p>
             )}
@@ -140,23 +140,17 @@ export default function LocationInWorkDetailsPage() {
                     </div>
 
                     <section className="card" aria-label="Location in work">
-                        <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                        <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>
                             <div className="field">
                                 <label className="label">Title</label>
-                                <input
-                                    type="text"
-                                    className={styles.input}
-                                    value={location?.title ?? ''}
-                                    disabled
-                                    readOnly
-                                />
+                                <input type="text" className="input" value={location?.title ?? ''} disabled readOnly />
                             </div>
 
                             <div className="field">
                                 <label className="label">Description</label>
                                 <textarea
                                     rows={5}
-                                    className={`${styles.input} ${styles.textarea}`}
+                                    className={`input ${styles.textarea}`}
                                     value={location?.description ?? ''}
                                     disabled
                                     readOnly
@@ -167,7 +161,7 @@ export default function LocationInWorkDetailsPage() {
                                 <label className="label">Parent Location</label>
                                 <input
                                     type="text"
-                                    className={styles.input}
+                                    className="input"
                                     value={parentTitle ?? '— None —'}
                                     disabled
                                     readOnly
@@ -216,7 +210,7 @@ export default function LocationInWorkDetailsPage() {
                             </div>
 
                             {updateError && (
-                                <p role="alert" className={styles.error}>
+                                <p role="alert" className="infoMessage error">
                                     {String(updateError)}
                                 </p>
                             )}
@@ -297,7 +291,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <label className="label">
                     Key
                     <input
-                        className={styles.input}
+                        className="input"
                         type="text"
                         value={keyStr}
                         onChange={e => setKeyStr(e.target.value)}
@@ -310,7 +304,7 @@ function AddTagFields({ onAdd, onCancel }) {
                 <label className="label">
                     Value
                     <input
-                        className={styles.input}
+                        className="input"
                         type="text"
                         value={valStr}
                         onChange={e => setValStr(e.target.value)}
@@ -320,7 +314,7 @@ function AddTagFields({ onAdd, onCancel }) {
             </div>
 
             {err && (
-                <p className={styles.error} role="alert">
+                <p className="infoMessage error" role="alert">
                     {err}
                 </p>
             )}

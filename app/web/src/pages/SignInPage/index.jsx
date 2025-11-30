@@ -69,7 +69,7 @@ export default function SignInPage() {
                         Sign In
                     </h1>
 
-                    <form onSubmit={handleSubmit} noValidate className="form">
+                    <form onSubmit={handleSubmit} noValidate>
                         <div className="field">
                             <label htmlFor="email" className="label">
                                 Email
@@ -80,7 +80,7 @@ export default function SignInPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading}
                             />
                         </div>
@@ -95,25 +95,25 @@ export default function SignInPage() {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className={styles.input}
+                                className="input"
                                 disabled={globalLoading}
                             />
                         </div>
 
                         {error && (
-                            <p role="alert" className={styles.error}>
+                            <p role="alert" className="infoMessage error">
                                 {error}
                             </p>
                         )}
 
                         {verifyEmailError && (
-                            <p role="alert" className={styles.error}>
+                            <p role="alert" className="infoMessage error">
                                 {verifyEmailError}
                             </p>
                         )}
 
                         {resetPasswordError && (
-                            <p role="alert" className={styles.error}>
+                            <p role="alert" className="infoMessage error">
                                 {resetPasswordError}
                             </p>
                         )}

@@ -46,7 +46,7 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-location-title" onClose={onClose}>
-            <form onSubmit={handleSubmit} className="form modal">
+            <form onSubmit={handleSubmit} className="modal">
                 <h2 id="create-location-title" className={styles.title}>
                     Create Location
                 </h2>
@@ -62,7 +62,7 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
                         onChange={e => setTitle(e.target.value)}
                         required
                         placeholder="e.g., Northern Outpost"
-                        className={styles.input}
+                        className="input"
                         disabled={globalLoading}
                     />
                 </div>
@@ -75,7 +75,7 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
                         id="loc-parent"
                         value={parentId}
                         onChange={e => setParentId(e.target.value)}
-                        className={styles.input}
+                        className="input"
                         disabled={globalLoading}
                     >
                         <option value="">— None —</option>
@@ -98,13 +98,13 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
                         onChange={e => setDescription(e.target.value)}
                         required
                         placeholder="Short description..."
-                        className={`${styles.input} ${styles.textarea}`}
+                        className={`input ${styles.textarea}`}
                         disabled={globalLoading}
                     />
                 </div>
 
                 {(formError || error) && (
-                    <p role="alert" className={styles.error}>
+                    <p role="alert" className="infoMessage error">
                         {formError || error}
                     </p>
                 )}

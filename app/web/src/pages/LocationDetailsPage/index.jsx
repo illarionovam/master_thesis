@@ -146,7 +146,7 @@ export default function LocationDetailsPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {globalError && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {globalError}
                 </p>
             )}
@@ -173,7 +173,7 @@ export default function LocationDetailsPage() {
                     </div>
 
                     <section className="card" aria-label="Location info">
-                        <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                        <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>
                             <div className="field">
                                 <label htmlFor="loc-title" className="label">
                                     Title
@@ -183,7 +183,7 @@ export default function LocationDetailsPage() {
                                     name="title"
                                     type="text"
                                     defaultValue={location.title ?? ''}
-                                    className={styles.input}
+                                    className="input"
                                     disabled={!editMode || globalLoading}
                                     required
                                 />
@@ -198,7 +198,7 @@ export default function LocationDetailsPage() {
                                     name="description"
                                     rows={5}
                                     defaultValue={location.description ?? ''}
-                                    className={`${styles.input} ${styles.textarea}`}
+                                    className={`input ${styles.textarea}`}
                                     disabled={!editMode || globalLoading}
                                     required
                                 />
@@ -212,7 +212,7 @@ export default function LocationDetailsPage() {
                                     id="loc-parent"
                                     name="parent_location_id"
                                     defaultValue={location.parent?.id ?? ''}
-                                    className={styles.input}
+                                    className="input"
                                     disabled={!editMode || globalLoading}
                                 >
                                     <option value="">— None —</option>
@@ -225,13 +225,13 @@ export default function LocationDetailsPage() {
                             </div>
 
                             {updateError && (
-                                <p role="alert" className={styles.error}>
+                                <p role="alert" className="infoMessage error">
                                     {String(updateError)}
                                 </p>
                             )}
 
                             {deleteError && (
-                                <p role="alert" className={styles.error}>
+                                <p role="alert" className="infoMessage error">
                                     {String(deleteError)}
                                 </p>
                             )}

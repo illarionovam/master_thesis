@@ -88,7 +88,7 @@ export default function RelationshipDetailsPage() {
     return (
         <main aria-labelledby={titleId} className="page">
             {error && (
-                <p role="alert" className={styles.error}>
+                <p role="alert" className="infoMessage error">
                     {error}
                 </p>
             )}
@@ -141,15 +141,15 @@ export default function RelationshipDetailsPage() {
                         <Title id={titleId}>Relationship</Title>
                     </div>
                     <section className="card" aria-label="Relationship details">
-                        <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                        <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>
                             <div className="field">
                                 <label className="label">From</label>
-                                <input type="text" className={styles.input} value={fromName} disabled readOnly />
+                                <input type="text" className="input" value={fromName} disabled readOnly />
                             </div>
 
                             <div className="field">
                                 <label className="label">To</label>
-                                <input type="text" className={styles.input} value={toName} disabled readOnly />
+                                <input type="text" className="input" value={toName} disabled readOnly />
                             </div>
 
                             <div className="field">
@@ -160,7 +160,7 @@ export default function RelationshipDetailsPage() {
                                     id="rel-type"
                                     name="type"
                                     type="text"
-                                    className={styles.input}
+                                    className="input"
                                     value={typeVal}
                                     onChange={e => setTypeVal(e.target.value)}
                                     disabled={!editMode || globalLoading}
@@ -177,7 +177,7 @@ export default function RelationshipDetailsPage() {
                                     id="rel-notes"
                                     name="notes"
                                     rows={5}
-                                    className={`${styles.input} ${styles.textarea}`}
+                                    className={`input ${styles.textarea}`}
                                     value={notesVal}
                                     onChange={e => setNotesVal(e.target.value)}
                                     disabled={!editMode || globalLoading}
@@ -186,13 +186,13 @@ export default function RelationshipDetailsPage() {
                             </div>
 
                             {updateError && (
-                                <p role="alert" className={styles.error}>
+                                <p role="alert" className="infoMessage error">
                                     {String(updateError)}
                                 </p>
                             )}
 
                             {deleteError && (
-                                <p role="alert" className={styles.error}>
+                                <p role="alert" className="infoMessage error">
                                     {String(deleteError)}
                                 </p>
                             )}

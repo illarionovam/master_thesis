@@ -77,8 +77,6 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
 
     return (
         <div className={styles.imageColumn}>
-            <span className="label">Image</span>
-
             <div className={styles.portraitWrap}>
                 {previewUrl ? (
                     <img className={styles.portraitImg} src={previewUrl} alt="Preview" />
@@ -91,17 +89,17 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
 
             <div className={styles.uploader}>
                 {generateError && (
-                    <p role="alert" className={styles.error}>
+                    <p role="alert" className="infoMessage error">
                         {generateError}
                     </p>
                 )}
                 {generateErrorCIW && (
-                    <p role="alert" className={styles.error}>
+                    <p role="alert" className="infoMessage error">
                         {generateErrorCIW}
                     </p>
                 )}
                 {uploadImageError && (
-                    <p role="alert" className={styles.error}>
+                    <p role="alert" className="infoMessage error">
                         {uploadImageError}
                     </p>
                 )}

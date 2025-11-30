@@ -164,7 +164,7 @@ dialog {
     }
 }
 
-.form {
+form {
     display: grid;
     gap: 14px;
 
@@ -175,10 +175,45 @@ dialog {
 
 .label {
     font-size: 14px;
-    color: #374151;
+    color: var(--gray);
 }
 
 .field {
     display: grid;
     gap: 6px;
+}
+
+.input {
+    height: 40px;
+    padding: 0 12px;
+    border: var(--border);
+    border-radius: var(--border-radius);
+
+    &:focus {
+        outline: none;
+        border-color: var(--lilac);
+        box-shadow: var(--box-shadow);
+    }
+
+    &:disabled {
+        background: #f9fafb;
+        cursor: not-allowed;
+    }
+}
+
+.infoMessage {
+    font-size: 14px;
+    padding: 8px 10px;
+    margin-top: 2px;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    color: var(--black);
+
+    &.error {
+        background: var(--pink);
+    }
+
+    &.success {
+        background: var(--light-green);
+    }
 }

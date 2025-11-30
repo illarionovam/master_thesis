@@ -46,7 +46,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-work-title" onClose={onClose}>
-            <form onSubmit={handleSubmit} className="form modal">
+            <form onSubmit={handleSubmit} className="modal">
                 <h2 id="create-work-title" className={styles.title}>
                     Create Work
                 </h2>
@@ -62,7 +62,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
                         onChange={e => setTitle(e.target.value)}
                         required
                         placeholder="e.g., The Ashen Caravan"
-                        className={styles.input}
+                        className="input"
                         disabled={globalLoading}
                     />
                 </div>
@@ -77,7 +77,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
                         value={annotation}
                         onChange={e => setAnnotation(e.target.value)}
                         placeholder="One-two sentences summary..."
-                        className={`${styles.input} ${styles.textarea}`}
+                        className={`input ${styles.textarea}`}
                         disabled={globalLoading}
                     />
                 </div>
@@ -92,13 +92,13 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
                         value={synopsis}
                         onChange={e => setSynopsis(e.target.value)}
                         placeholder="Extended outline, key beats, arcs..."
-                        className={`${styles.input} ${styles.textarea}`}
+                        className={`input ${styles.textarea}`}
                         disabled={globalLoading}
                     />
                 </div>
 
                 {(formError || error) && (
-                    <p role="alert" className={styles.error}>
+                    <p role="alert" className="infoMessage error">
                         {formError || error}
                     </p>
                 )}
