@@ -103,13 +103,11 @@ button {
 }
 
 .primaryBtn {
-    background: var(--black);
-    color: var(--white);
+    background: var(--lilac);
 }
 
 .dangerBtn {
-    background: var(--red);
-    color: var(--white);
+    background: var(--pink);
 }
 
 .icon {
@@ -188,6 +186,7 @@ form {
     padding: 0 12px;
     border: var(--border);
     border-radius: var(--border-radius);
+    background-color: var(--white);
 
     &:focus {
         outline: none;

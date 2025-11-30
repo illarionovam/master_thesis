@@ -62,16 +62,13 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                         type="text"
                         value={title}
                         onChange={e => setTitle(e.target.value)}
-                        placeholder="e.g., Caravan arrives"
+                        placeholder="Title"
                         className="input"
                         disabled={globalLoading}
                         required
                         maxLength={100}
                         aria-describedby="ev-title-hint"
                     />
-                    <small id="ev-title-hint" className={styles.hint}>
-                        {Math.max(0, 100 - title.length)} characters left
-                    </small>
                 </div>
 
                 <div className="field">
@@ -84,7 +81,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                         required
-                        placeholder="Short description of the event..."
+                        placeholder="Short description of the event"
                         className="input textarea"
                         disabled={globalLoading}
                     />
@@ -92,7 +89,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
 
                 <div className="field">
                     <label htmlFor="ev-location" className="label">
-                        Location (in this work)
+                        Location
                     </label>
                     <select
                         id="ev-location"

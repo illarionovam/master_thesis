@@ -261,7 +261,7 @@ export default function EventDetailsPage() {
 
                             <div className="field">
                                 <label htmlFor="ev-location" className="label">
-                                    Location (in this work)
+                                    Location
                                 </label>
                                 <select
                                     id="ev-location"
@@ -387,9 +387,6 @@ export default function EventDetailsPage() {
                         </h3>
 
                         <div className="field">
-                            <label htmlFor="generated-description" className="label">
-                                Text
-                            </label>
                             <textarea
                                 id="generated-description"
                                 className="input textarea"
