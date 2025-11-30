@@ -69,9 +69,9 @@ export default function SignInPage() {
                         Sign In
                     </h1>
 
-                    <form onSubmit={handleSubmit} noValidate className={styles.form}>
-                        <div className={styles.field}>
-                            <label htmlFor="email" className={styles.label}>
+                    <form onSubmit={handleSubmit} noValidate className="form">
+                        <div className="field">
+                            <label htmlFor="email" className="label">
                                 Email
                             </label>
                             <input
@@ -85,8 +85,8 @@ export default function SignInPage() {
                             />
                         </div>
 
-                        <div className={styles.field}>
-                            <label htmlFor="password" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="password" className="label">
                                 Password
                             </label>
                             <input

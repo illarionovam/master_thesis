@@ -343,9 +343,9 @@ export default function WorkDetailsPage() {
                         </div>
 
                         <section className="card" aria-label="Work info">
-                            <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                                <div className={styles.field}>
-                                    <label htmlFor="work-title" className={styles.label}>
+                            <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                                <div className="field">
+                                    <label htmlFor="work-title" className="label">
                                         Title
                                     </label>
                                     <input
@@ -359,8 +359,8 @@ export default function WorkDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <label htmlFor="work-annotation" className={styles.label}>
+                                <div className="field">
+                                    <label htmlFor="work-annotation" className="label">
                                         Annotation
                                     </label>
                                     <textarea
@@ -373,8 +373,8 @@ export default function WorkDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <label htmlFor="work-synopsis" className={styles.label}>
+                                <div className="field">
+                                    <label htmlFor="work-synopsis" className="label">
                                         Synopsis
                                     </label>
                                     <textarea
@@ -619,8 +619,8 @@ export default function WorkDetailsPage() {
                             Generated description
                         </h3>
 
-                        <div className={styles.field}>
-                            <label htmlFor="generated-description" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="generated-description" className="label">
                                 Text
                             </label>
                             <textarea

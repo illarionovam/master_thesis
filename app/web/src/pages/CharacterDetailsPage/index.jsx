@@ -201,9 +201,9 @@ export default function CharacterDetailsPage() {
                         </section>
 
                         <section className="card" aria-label="Character info">
-                            <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                                <div className={styles.field}>
-                                    <label htmlFor="ch-name" className={styles.label}>
+                            <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                                <div className="field">
+                                    <label htmlFor="ch-name" className="label">
                                         Name
                                     </label>
                                     <input
@@ -217,8 +217,8 @@ export default function CharacterDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <label htmlFor="ch-appearance" className={styles.label}>
+                                <div className="field">
+                                    <label htmlFor="ch-appearance" className="label">
                                         Appearance
                                     </label>
                                     <textarea
@@ -231,8 +231,8 @@ export default function CharacterDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <label htmlFor="ch-personality" className={styles.label}>
+                                <div className="field">
+                                    <label htmlFor="ch-personality" className="label">
                                         Personality
                                     </label>
                                     <textarea
@@ -245,8 +245,8 @@ export default function CharacterDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <label htmlFor="ch-bio" className={styles.label}>
+                                <div className="field">
+                                    <label htmlFor="ch-bio" className="label">
                                         Bio
                                     </label>
                                     <textarea
@@ -259,8 +259,8 @@ export default function CharacterDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <span className={styles.label}>Tags</span>
+                                <div className="field">
+                                    <span className="label">Tags</span>
                                     <div className={styles.chips}>
                                         {Object.keys(attrs).length === 0 && (
                                             <span className={styles.muted}>No tags yet.</span>
@@ -460,8 +460,8 @@ function AddTagFields({ onAdd, onCancel }) {
 
     return (
         <>
-            <div className={styles.field}>
-                <label className={styles.label}>
+            <div className="field">
+                <label className="label">
                     Key
                     <input
                         className={styles.input}
@@ -473,8 +473,8 @@ function AddTagFields({ onAdd, onCancel }) {
                     />
                 </label>
             </div>
-            <div className={styles.field}>
-                <label className={styles.label}>
+            <div className="field">
+                <label className="label">
                     Value
                     <input
                         className={styles.input}

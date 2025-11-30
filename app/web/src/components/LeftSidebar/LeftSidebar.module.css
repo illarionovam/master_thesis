@@ -42,8 +42,7 @@
 }
 
 .active {
-    background: var(--light-gray);
-    font-weight: 600;
+    background: var(--light-blue);
 }
 
 .toggleBtn {

@@ -1,23 +1,7 @@
-.form {
-    padding: 24px;
-    display: grid;
-    gap: 14px;
-}
-
 .title {
     margin: 0;
     font-size: 20px;
     font-weight: 700;
-}
-
-.field {
-    display: grid;
-    gap: 6px;
-}
-
-.label {
-    font-size: 14px;
-    color: #374151;
 }
 
 .input {

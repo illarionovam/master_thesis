@@ -34,13 +34,13 @@ export default function VerifyEmailModal({ onClose }) {
 
     return (
         <dialog ref={dialogRef} aria-labelledby="verify-title" onCancel={handleCancel}>
-            <form onSubmit={handleSubmit} className={styles.form} noValidate>
+            <form onSubmit={handleSubmit} className="form modal" noValidate>
                 <h2 id="verify-title" className={styles.title}>
                     Verify Email
                 </h2>
 
-                <div className={styles.field}>
-                    <label htmlFor="verify-email" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="verify-email" className="label">
                         Email
                     </label>
                     <input

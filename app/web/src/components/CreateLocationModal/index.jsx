@@ -46,13 +46,13 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-location-title" onClose={onClose}>
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <form onSubmit={handleSubmit} className="form modal">
                 <h2 id="create-location-title" className={styles.title}>
                     Create Location
                 </h2>
 
-                <div className={styles.field}>
-                    <label htmlFor="loc-title" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="loc-title" className="label">
                         Title *
                     </label>
                     <input
@@ -67,8 +67,8 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
                     />
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="loc-parent" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="loc-parent" className="label">
                         Parent Location
                     </label>
                     <select
@@ -87,8 +87,8 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
                     </select>
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="loc-desc" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="loc-desc" className="label">
                         Description *
                     </label>
                     <textarea

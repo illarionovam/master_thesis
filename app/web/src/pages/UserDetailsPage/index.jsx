@@ -111,7 +111,7 @@ export default function UserDetailPage() {
                     </h1>
                     <form
                         ref={formRef}
-                        className={styles.form}
+                        className="form"
                         noValidate
                         onSubmit={e => {
                             if (editMode) {
@@ -122,8 +122,8 @@ export default function UserDetailPage() {
                         }}
                     >
                         <div className={styles.fieldRow}>
-                            <div className={styles.field}>
-                                <label htmlFor="email" className={styles.label}>
+                            <div className="field">
+                                <label htmlFor="email" className="label">
                                     Email
                                 </label>
                                 <input
@@ -165,8 +165,8 @@ export default function UserDetailPage() {
                             </p>
                         )}
 
-                        <div className={styles.field}>
-                            <label htmlFor="username" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="username" className="label">
                                 Username
                             </label>
                             <input
@@ -180,8 +180,8 @@ export default function UserDetailPage() {
                             />
                         </div>
 
-                        <div className={styles.field}>
-                            <label htmlFor="name" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="name" className="label">
                                 Name
                             </label>
                             <input

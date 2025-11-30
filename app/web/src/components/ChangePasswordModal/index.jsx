@@ -39,8 +39,8 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, apiError 
                 </h2>
 
                 <div className={styles.fields}>
-                    <label className={styles.field}>
-                        <span className={styles.label}>Current password</span>
+                    <label className="field">
+                        <span className="label">Current password</span>
                         <input
                             type="password"
                             name="current_password"
@@ -53,8 +53,8 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, apiError 
                         />
                     </label>
 
-                    <label className={styles.field}>
-                        <span className={styles.label}>New password</span>
+                    <label className="field">
+                        <span className="label">New password</span>
                         <input
                             type="password"
                             name="new_password"

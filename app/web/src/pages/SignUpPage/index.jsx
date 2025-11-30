@@ -53,9 +53,9 @@ export default function SignUpPage() {
                         Sign Up
                     </h1>
 
-                    <form onSubmit={handleSubmit} noValidate className={styles.form} onInput={clearLocalValidation}>
-                        <div className={styles.field}>
-                            <label htmlFor="name" className={styles.label}>
+                    <form onSubmit={handleSubmit} noValidate className="form" onInput={clearLocalValidation}>
+                        <div className="field">
+                            <label htmlFor="name" className="label">
                                 Name
                             </label>
                             <input
@@ -68,8 +68,8 @@ export default function SignUpPage() {
                             />
                         </div>
 
-                        <div className={styles.field}>
-                            <label htmlFor="username" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="username" className="label">
                                 Username
                             </label>
                             <input
@@ -82,8 +82,8 @@ export default function SignUpPage() {
                             />
                         </div>
 
-                        <div className={styles.field}>
-                            <label htmlFor="email" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="email" className="label">
                                 Email
                             </label>
                             <input
@@ -97,8 +97,8 @@ export default function SignUpPage() {
                             />
                         </div>
 
-                        <div className={styles.field}>
-                            <label htmlFor="password" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="password" className="label">
                                 Password
                             </label>
                             <input
@@ -112,8 +112,8 @@ export default function SignUpPage() {
                             />
                         </div>
 
-                        <div className={styles.field}>
-                            <label htmlFor="passwordConfirm" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="passwordConfirm" className="label">
                                 Confirm password
                             </label>
                             <input

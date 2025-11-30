@@ -214,9 +214,9 @@ export default function CharacterInWorkDetailsPage() {
                             />
                         </section>
                         <section className="card" aria-label="Character in work">
-                            <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                                <div className={styles.field}>
-                                    <label className={styles.label}>Character Name</label>
+                            <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                                <div className="field">
+                                    <label className="label">Character Name</label>
                                     <input
                                         type="text"
                                         className={styles.input}
@@ -226,8 +226,8 @@ export default function CharacterInWorkDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <label className={styles.label}>Appearance</label>
+                                <div className="field">
+                                    <label className="label">Appearance</label>
                                     <textarea
                                         rows={5}
                                         className={`${styles.input} ${styles.textarea}`}
@@ -237,8 +237,8 @@ export default function CharacterInWorkDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <label className={styles.label}>Personality</label>
+                                <div className="field">
+                                    <label className="label">Personality</label>
                                     <textarea
                                         rows={5}
                                         className={`${styles.input} ${styles.textarea}`}
@@ -248,8 +248,8 @@ export default function CharacterInWorkDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <label className={styles.label}>Bio</label>
+                                <div className="field">
+                                    <label className="label">Bio</label>
                                     <textarea
                                         rows={6}
                                         className={`${styles.input} ${styles.textarea}`}
@@ -259,8 +259,8 @@ export default function CharacterInWorkDetailsPage() {
                                     />
                                 </div>
 
-                                <div className={styles.field}>
-                                    <span className={styles.label}>Parent Tags</span>
+                                <div className="field">
+                                    <span className="label">Parent Tags</span>
                                     <div className={styles.chips}>
                                         {Object.keys(initialAttrs).length === 0 && (
                                             <span className={styles.muted}>No tags yet.</span>
@@ -276,8 +276,8 @@ export default function CharacterInWorkDetailsPage() {
                                     </div>
                                 </div>
 
-                                <div className={styles.field}>
-                                    <span className={styles.label}>Current Tags</span>
+                                <div className="field">
+                                    <span className="label">Current Tags</span>
                                     <div className={styles.chips}>
                                         {Object.keys(currentAttrs).length === 0 && (
                                             <span className={styles.muted}>No tags yet.</span>
@@ -428,8 +428,8 @@ export default function CharacterInWorkDetailsPage() {
                             </ul>
                         )}
 
-                        <div className={styles.field}>
-                            <label className={styles.label}>
+                        <div className="field">
+                            <label className="label">
                                 Type
                                 <input
                                     className={styles.input}
@@ -495,8 +495,8 @@ function AddTagFields({ onAdd, onCancel }) {
 
     return (
         <>
-            <div className={styles.field}>
-                <label className={styles.label}>
+            <div className="field">
+                <label className="label">
                     Key
                     <input
                         className={styles.input}
@@ -508,8 +508,8 @@ function AddTagFields({ onAdd, onCancel }) {
                     />
                 </label>
             </div>
-            <div className={styles.field}>
-                <label className={styles.label}>
+            <div className="field">
+                <label className="label">
                     Value
                     <input
                         className={styles.input}

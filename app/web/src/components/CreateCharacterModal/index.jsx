@@ -56,13 +56,13 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-character-title" onClose={onClose}>
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <form onSubmit={handleSubmit} className="form modal">
                 <h2 id="create-character-title" className={styles.title}>
                     Create Character
                 </h2>
 
-                <div className={styles.field}>
-                    <label htmlFor="ch-name" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="ch-name" className="label">
                         Name *
                     </label>
                     <input
@@ -77,8 +77,8 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                     />
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="ch-appearance" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="ch-appearance" className="label">
                         Appearance *
                     </label>
                     <textarea
@@ -93,8 +93,8 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                     />
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="ch-personality" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="ch-personality" className="label">
                         Personality *
                     </label>
                     <textarea
@@ -109,8 +109,8 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                     />
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="ch-bio" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="ch-bio" className="label">
                         Bio *
                     </label>
                     <textarea

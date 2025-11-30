@@ -77,7 +77,7 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
 
     return (
         <div className={styles.imageColumn}>
-            <span className={styles.label}>Image</span>
+            <span className="label">Image</span>
 
             <div className={styles.portraitWrap}>
                 {previewUrl ? (
@@ -145,8 +145,8 @@ export default function CharacterImageSection({ characterId, workId, ciwId, name
                             Upload image
                         </h3>
 
-                        <div className={styles.field}>
-                            <label className={styles.label}>
+                        <div className="field">
+                            <label className="label">
                                 Choose file
                                 <input
                                     type="file"

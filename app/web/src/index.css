@@ -10,6 +10,12 @@
     --light-gray: rgba(0, 0, 0, 0.08);
     --shadow-gray: rgba(0, 0, 0, 0.16);
     --blue: #1d4ed8;
+    --light-blue: #c0e9ffff;
+    --light-green: #d2fd78ff;
+    --pink: #ffcce4ff;
+    --peach: #fbe2c4ff;
+    --yellow: #faea32ff;
+    --lilac: #cbb2feff;
 
     --box-shadow: 4px 4px 8px var(--light-gray);
 
@@ -156,4 +162,23 @@ dialog {
         width: 100%;
         max-width: 420px;
     }
+}
+
+.form {
+    display: grid;
+    gap: 14px;
+
+    &.modal {
+        padding: 24px;
+    }
+}
+
+.label {
+    font-size: 14px;
+    color: #374151;
+}
+
+.field {
+    display: grid;
+    gap: 6px;
 }

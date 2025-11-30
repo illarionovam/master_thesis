@@ -46,13 +46,13 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-work-title" onClose={onClose}>
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <form onSubmit={handleSubmit} className="form modal">
                 <h2 id="create-work-title" className={styles.title}>
                     Create Work
                 </h2>
 
-                <div className={styles.field}>
-                    <label htmlFor="work-title" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="work-title" className="label">
                         Title *
                     </label>
                     <input
@@ -67,9 +67,9 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
                     />
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="work-annotation" className={styles.label}>
-                        Annotation
+                <div className="field">
+                    <label htmlFor="work-annotation" className="label">
+                        Annotation *
                     </label>
                     <textarea
                         id="work-annotation"
@@ -82,9 +82,9 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
                     />
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="work-synopsis" className={styles.label}>
-                        Synopsis
+                <div className="field">
+                    <label htmlFor="work-synopsis" className="label">
+                        Synopsis *
                     </label>
                     <textarea
                         id="work-synopsis"

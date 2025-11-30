@@ -40,9 +40,9 @@ export default function ResetPasswordPage() {
                         Reset Password
                     </h1>
 
-                    <form onSubmit={handleSubmit} noValidate className={styles.form}>
-                        <div className={styles.field}>
-                            <label htmlFor="new_password" className={styles.label}>
+                    <form onSubmit={handleSubmit} noValidate className="form">
+                        <div className="field">
+                            <label htmlFor="new_password" className="label">
                                 New password
                             </label>
                             <input

@@ -141,19 +141,19 @@ export default function RelationshipDetailsPage() {
                         <Title id={titleId}>Relationship</Title>
                     </div>
                     <section className="card" aria-label="Relationship details">
-                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                            <div className={styles.field}>
-                                <label className={styles.label}>From</label>
+                        <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                            <div className="field">
+                                <label className="label">From</label>
                                 <input type="text" className={styles.input} value={fromName} disabled readOnly />
                             </div>
 
-                            <div className={styles.field}>
-                                <label className={styles.label}>To</label>
+                            <div className="field">
+                                <label className="label">To</label>
                                 <input type="text" className={styles.input} value={toName} disabled readOnly />
                             </div>
 
-                            <div className={styles.field}>
-                                <label className={styles.label} htmlFor="rel-type">
+                            <div className="field">
+                                <label className="label" htmlFor="rel-type">
                                     Type
                                 </label>
                                 <input
@@ -169,8 +169,8 @@ export default function RelationshipDetailsPage() {
                                 />
                             </div>
 
-                            <div className={styles.field}>
-                                <label className={styles.label} htmlFor="rel-notes">
+                            <div className="field">
+                                <label className="label" htmlFor="rel-notes">
                                     Notes
                                 </label>
                                 <textarea

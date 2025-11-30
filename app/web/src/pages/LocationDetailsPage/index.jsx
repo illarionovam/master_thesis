@@ -173,9 +173,9 @@ export default function LocationDetailsPage() {
                     </div>
 
                     <section className="card" aria-label="Location info">
-                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                            <div className={styles.field}>
-                                <label htmlFor="loc-title" className={styles.label}>
+                        <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                            <div className="field">
+                                <label htmlFor="loc-title" className="label">
                                     Title
                                 </label>
                                 <input
@@ -189,8 +189,8 @@ export default function LocationDetailsPage() {
                                 />
                             </div>
 
-                            <div className={styles.field}>
-                                <label htmlFor="loc-desc" className={styles.label}>
+                            <div className="field">
+                                <label htmlFor="loc-desc" className="label">
                                     Description
                                 </label>
                                 <textarea
@@ -204,8 +204,8 @@ export default function LocationDetailsPage() {
                                 />
                             </div>
 
-                            <div className={styles.field}>
-                                <label htmlFor="loc-parent" className={styles.label}>
+                            <div className="field">
+                                <label htmlFor="loc-parent" className="label">
                                     Parent Location
                                 </label>
                                 <select

@@ -228,9 +228,9 @@ export default function EventDetailsPage() {
                         <Title id={titleId}>{pageTitle}</Title>
                     </div>
                     <section className="card" aria-label="Event info">
-                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                            <div className={styles.field}>
-                                <label htmlFor="ev-title" className={styles.label}>
+                        <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                            <div className="field">
+                                <label htmlFor="ev-title" className="label">
                                     Title
                                 </label>
                                 <input
@@ -245,8 +245,8 @@ export default function EventDetailsPage() {
                                 />
                             </div>
 
-                            <div className={styles.field}>
-                                <label htmlFor="ev-desc" className={styles.label}>
+                            <div className="field">
+                                <label htmlFor="ev-desc" className="label">
                                     Description
                                 </label>
                                 <textarea
@@ -260,8 +260,8 @@ export default function EventDetailsPage() {
                                 />
                             </div>
 
-                            <div className={styles.field}>
-                                <label htmlFor="ev-location" className={styles.label}>
+                            <div className="field">
+                                <label htmlFor="ev-location" className="label">
                                     Location (in this work)
                                 </label>
                                 <select
@@ -387,8 +387,8 @@ export default function EventDetailsPage() {
                             Generated description
                         </h3>
 
-                        <div className={styles.field}>
-                            <label htmlFor="generated-description" className={styles.label}>
+                        <div className="field">
+                            <label htmlFor="generated-description" className="label">
                                 Text
                             </label>
                             <textarea

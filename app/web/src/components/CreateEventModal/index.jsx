@@ -50,13 +50,13 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-event-title" onClose={onClose}>
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <form onSubmit={handleSubmit} className="form modal">
                 <h2 id="create-event-title" className={styles.title}>
                     Create Event
                 </h2>
 
-                <div className={styles.field}>
-                    <label htmlFor="ev-title" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="ev-title" className="label">
                         Title *
                     </label>
                     <input
@@ -76,8 +76,8 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                     </small>
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="ev-desc" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="ev-desc" className="label">
                         Description *
                     </label>
                     <textarea
@@ -92,8 +92,8 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                     />
                 </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="ev-location" className={styles.label}>
+                <div className="field">
+                    <label htmlFor="ev-location" className="label">
                         Location (in this work)
                     </label>
                     <select

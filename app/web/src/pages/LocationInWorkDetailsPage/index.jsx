@@ -140,9 +140,9 @@ export default function LocationInWorkDetailsPage() {
                     </div>
 
                     <section className="card" aria-label="Location in work">
-                        <form ref={formRef} className={styles.form} onSubmit={e => e.preventDefault()} noValidate>
-                            <div className={styles.field}>
-                                <label className={styles.label}>Title</label>
+                        <form ref={formRef} className="form" onSubmit={e => e.preventDefault()} noValidate>
+                            <div className="field">
+                                <label className="label">Title</label>
                                 <input
                                     type="text"
                                     className={styles.input}
@@ -152,8 +152,8 @@ export default function LocationInWorkDetailsPage() {
                                 />
                             </div>
 
-                            <div className={styles.field}>
-                                <label className={styles.label}>Description</label>
+                            <div className="field">
+                                <label className="label">Description</label>
                                 <textarea
                                     rows={5}
                                     className={`${styles.input} ${styles.textarea}`}
@@ -163,8 +163,8 @@ export default function LocationInWorkDetailsPage() {
                                 />
                             </div>
 
-                            <div className={styles.field}>
-                                <label className={styles.label}>Parent Location</label>
+                            <div className="field">
+                                <label className="label">Parent Location</label>
                                 <input
                                     type="text"
                                     className={styles.input}
@@ -174,8 +174,8 @@ export default function LocationInWorkDetailsPage() {
                                 />
                             </div>
 
-                            <div className={styles.field}>
-                                <span className={styles.label}>Tags</span>
+                            <div className="field">
+                                <span className="label">Tags</span>
                                 <div className={styles.chips}>
                                     {Object.keys(attrs).length === 0 && (
                                         <span className={styles.muted}>No tags yet.</span>
@@ -293,8 +293,8 @@ function AddTagFields({ onAdd, onCancel }) {
 
     return (
         <>
-            <div className={styles.field}>
-                <label className={styles.label}>
+            <div className="field">
+                <label className="label">
                     Key
                     <input
                         className={styles.input}
@@ -306,8 +306,8 @@ function AddTagFields({ onAdd, onCancel }) {
                     />
                 </label>
             </div>
-            <div className={styles.field}>
-                <label className={styles.label}>
+            <div className="field">
+                <label className="label">
                     Value
                     <input
                         className={styles.input}
