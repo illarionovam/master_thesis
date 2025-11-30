@@ -54,9 +54,7 @@ Answer in language of the provided data.
 Events: ${JSON.stringify(events)}
 `;
 
-    return 'test';
-
-    //return generateTextResponse(prompt);
+    return generateTextResponse(prompt);
 };
 
 export const generateEventFactCheck = async (currentEvent, participants, previousEvents) => {
@@ -76,7 +74,7 @@ Using ONLY this information, do the following:
 
 2) LOGICAL CONTINUITY:
 - Explain whether the CURRENT EVENT logically follows from the PREVIOUS EVENTS.
-- Comment on whether the characters’ decisions and the situation feel like a natural consequence of what happened before, or if any steps feel rushed, missing, or unjustified.
+- Comment on whether the characters' decisions and the situation feel like a natural consequence of what happened before, or if any steps feel rushed, missing, or unjustified.
 
 3) INCONSISTENCIES:
 - Point out any obvious contradictions or continuity errors (timeline, physical details, relationships, character motivations, or what characters should/should not know).
@@ -106,7 +104,5 @@ PREVIOUS EVENTS:
 ${JSON.stringify(previousEvents)}
 `;
 
-    console.log(prompt);
-    return 'test';
-    //return generateTextResponse(prompt);
+    return generateTextResponse(prompt);
 };

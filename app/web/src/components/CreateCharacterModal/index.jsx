@@ -71,7 +71,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                         value={name}
                         onChange={e => setName(e.target.value)}
                         required
-                        placeholder="e.g., Tyrel"
+                        placeholder="Name"
                         className={styles.input}
                         disabled={globalLoading}
                     />
@@ -87,7 +87,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                         value={appearance}
                         onChange={e => setAppearance(e.target.value)}
                         required
-                        placeholder="Short appearance description..."
+                        placeholder="Short appearance description"
                         className={`${styles.input} ${styles.textarea}`}
                         disabled={globalLoading}
                     />
@@ -103,7 +103,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                         value={personality}
                         onChange={e => setPersonality(e.target.value)}
                         required
-                        placeholder="Key personality traits..."
+                        placeholder="Key personality traits"
                         className={`${styles.input} ${styles.textarea}`}
                         disabled={globalLoading}
                     />
@@ -119,7 +119,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
                         value={bio}
                         onChange={e => setBio(e.target.value)}
                         required
-                        placeholder="Backstory / biography..."
+                        placeholder="Backstory"
                         className={`${styles.input} ${styles.textarea}`}
                         disabled={globalLoading}
                     />
