@@ -164,7 +164,7 @@ export default function RelationshipDetailsPage() {
                                     onChange={e => setTypeVal(e.target.value)}
                                     disabled={!editMode || globalLoading}
                                     required
-                                    placeholder="e.g. ally, enemy, mentor"
+                                    placeholder="Type"
                                 />
                             </div>
 
@@ -180,7 +180,7 @@ export default function RelationshipDetailsPage() {
                                     value={notesVal}
                                     onChange={e => setNotesVal(e.target.value)}
                                     disabled={!editMode || globalLoading}
-                                    placeholder="Optional notes..."
+                                    placeholder="Optional notes"
                                 />
                             </div>
 

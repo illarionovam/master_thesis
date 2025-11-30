@@ -383,7 +383,7 @@ export default function EventDetailsPage() {
                 >
                     <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
                         <h3 id="generate-description-title" className={styles.modalTitle}>
-                            Generated description
+                            Generated Feedback
                         </h3>
 
                         <div className="field">

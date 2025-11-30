@@ -422,18 +422,15 @@ export default function CharacterInWorkDetailsPage() {
                         )}
 
                         <div className="field">
-                            <label className="label">
-                                Type
-                                <input
-                                    className="input"
-                                    type="text"
-                                    value={relType}
-                                    onChange={e => setRelType(e.target.value)}
-                                    placeholder="e.g. ally, enemy, mentor"
-                                    required
-                                />
-                            </label>
-                            <small className={styles.muted}>This field is required.</small>
+                            <label className="label">Type *</label>
+                            <input
+                                className="input"
+                                type="text"
+                                value={relType}
+                                onChange={e => setRelType(e.target.value)}
+                                placeholder="Type"
+                                required
+                            />
                         </div>
 
                         <div className={styles.modalActions}>

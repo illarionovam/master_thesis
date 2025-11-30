@@ -615,13 +615,10 @@ export default function WorkDetailsPage() {
                 >
                     <form method="dialog" className={styles.modalBody} onSubmit={e => e.preventDefault()}>
                         <h3 id="generate-description-title" className={styles.modalTitle}>
-                            Generated description
+                            Generated Description
                         </h3>
 
                         <div className="field">
-                            <label htmlFor="generated-description" className="label">
-                                Text
-                            </label>
                             <textarea
                                 id="generated-description"
                                 className="input textarea"
