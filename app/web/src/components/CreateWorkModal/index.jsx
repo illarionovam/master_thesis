@@ -47,7 +47,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-work-title" onClose={onClose}>
             <form onSubmit={handleSubmit} className="modal">
-                <h2 id="create-work-title" className={styles.title}>
+                <h2 id="create-work-title" className="title">
                     Create Work
                 </h2>
 

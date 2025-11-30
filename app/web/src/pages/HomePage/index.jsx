@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import { Link } from 'react-router-dom';
-import Title from '../../components/Title';
+
 import styles from './HomePage.module.css';
 
 export default function HomePage() {
@@ -9,9 +9,9 @@ export default function HomePage() {
     return (
         <main aria-labelledby={titleId} className="page centered">
             <section className={styles.hero}>
-                <Title id={titleId} className={styles.heroTitle}>
+                <h1 id={titleId} className={styles.heroTitle}>
                     Welcome to Narrive
-                </Title>
+                </h1>
 
                 <p className={styles.tagline}>
                     Capture works, characters, locations, events, and the relationships between them in one clean,
@@ -33,7 +33,7 @@ export default function HomePage() {
 
             <section className={styles.grid} aria-label="Quick start">
                 <article className={`card ${styles.homeCard}`}>
-                    <h2 className={styles.title}>Works</h2>
+                    <h2>Works</h2>
                     <p className={styles.text}>
                         Create projects for novels, visual novels, or shared universes. Keep outlines, tones, and core
                         ideas together so every story has a clear spine.
@@ -45,7 +45,7 @@ export default function HomePage() {
                 </article>
 
                 <article className={`card ${styles.homeCard}`}>
-                    <h2 className={styles.title}>Characters</h2>
+                    <h2>Characters</h2>
                     <p className={styles.text}>
                         Follow your cast across multiple works. Track arcs, dynamics, and on-page history so no
                         relationship or detail quietly drifts out of canon.
@@ -58,7 +58,7 @@ export default function HomePage() {
                 </article>
 
                 <article className={`card ${styles.homeCard}`}>
-                    <h2 className={styles.title}>Locations & Events</h2>
+                    <h2>Locations & Events</h2>
                     <p className={styles.text}>
                         Anchor your story in time and space. Connect events to locations and participants so timelines
                         stay consistent even when plots jump around.

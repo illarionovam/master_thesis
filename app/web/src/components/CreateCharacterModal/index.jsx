@@ -57,9 +57,7 @@ export default function CreateCharacterModal({ open, onClose, onSubmit, error = 
     return (
         <dialog ref={dialogRef} aria-labelledby="create-character-title" onClose={onClose}>
             <form onSubmit={handleSubmit} className="modal">
-                <h2 id="create-character-title" className={styles.title}>
-                    Create Character
-                </h2>
+                <h2 id="create-character-title">Create Character</h2>
 
                 <div className="field">
                     <label htmlFor="ch-name" className="label">

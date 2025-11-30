@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
-import Title from '../../components/Title';
 import List from '../../components/List';
 
 import {
@@ -339,7 +338,7 @@ export default function WorkDetailsPage() {
                                 </ol>
                             </nav>
 
-                            <Title id={titleId}>{work?.title ?? '—'}</Title>
+                            <h2 id={titleId}>{work?.title ?? '—'}</h2>
                         </div>
 
                         <section className="card" aria-label="Work info">

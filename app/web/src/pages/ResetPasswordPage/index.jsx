@@ -36,9 +36,7 @@ export default function ResetPasswordPage() {
         <main aria-labelledby={titleId} className="page centered">
             {!globalLoading && (
                 <section className="card narrow" aria-busy={globalLoading ? 'true' : 'false'}>
-                    <h1 id={titleId} className={styles.title}>
-                        Reset Password
-                    </h1>
+                    <h2 id={titleId}>Reset Password</h2>
 
                     <form onSubmit={handleSubmit} noValidate>
                         <div className="field">

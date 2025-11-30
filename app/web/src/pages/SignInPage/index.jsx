@@ -65,9 +65,7 @@ export default function SignInPage() {
         <main aria-labelledby={titleId} className="page centered">
             {!globalLoading && (
                 <section className="card narrow" aria-busy={globalLoading ? 'true' : 'false'}>
-                    <h1 id={titleId} className={styles.title}>
-                        Sign In
-                    </h1>
+                    <h2 id={titleId}>Sign In</h2>
 
                     <form onSubmit={handleSubmit} noValidate>
                         <div className="field">

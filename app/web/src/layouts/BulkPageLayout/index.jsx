@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Title from '../../components/Title';
+
 import styles from './BulkPageLayout.module.css';
 import { selectGlobalLoading } from '../../redux/globalSelectors';
 
@@ -60,11 +60,15 @@ export default function BulkPageLayout({
 
     return (
         <main aria-labelledby={titleId} className="page">
-            {error && <p role="alert">{error}</p>}
+            {error && (
+                <p role="alert" className="infoMessage error">
+                    {error}
+                </p>
+            )}
             {!globalLoading && !error && data && !navigatingAfterCreate && (
                 <>
                     <div className={styles.header}>
-                        <Title id={titleId}>{title}</Title>
+                        <h2 id={titleId}>{title}</h2>
                     </div>
                     {render?.(data)}
                 </>

@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import Title from '../../components/Title';
+
 import styles from './NotFoundPage.module.css';
 
 export default function NotFoundPage() {
@@ -7,7 +7,7 @@ export default function NotFoundPage() {
 
     return (
         <main aria-labelledby={titleId} className="page">
-            <Title id={titleId}>Page not found.</Title>
+            <h2 id={titleId}>Page not found.</h2>
         </main>
     );
 }

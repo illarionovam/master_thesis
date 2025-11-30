@@ -47,9 +47,7 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
     return (
         <dialog ref={dialogRef} aria-labelledby="create-location-title" onClose={onClose}>
             <form onSubmit={handleSubmit} className="modal">
-                <h2 id="create-location-title" className={styles.title}>
-                    Create Location
-                </h2>
+                <h2 id="create-location-title">Create Location</h2>
 
                 <div className="field">
                     <label htmlFor="loc-title" className="label">

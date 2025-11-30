@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
-import Title from '../../components/Title';
 import styles from './RelationshipDetailsPage.module.css';
 
 import { getRelationship, updateRelationship, deleteRelationship } from '../../redux/works/operations';
@@ -138,7 +137,7 @@ export default function RelationshipDetailsPage() {
                                 </li>
                             </ol>
                         </nav>
-                        <Title id={titleId}>Relationship</Title>
+                        <h2 id={titleId}>Relationship</h2>
                     </div>
                     <section className="card" aria-label="Relationship details">
                         <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>

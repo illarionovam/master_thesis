@@ -49,9 +49,7 @@ export default function SignUpPage() {
         <main aria-labelledby={titleId} className="page centered">
             {!globalLoading && (
                 <section className="card narrow" aria-busy={globalLoading ? 'true' : 'false'}>
-                    <h1 id={titleId} className={styles.title}>
-                        Sign Up
-                    </h1>
+                    <h2 id={titleId}>Sign Up</h2>
 
                     <form onSubmit={handleSubmit} noValidate onInput={clearLocalValidation}>
                         <div className="field">

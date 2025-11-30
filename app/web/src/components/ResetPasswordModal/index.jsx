@@ -35,9 +35,7 @@ export default function ResetPasswordModal({ onClose }) {
     return (
         <dialog ref={dialogRef} aria-labelledby="reset-title" onCancel={handleCancel}>
             <form onSubmit={handleSubmit} className="modal" noValidate>
-                <h2 id="reset-title" className={styles.title}>
-                    Reset Password
-                </h2>
+                <h2 id="reset-title">Reset Password</h2>
 
                 <div className="field">
                     <label htmlFor="reset-email" className="label">

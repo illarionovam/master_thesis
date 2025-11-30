@@ -106,9 +106,7 @@ export default function UserDetailPage() {
 
             {!globalLoading && !error && user && (
                 <section className="card wide" aria-busy={globalLoading ? 'true' : 'false'}>
-                    <h1 id={titleId} className={styles.title}>
-                        User
-                    </h1>
+                    <h2 id={titleId}>User</h2>
                     <form
                         ref={formRef}
                         noValidate

@@ -51,9 +51,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
     return (
         <dialog ref={dialogRef} aria-labelledby="create-event-title" onClose={onClose}>
             <form onSubmit={handleSubmit} className="modal">
-                <h2 id="create-event-title" className={styles.title}>
-                    Create Event
-                </h2>
+                <h2 id="create-event-title">Create Event</h2>
 
                 <div className="field">
                     <label htmlFor="ev-title" className="label">

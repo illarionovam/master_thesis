@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
 
-import Title from '../../components/Title';
 import List from '../../components/List';
 import styles from './LocationInWorkDetailsPage.module.css';
 
@@ -136,7 +135,7 @@ export default function LocationInWorkDetailsPage() {
                             </ol>
                         </nav>
 
-                        <Title id={titleId}>{location?.title ?? '—'}</Title>
+                        <h2 id={titleId}>{location?.title ?? '—'}</h2>
                     </div>
 
                     <section className="card" aria-label="Location in work">

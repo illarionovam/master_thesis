@@ -34,9 +34,7 @@ export default function ChangePasswordModal({ open, onClose, onSubmit, apiError 
     return (
         <dialog ref={dialogRef} aria-labelledby="cp-title" onClose={onClose}>
             <form method="dialog" onSubmit={handleSubmit} className={styles.body} noValidate>
-                <h2 id="cp-title" className={styles.title}>
-                    Change Password
-                </h2>
+                <h2 id="cp-title">Change Password</h2>
 
                 <div className={styles.fields}>
                     <label className="field">

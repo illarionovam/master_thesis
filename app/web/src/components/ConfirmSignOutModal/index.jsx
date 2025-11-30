@@ -12,10 +12,8 @@ export default function ConfirmSignOutModal({ open, onClose, onCurrent, onAll })
     return (
         <dialog ref={dialogRef} aria-labelledby="signout-title" onClose={onClose}>
             <form method="dialog" className={styles.body}>
-                <h2 id="signout-title" className={styles.title}>
-                    Terminate all sessions?
-                </h2>
-                <p className={styles.text}>Choose what to sign out:</p>
+                <h2 id="signout-title">Terminate all sessions?</h2>
+                <p className="label">Choose what to sign out:</p>
 
                 <div className={styles.actions}>
                     <button type="button" onClick={onCurrent} className="primaryBtn">
