@@ -23,7 +23,7 @@ export default function AppHeader() {
                     Narrive
                 </Link>
 
-                <Link to={userTo} className={styles.userLink} aria-label={userAria}>
+                <Link to={userTo} aria-label={userAria}>
                     {userLabel}
                 </Link>
             </div>
