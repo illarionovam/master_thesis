@@ -226,7 +226,7 @@ export default function CharacterDetailsPage() {
                                         name="appearance"
                                         rows={5}
                                         defaultValue={character.appearance ?? ''}
-                                        className={`input ${styles.textarea}`}
+                                        className="input textarea"
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
@@ -240,7 +240,7 @@ export default function CharacterDetailsPage() {
                                         name="personality"
                                         rows={5}
                                         defaultValue={character.personality ?? ''}
-                                        className={`input ${styles.textarea}`}
+                                        className="input textarea"
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
@@ -254,7 +254,7 @@ export default function CharacterDetailsPage() {
                                         name="bio"
                                         rows={6}
                                         defaultValue={character.bio ?? ''}
-                                        className={`input ${styles.textarea}`}
+                                        className="input textarea"
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>

@@ -87,7 +87,7 @@ export default function CreateEventModal({ open, onClose, onSubmit, error = null
                         onChange={e => setDescription(e.target.value)}
                         required
                         placeholder="Short description of the event..."
-                        className={`input ${styles.textarea}`}
+                        className="input textarea"
                         disabled={globalLoading}
                     />
                 </div>

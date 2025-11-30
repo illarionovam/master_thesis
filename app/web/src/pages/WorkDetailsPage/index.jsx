@@ -368,7 +368,7 @@ export default function WorkDetailsPage() {
                                         name="annotation"
                                         rows={4}
                                         defaultValue={work.annotation ?? ''}
-                                        className={`input ${styles.textarea}`}
+                                        className="input textarea"
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
@@ -382,7 +382,7 @@ export default function WorkDetailsPage() {
                                         name="synopsis"
                                         rows={8}
                                         defaultValue={work.synopsis ?? ''}
-                                        className={`input ${styles.textarea}`}
+                                        className="input textarea"
                                         disabled={!editMode || globalLoading}
                                     />
                                 </div>
@@ -625,7 +625,7 @@ export default function WorkDetailsPage() {
                             </label>
                             <textarea
                                 id="generated-description"
-                                className={`input ${styles.textarea}`}
+                                className="input textarea"
                                 rows={10}
                                 readOnly
                                 value={genResult?.result ?? 'Generating...'}

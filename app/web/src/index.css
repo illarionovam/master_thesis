@@ -199,6 +199,12 @@ form {
         background: #f9fafb;
         cursor: not-allowed;
     }
+
+    &.textarea {
+        min-height: 120px;
+        padding: 10px 12px;
+        height: auto;
+    }
 }
 
 .infoMessage {

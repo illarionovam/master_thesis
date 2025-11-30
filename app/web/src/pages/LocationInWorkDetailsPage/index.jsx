@@ -150,7 +150,7 @@ export default function LocationInWorkDetailsPage() {
                                 <label className="label">Description</label>
                                 <textarea
                                     rows={5}
-                                    className={`input ${styles.textarea}`}
+                                    className="input textarea"
                                     value={location?.description ?? ''}
                                     disabled
                                     readOnly

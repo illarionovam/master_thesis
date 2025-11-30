@@ -224,7 +224,7 @@ export default function CharacterInWorkDetailsPage() {
                                     <label className="label">Appearance</label>
                                     <textarea
                                         rows={5}
-                                        className={`input ${styles.textarea}`}
+                                        className="input textarea"
                                         value={characterAppearance}
                                         disabled
                                         readOnly
@@ -235,7 +235,7 @@ export default function CharacterInWorkDetailsPage() {
                                     <label className="label">Personality</label>
                                     <textarea
                                         rows={5}
-                                        className={`input ${styles.textarea}`}
+                                        className="input textarea"
                                         value={characterPersonality}
                                         disabled
                                         readOnly
@@ -246,7 +246,7 @@ export default function CharacterInWorkDetailsPage() {
                                     <label className="label">Bio</label>
                                     <textarea
                                         rows={6}
-                                        className={`input ${styles.textarea}`}
+                                        className="input textarea"
                                         value={characterBio}
                                         disabled
                                         readOnly

@@ -98,7 +98,7 @@ export default function CreateLocationModal({ open, onClose, onSubmit, error = n
                         onChange={e => setDescription(e.target.value)}
                         required
                         placeholder="Short description..."
-                        className={`input ${styles.textarea}`}
+                        className="input textarea"
                         disabled={globalLoading}
                     />
                 </div>

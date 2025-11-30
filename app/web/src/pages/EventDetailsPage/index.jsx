@@ -254,7 +254,7 @@ export default function EventDetailsPage() {
                                     name="description"
                                     rows={6}
                                     defaultValue={event.description ?? ''}
-                                    className={`input ${styles.textarea}`}
+                                    className="input textarea"
                                     disabled={!editMode || globalLoading}
                                     required
                                 />
@@ -393,7 +393,7 @@ export default function EventDetailsPage() {
                             </label>
                             <textarea
                                 id="generated-description"
-                                className={`input ${styles.textarea}`}
+                                className="input textarea"
                                 rows={10}
                                 readOnly
                                 value={genResult?.result ?? 'Generating...'}

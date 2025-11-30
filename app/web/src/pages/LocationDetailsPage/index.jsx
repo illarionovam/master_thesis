@@ -198,7 +198,7 @@ export default function LocationDetailsPage() {
                                     name="description"
                                     rows={5}
                                     defaultValue={location.description ?? ''}
-                                    className={`input ${styles.textarea}`}
+                                    className="input textarea"
                                     disabled={!editMode || globalLoading}
                                     required
                                 />

@@ -45,12 +45,6 @@
     word-break: break-word;
 }
 
-.textarea {
-    min-height: 120px;
-    padding: 10px 12px; /* для textarea */
-    height: auto;
-}
-
 .actions {
     display: flex;
     gap: 8px;

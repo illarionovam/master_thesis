@@ -77,7 +77,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
                         value={annotation}
                         onChange={e => setAnnotation(e.target.value)}
                         placeholder="One-two sentences summary..."
-                        className={`input ${styles.textarea}`}
+                        className="input textarea"
                         disabled={globalLoading}
                     />
                 </div>
@@ -92,7 +92,7 @@ export default function CreateWorkModal({ open, onClose, onSubmit, error = null 
                         value={synopsis}
                         onChange={e => setSynopsis(e.target.value)}
                         placeholder="Extended outline, key beats, arcs..."
-                        className={`input ${styles.textarea}`}
+                        className="input textarea"
                         disabled={globalLoading}
                     />
                 </div>

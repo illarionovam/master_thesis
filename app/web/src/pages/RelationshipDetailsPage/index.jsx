@@ -177,7 +177,7 @@ export default function RelationshipDetailsPage() {
                                     id="rel-notes"
                                     name="notes"
                                     rows={5}
-                                    className={`input ${styles.textarea}`}
+                                    className="input textarea"
                                     value={notesVal}
                                     onChange={e => setNotesVal(e.target.value)}
                                     disabled={!editMode || globalLoading}
