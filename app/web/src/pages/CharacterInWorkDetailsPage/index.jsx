@@ -215,7 +215,7 @@ export default function CharacterInWorkDetailsPage() {
                         <section className="card" aria-label="Character in work">
                             <form ref={formRef} onSubmit={e => e.preventDefault()} noValidate>
                                 <div className="field">
-                                    <label className="label">Character Name</label>
+                                    <label className="label">Name</label>
                                     <input type="text" className="input" value={characterName} disabled readOnly />
                                 </div>
 
@@ -253,7 +253,7 @@ export default function CharacterInWorkDetailsPage() {
                                 </div>
 
                                 <div className="field">
-                                    <span className="label">Parent Tags</span>
+                                    <span className="label">Tags</span>
                                     <div className={styles.chips}>
                                         {Object.keys(initialAttrs).length === 0 && (
                                             <span className={styles.muted}>No tags yet.</span>
@@ -270,7 +270,7 @@ export default function CharacterInWorkDetailsPage() {
                                 </div>
 
                                 <div className="field">
-                                    <span className="label">Current Tags</span>
+                                    <span className="label">In Work Tags</span>
                                     <div className={styles.chips}>
                                         {Object.keys(currentAttrs).length === 0 && (
                                             <span className={styles.muted}>No tags yet.</span>
@@ -346,8 +346,8 @@ export default function CharacterInWorkDetailsPage() {
                         </section>
                     </div>
 
-                    <section className="card" aria-label="Used in events">
-                        <h2 className={styles.subTitle}>Used in events</h2>
+                    <section className="card" aria-label="Events">
+                        <h2 className={styles.subTitle}>Events</h2>
 
                         {events.length > 0 ? <List items={events} /> : <p className={styles.muted}>No events yet.</p>}
                     </section>

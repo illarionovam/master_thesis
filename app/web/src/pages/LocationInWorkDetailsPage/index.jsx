@@ -168,7 +168,7 @@ export default function LocationInWorkDetailsPage() {
                             </div>
 
                             <div className="field">
-                                <span className="label">Tags</span>
+                                <span className="label">In Work Tags</span>
                                 <div className={styles.chips}>
                                     {Object.keys(attrs).length === 0 && (
                                         <span className={styles.muted}>No tags yet.</span>
@@ -243,8 +243,8 @@ export default function LocationInWorkDetailsPage() {
                         </form>
                     </section>
 
-                    <section className="card" aria-label="Used in events">
-                        <h2 className={styles.subTitle}>Used in events</h2>
+                    <section className="card" aria-label="Events">
+                        <h2 className={styles.subTitle}>Events</h2>
 
                         {events.length > 0 ? <List items={events} /> : <p className={styles.muted}>No events yet.</p>}
                     </section>

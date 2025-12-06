@@ -477,7 +477,7 @@ export default function WorkDetailsPage() {
 
                         <section className="card" aria-label="Location links">
                             <div className={styles.subHeader}>
-                                <h2 className={styles.subTitle}>Location links</h2>
+                                <h2 className={styles.subTitle}>Location Links</h2>
                                 <button
                                     type="button"
                                     className="primaryBtn"
