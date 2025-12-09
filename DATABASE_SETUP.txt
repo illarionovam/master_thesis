@@ -1,0 +1,445 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS citext;
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS trigger AS $$
+BEGIN
+NEW.updated_at := now();
+RETURN NEW;
+END;
+
+$$
+LANGUAGE plpgsql;
+
+
+CREATE TABLE IF NOT EXISTS app_user (
+ id             UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
+ verified       BOOLEAN NOT NULL DEFAULT FALSE,
+ name           TEXT    CHECK (name IS NULL OR char_length(btrim(name)) <= 255),
+ username       CITEXT  NOT NULL
+                         CHECK (char_length(btrim(username)) BETWEEN 3 AND 60),
+ email          CITEXT  NOT NULL
+                         CHECK (
+                           char_length(btrim(email)) <= 255
+                           AND email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+                         ),
+ new_email      CITEXT  CHECK (
+                           new_email IS NULL OR (
+                             char_length(btrim(new_email)) <= 255
+                             AND new_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+                             AND new_email <> email
+                           )
+                         ),
+ hash_password  TEXT    NOT NULL,
+ created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+ CONSTRAINT uq_app_user_username UNIQUE (username),
+ CONSTRAINT uq_app_user_email    UNIQUE (email)
+);
+DROP TRIGGER IF EXISTS trg_app_user_updated_at ON app_user;
+CREATE TRIGGER trg_app_user_updated_at
+BEFORE UPDATE ON app_user
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
+CREATE TABLE IF NOT EXISTS work (
+ id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ owner_id    UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+ title       TEXT NOT NULL CHECK (char_length(btrim(title)) BETWEEN 1 AND 300),
+ annotation  TEXT CHECK (annotation IS NULL OR char_length(annotation) <= 3000),
+ synopsis    TEXT CHECK (synopsis   IS NULL OR char_length(synopsis)   <= 1500),
+ created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_work_owner_id           ON work (owner_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_work_owner_title ON work (owner_id, lower(title));
+DROP TRIGGER IF EXISTS trg_work_updated_at ON work;
+CREATE TRIGGER trg_work_updated_at
+BEFORE UPDATE ON work
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
+CREATE TABLE IF NOT EXISTS character_entity (
+ id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ owner_id      UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+ name          TEXT NOT NULL CHECK (char_length(btrim(name)) BETWEEN 1 AND 200),
+ appearance    TEXT NOT NULL CHECK (char_length(appearance)  <= 3000),
+ personality   TEXT NOT NULL CHECK (char_length(personality) <= 3000),
+ bio           TEXT NOT NULL CHECK (char_length(bio)         <= 6000),
+ image_url     TEXT,
+ attributes    JSONB NOT NULL DEFAULT '{}'::jsonb,
+ CONSTRAINT chk_character_entity_attributes_object
+   CHECK (jsonb_typeof(attributes) = 'object'),
+ created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_character_entity_owner_id       		ON character_entity (owner_id);
+CREATE INDEX IF NOT EXISTS idx_character_entity_attributes_gin 		ON character_entity USING GIN (attributes);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_character_entity_owner_name 	ON character_entity (owner_id, lower(name));
+DROP TRIGGER IF EXISTS trg_character_entity_updated_at ON character_entity;
+CREATE TRIGGER trg_character_entity_updated_at
+BEFORE UPDATE ON character_entity
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+CREATE TABLE IF NOT EXISTS character_in_work (
+ id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ character_id  UUID NOT NULL REFERENCES character_entity(id) ON DELETE CASCADE,
+ work_id       UUID NOT NULL REFERENCES work(id)             ON DELETE CASCADE,
+ image_url     TEXT,
+ attributes    JSONB NOT NULL DEFAULT '{}'::jsonb,
+ CONSTRAINT chk_character_in_work_attributes_object
+   CHECK (jsonb_typeof(attributes) = 'object'),
+ created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+ CONSTRAINT uq_character_in_work UNIQUE (character_id, work_id)
+);
+CREATE INDEX IF NOT EXISTS idx_character_in_work_work_id       ON character_in_work (work_id);
+CREATE INDEX IF NOT EXISTS idx_character_in_work_character_id  ON character_in_work (character_id);
+CREATE INDEX IF NOT EXISTS idx_character_in_work_attributes_gin
+ ON character_in_work USING GIN (attributes);
+DROP TRIGGER IF EXISTS trg_character_in_work_updated_at ON character_in_work;
+CREATE TRIGGER trg_character_in_work_updated_at
+BEFORE UPDATE ON character_in_work
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+CREATE OR REPLACE FUNCTION ensure_character_work_same_owner()
+RETURNS trigger AS
+$$
+
+DECLARE
+ch_owner UUID;
+wk_owner UUID;
+BEGIN
+SELECT owner_id INTO ch_owner FROM character_entity WHERE id = NEW.character_id;
+SELECT owner_id INTO wk_owner FROM work WHERE id = NEW.work_id;
+IF ch_owner IS DISTINCT FROM wk_owner THEN
+RAISE EXCEPTION
+'Owner mismatch: character % (owner=%) vs work % (owner=%)',
+NEW.character_id, ch_owner, NEW.work_id, wk_owner
+USING ERRCODE = '23514';
+END IF;
+RETURN NEW;
+END;
+
+$$
+LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_character_in_work_same_owner ON character_in_work;
+CREATE CONSTRAINT TRIGGER trg_character_in_work_same_owner
+AFTER INSERT OR UPDATE OF character_id, work_id
+ON character_in_work
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION ensure_character_work_same_owner();
+
+
+CREATE TABLE IF NOT EXISTS location_entity (
+ id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ owner_id           UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+ title              TEXT NOT NULL CHECK (char_length(btrim(title)) BETWEEN 1 AND 300),
+ description        TEXT NOT NULL CHECK (char_length(description) <= 3000),
+ parent_location_id UUID NULL
+   REFERENCES location_entity(id)
+   ON DELETE SET NULL
+   DEFERRABLE INITIALLY DEFERRED,
+ created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+ CONSTRAINT chk_location_entity_not_self
+   CHECK (parent_location_id IS NULL OR parent_location_id <> id)
+);
+CREATE INDEX IF NOT EXISTS idx_location_entity_owner_id  			ON location_entity (owner_id);
+CREATE INDEX IF NOT EXISTS idx_location_entity_parent_id 			ON location_entity (parent_location_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_location_entity_owner_title 	ON location_entity (owner_id, lower(title));
+DROP TRIGGER IF EXISTS trg_location_entity_updated_at ON location_entity;
+CREATE TRIGGER trg_location_entity_updated_at
+BEFORE UPDATE ON location_entity
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+CREATE OR REPLACE FUNCTION ensure_location_parent_valid()
+RETURNS trigger AS
+$$
+
+DECLARE
+cursor_id UUID;
+cursor_owner UUID;
+hop INT := 0;
+BEGIN
+IF NEW.parent_location_id IS NULL THEN
+RETURN NEW;
+END IF;
+SELECT owner_id INTO cursor_owner FROM location_entity WHERE id = NEW.parent_location_id;
+IF cursor_owner IS DISTINCT FROM NEW.owner_id THEN
+RAISE EXCEPTION
+'Parent location % has different owner (% vs %)',
+NEW.parent_location_id, cursor_owner, NEW.owner_id
+USING ERRCODE = '23514';
+END IF;
+cursor_id := NEW.parent_location_id;
+WHILE cursor_id IS NOT NULL LOOP
+IF cursor_id = NEW.id THEN
+RAISE EXCEPTION 'Cyclic parent chain detected for location %', NEW.id
+USING ERRCODE = '23514';
+END IF;
+hop := hop + 1;
+IF hop > 1000 THEN
+RAISE EXCEPTION 'Parent chain too deep (possible cycle) for location %', NEW.id
+USING ERRCODE = '23514';
+END IF;
+SELECT parent_location_id INTO cursor_id
+FROM location_entity
+WHERE id = cursor_id;
+END LOOP;
+RETURN NEW;
+END;
+
+$$
+LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_location_entity_parent_valid ON location_entity;
+CREATE CONSTRAINT TRIGGER trg_location_entity_parent_valid
+AFTER INSERT OR UPDATE OF parent_location_id, owner_id
+ON location_entity
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION ensure_location_parent_valid();
+CREATE TABLE IF NOT EXISTS location_in_work (
+ id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ location_id UUID NOT NULL REFERENCES location_entity(id) ON DELETE CASCADE,
+ work_id     UUID NOT NULL REFERENCES work(id)            ON DELETE CASCADE,
+ attributes  JSONB NOT NULL DEFAULT '{}'::jsonb,
+ CONSTRAINT chk_location_in_work_attributes_object
+   CHECK (jsonb_typeof(attributes) = 'object'),
+ created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+ CONSTRAINT uq_location_in_work UNIQUE (location_id, work_id)
+);
+CREATE INDEX IF NOT EXISTS idx_location_in_work_location_id ON location_in_work (location_id);
+CREATE INDEX IF NOT EXISTS idx_location_in_work_work_id     ON location_in_work (work_id);
+CREATE INDEX IF NOT EXISTS idx_location_in_work_attr_gin    ON location_in_work USING GIN (attributes);
+DROP TRIGGER IF EXISTS trg_location_in_work_updated_at ON location_in_work;
+CREATE TRIGGER trg_location_in_work_updated_at
+BEFORE UPDATE ON location_in_work
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+CREATE OR REPLACE FUNCTION ensure_location_work_same_owner()
+RETURNS trigger AS
+$$
+
+DECLARE
+loc_owner UUID;
+wk_owner UUID;
+BEGIN
+SELECT owner_id INTO loc_owner FROM location_entity WHERE id = NEW.location_id;
+SELECT owner_id INTO wk_owner FROM work WHERE id = NEW.work_id;
+IF loc_owner IS DISTINCT FROM wk_owner THEN
+RAISE EXCEPTION
+'Owner mismatch: location % (owner=%) vs work % (owner=%)',
+NEW.location_id, loc_owner, NEW.work_id, wk_owner
+USING ERRCODE = '23514';
+END IF;
+RETURN NEW;
+END;
+
+$$
+LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_location_in_work_same_owner ON location_in_work;
+CREATE CONSTRAINT TRIGGER trg_location_in_work_same_owner
+AFTER INSERT OR UPDATE OF location_id, work_id
+ON location_in_work
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION ensure_location_work_same_owner();
+
+
+CREATE TABLE IF NOT EXISTS event (
+ id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ work_id             UUID NOT NULL REFERENCES work(id) ON DELETE CASCADE,
+ location_in_work_id UUID NULL
+   REFERENCES location_in_work(id)
+   ON DELETE SET NULL
+   DEFERRABLE INITIALLY DEFERRED,
+ title               TEXT NOT NULL CHECK (char_length(title) <= 100),
+ description         TEXT NOT NULL CHECK (char_length(description) <= 6000),
+ order_in_work       INTEGER NULL,
+ created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+ CONSTRAINT uq_event_work_order    UNIQUE (work_id, order_in_work) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE INDEX IF NOT EXISTS idx_event_work_id             	ON event (work_id);
+CREATE INDEX IF NOT EXISTS idx_event_location_in_work_id 	ON event (location_in_work_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_event_work_title_ci 	ON event (work_id, lower(title));
+CREATE OR REPLACE FUNCTION set_event_order_default()
+RETURNS trigger AS
+$$
+
+BEGIN
+IF NEW.order_in_work IS NULL THEN
+PERFORM pg_advisory_xact_lock(hashtextextended(NEW.work_id::text, 0));
+SELECT COALESCE(MAX(e.order_in_work), 0) + 1
+INTO NEW.order_in_work
+FROM event e
+WHERE e.work_id = NEW.work_id;
+END IF;
+RETURN NEW;
+END;
+
+$$
+LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_event_set_order ON event;
+CREATE TRIGGER trg_event_set_order
+BEFORE INSERT ON event
+FOR EACH ROW
+EXECUTE FUNCTION set_event_order_default();
+DROP TRIGGER IF EXISTS trg_event_updated_at ON event;
+CREATE TRIGGER trg_event_updated_at
+BEFORE UPDATE ON event
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+CREATE OR REPLACE FUNCTION ensure_event_location_same_work()
+RETURNS trigger AS
+$$
+
+DECLARE
+loc_work UUID;
+BEGIN
+IF NEW.location_in_work_id IS NULL THEN
+RETURN NEW;
+END IF;
+SELECT work_id INTO loc_work FROM location_in_work WHERE id = NEW.location_in_work_id;
+IF loc_work IS NOT NULL AND loc_work <> NEW.work_id THEN
+RAISE EXCEPTION
+'Event %. Location_in_work % belongs to work %, but event uses work %',
+NEW.id, NEW.location_in_work_id, loc_work, NEW.work_id
+USING ERRCODE = '23514';
+END IF;
+RETURN NEW;
+END;
+
+$$
+LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_event_location_same_work ON event;
+CREATE CONSTRAINT TRIGGER trg_event_location_same_work
+AFTER INSERT OR UPDATE OF location_in_work_id, work_id
+ON event
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION ensure_event_location_same_work();
+CREATE TABLE IF NOT EXISTS event_participant (
+ id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ event_id             UUID NOT NULL REFERENCES event(id)             ON DELETE CASCADE,
+ character_in_work_id UUID NOT NULL REFERENCES character_in_work(id) ON DELETE CASCADE,
+ created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+ CONSTRAINT uq_event_participant UNIQUE (event_id, character_in_work_id)
+);
+CREATE INDEX IF NOT EXISTS idx_event_participant_event_id             ON event_participant (event_id);
+CREATE INDEX IF NOT EXISTS idx_event_participant_character_in_work_id ON event_participant (character_in_work_id);
+DROP TRIGGER IF EXISTS trg_event_participant_updated_at ON event_participant;
+CREATE TRIGGER trg_event_participant_updated_at
+BEFORE UPDATE ON event_participant
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+CREATE OR REPLACE FUNCTION ensure_event_participant_same_work()
+RETURNS trigger AS
+$$
+
+DECLARE
+ev_work UUID;
+ciw_work UUID;
+BEGIN
+SELECT work_id INTO ev_work FROM event WHERE id = NEW.event_id;
+SELECT work_id INTO ciw_work FROM character_in_work WHERE id = NEW.character_in_work_id;
+IF ev_work IS NOT NULL AND ciw_work IS NOT NULL AND ev_work <> ciw_work THEN
+RAISE EXCEPTION
+'Work mismatch: event % (work=%) vs character_in_work % (work=%)',
+NEW.event_id, ev_work, NEW.character_in_work_id, ciw_work
+USING ERRCODE = '23514';
+END IF;
+RETURN NEW;
+END;
+
+$$
+LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_event_participant_same_work ON event_participant;
+CREATE CONSTRAINT TRIGGER trg_event_participant_same_work
+AFTER INSERT OR UPDATE OF event_id, character_in_work_id
+ON event_participant
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION ensure_event_participant_same_work();
+
+
+CREATE TABLE IF NOT EXISTS relationship (
+ id                        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ from_character_in_work_id UUID NOT NULL REFERENCES character_in_work(id) ON DELETE CASCADE,
+ to_character_in_work_id   UUID NOT NULL REFERENCES character_in_work(id) ON DELETE CASCADE,
+ type                      TEXT NOT NULL CHECK (char_length(btrim(type)) BETWEEN 1 AND 120),
+ notes                     TEXT CHECK (notes IS NULL OR char_length(notes) <= 500),
+ created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+ CONSTRAINT chk_relationship_not_self
+   CHECK (from_character_in_work_id <> to_character_in_work_id),
+ CONSTRAINT uq_relationship_from_to UNIQUE (from_character_in_work_id, to_character_in_work_id)
+);
+CREATE INDEX IF NOT EXISTS idx_relationship_from ON relationship (from_character_in_work_id);
+CREATE INDEX IF NOT EXISTS idx_relationship_to   ON relationship (to_character_in_work_id);
+DROP TRIGGER IF EXISTS trg_relationship_updated_at ON relationship;
+CREATE TRIGGER trg_relationship_updated_at
+BEFORE UPDATE ON relationship
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+CREATE OR REPLACE FUNCTION ensure_relationship_same_work_distinct_chars()
+RETURNS trigger AS
+$$
+
+DECLARE
+w_from UUID;
+w_to UUID;
+ch_from UUID;
+ch_to UUID;
+BEGIN
+SELECT ciw_from.work_id, ciw_to.work_id, ciw_from.character_id, ciw_to.character_id
+INTO w_from, w_to, ch_from, ch_to
+FROM character_in_work ciw_from
+JOIN character_in_work ciw_to ON ciw_to.id = NEW.to_character_in_work_id
+WHERE ciw_from.id = NEW.from_character_in_work_id;
+IF w_from IS NOT NULL AND w_to IS NOT NULL AND w_from <> w_to THEN
+RAISE EXCEPTION
+'Relationship endpoints belong to different works: from(work=%) vs to(work=%)',
+w_from, w_to
+USING ERRCODE = '23514';
+END IF;
+IF ch_from IS NOT NULL AND ch_to IS NOT NULL AND ch_from = ch_to THEN
+RAISE EXCEPTION
+'Relationship endpoints refer to the same character (character_id=%)',
+ch_from
+USING ERRCODE = '23514';
+END IF;
+RETURN NEW;
+END;
+
+$$
+LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_relationship_same_work_distinct_chars ON relationship;
+CREATE CONSTRAINT TRIGGER trg_relationship_same_work_distinct_chars
+AFTER INSERT OR UPDATE OF from_character_in_work_id, to_character_in_work_id
+ON relationship
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION ensure_relationship_same_work_distinct_chars();
+CREATE TABLE IF NOT EXISTS token (
+ id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ owner_id   UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+ token      TEXT NOT NULL CHECK (char_length(token) BETWEEN 16 AND 4096),
+ scope      TEXT NOT NULL CHECK (char_length(btrim(scope)) BETWEEN 1 AND 255),
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ CONSTRAINT uq_token_value UNIQUE (token)
+);
+CREATE INDEX IF NOT EXISTS idx_token_owner_id   ON token (owner_id);
+CREATE INDEX IF NOT EXISTS idx_token_created_at ON token (created_at);
+DROP TRIGGER IF EXISTS trg_token_updated_at ON token;
+CREATE TRIGGER trg_token_updated_at
+BEFORE UPDATE ON token
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+$$
